@@ -1,0 +1,241 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+// ============================================================
+// CometChatTag — Matches Figma "Tags" component
+// Sizes: sm, md, lg
+// Features: avatar, checkbox, close button, count badge
+// ============================================================
+
+.cc-tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: $font-family-base;
+  font-weight: $font-weight-medium;
+  color: $neutral-lm-700;
+  background-color: $base-white;
+  border: 1px solid $neutral-lm-300;
+  border-radius: $radius-sm;
+  box-sizing: border-box;
+  white-space: nowrap;
+  vertical-align: middle;
+  transition: border-color 0.15s ease;
+
+  &:hover:not(.cc-tag-disabled) {
+    border-color: $neutral-lm-400;
+  }
+
+  // ----------------------------------------------------------
+  // SIZES
+  // ----------------------------------------------------------
+  &.cc-tag-sm {
+    padding: 3px $spacing-md;
+    gap: 3px;
+    font-size: $font-size-text-xs;
+    line-height: $line-height-text-xs;
+
+    .cc-tag__checkbox {
+      width: 14px;
+      height: 14px;
+
+      .anticon {
+        font-size: 8px;
+      }
+    }
+
+    .cc-tag__avatar {
+      width: 16px;
+      height: 16px;
+    }
+
+    .cc-tag__close {
+      padding: $spacing-xxs;
+
+      .anticon {
+        font-size: 10px;
+      }
+    }
+
+    .cc-tag__count {
+      font-size: $font-size-text-xs;
+      line-height: $line-height-text-xs;
+      padding: 0 5px;
+    }
+  }
+
+  &.cc-tag-md {
+    padding: $spacing-xxs 9px;
+    gap: 3px;
+    font-size: $font-size-text-sm;
+    line-height: $line-height-text-sm;
+
+    .cc-tag__checkbox {
+      width: 16px;
+      height: 16px;
+
+      .anticon {
+        font-size: 10px;
+      }
+    }
+
+    .cc-tag__avatar {
+      width: 16px;
+      height: 16px;
+    }
+
+    .cc-tag__close {
+      padding: $spacing-xxs;
+
+      .anticon {
+        font-size: 12px;
+      }
+    }
+
+    .cc-tag__count {
+      font-size: $font-size-text-xs;
+      line-height: $line-height-text-xs;
+      padding: 0 5px;
+    }
+  }
+
+  &.cc-tag-lg {
+    padding: $spacing-xs 10px;
+    gap: 3px;
+    font-size: $font-size-text-sm;
+    line-height: $line-height-text-sm;
+
+    .cc-tag__checkbox {
+      width: 18px;
+      height: 18px;
+
+      .anticon {
+        font-size: 11px;
+      }
+    }
+
+    .cc-tag__avatar {
+      width: 16px;
+      height: 16px;
+    }
+
+    .cc-tag__close {
+      padding: 3px;
+
+      .anticon {
+        font-size: 14px;
+      }
+    }
+
+    .cc-tag__count {
+      font-size: $font-size-text-sm;
+      line-height: $line-height-text-sm;
+      padding: 0 6px;
+    }
+  }
+
+  // ----------------------------------------------------------
+  // DISABLED
+  // ----------------------------------------------------------
+  &.cc-tag-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ----------------------------------------------------------
+// ELEMENTS
+// ----------------------------------------------------------
+
+.cc-tag__text {
+  display: inline-block;
+}
+
+.cc-tag__avatar {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: $radius-full;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.cc-tag__checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  margin: 0;
+  border: 1px solid $neutral-lm-300;
+  border-radius: $radius-xs;
+  background-color: $base-white;
+  color: $base-white;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    border-color: $neutral-lm-400;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: $focus-ring;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    background-color: $neutral-lm-50;
+  }
+
+  &.cc-tag__checkbox-checked {
+    background-color: $base-primary;
+    border-color: $base-primary;
+
+    &:hover:not(:disabled) {
+      background-color: $primary-700;
+      border-color: $primary-700;
+    }
+  }
+}
+
+.cc-tag__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $neutral-lm-100;
+  border-radius: 3px;
+  font-weight: $font-weight-medium;
+  color: $neutral-lm-700;
+}
+
+.cc-tag__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  color: $neutral-lm-400;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background-color: $neutral-lm-50;
+    color: $neutral-lm-600;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: $focus-ring;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}

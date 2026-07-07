@@ -1,0 +1,19 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+.cc-dropdown .ant-dropdown-menu {
+  font-family: $font-family-base;
+  border-radius: $radius-md;
+  padding: 4px;
+  box-shadow: $shadow-lg;
+}
+
+.cc-dropdown .ant-dropdown-menu-item {
+  border-radius: $radius-sm;
+  font-size: $font-size-text-sm;
+  padding: 8px 12px;
+}
+
+.cc-dropdown .ant-dropdown-menu-item-danger {
+  color: #f04438;
+}

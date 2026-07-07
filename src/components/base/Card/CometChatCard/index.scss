@@ -1,0 +1,12 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+.cc-card.ant-card {
+  border-radius: $radius-md;
+  font-family: $font-family-base;
+}
+
+.cc-card.ant-card .ant-card-head-title {
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-text-sm;
+}

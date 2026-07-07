@@ -1,0 +1,287 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+// ============================================================
+// CometChatBadge
+// Types: pill (fully rounded), badge (slightly rounded), modern (white + border + shadow)
+// Sizes: sm, md, lg
+// Colors: brand, gray, error, warning, success
+// ============================================================
+
+.cc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-family: $font-family-base;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  vertical-align: middle;
+
+  // ----------------------------------------------------------
+  // SIZES
+  // ----------------------------------------------------------
+  &.cc-badge-sm {
+    padding: $spacing-xxs $spacing-md;
+    font-size: $font-size-text-xs;
+    line-height: $line-height-text-xs;
+
+    .cc-badge__icon svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .cc-badge__avatar {
+      width: 16px;
+      height: 16px;
+    }
+
+    .cc-badge__close svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  &.cc-badge-md {
+    padding: $spacing-xxs 10px;
+    font-size: $font-size-text-xs;
+    line-height: $line-height-text-xs;
+
+    .cc-badge__icon svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .cc-badge__avatar {
+      width: 16px;
+      height: 16px;
+    }
+
+    .cc-badge__close svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  &.cc-badge-lg {
+    padding: $spacing-xs $spacing-lg;
+    font-size: $font-size-text-sm;
+    line-height: $line-height-text-sm;
+
+    .cc-badge__icon svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .cc-badge__avatar {
+      width: 20px;
+      height: 20px;
+    }
+
+    .cc-badge__close svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  // ----------------------------------------------------------
+  // TYPES (shape)
+  // ----------------------------------------------------------
+  &.cc-badge-pill {
+    border-radius: $radius-full;
+  }
+
+  &.cc-badge-badge {
+    border-radius: $radius-sm;
+
+    &.cc-badge-lg {
+      border-radius: $radius-md;
+    }
+  }
+
+  &.cc-badge-modern {
+    background-color: $base-white;
+    border-color: $neutral-lm-300;
+    box-shadow: $shadow-xs;
+    border-radius: $radius-sm;
+
+    &.cc-badge-lg {
+      border-radius: $radius-md;
+    }
+  }
+
+  // ----------------------------------------------------------
+  // COLORS (only apply when NOT modern type)
+  // ----------------------------------------------------------
+  &.cc-badge-brand:not(.cc-badge-modern) {
+    background-color: $primary-50;
+    border-color: $primary-200;
+    color: $primary-700;
+
+    .cc-badge__icon {
+      color: $primary-500;
+    }
+
+    .cc-badge__close {
+      color: $primary-500;
+
+      &:hover {
+        color: $primary-700;
+      }
+    }
+  }
+
+  &.cc-badge-gray:not(.cc-badge-modern) {
+    background-color: $neutral-lm-50;
+    border-color: $neutral-lm-200;
+    color: $neutral-lm-700;
+
+    .cc-badge__icon {
+      color: $neutral-lm-500;
+    }
+
+    .cc-badge__close {
+      color: $neutral-lm-500;
+
+      &:hover {
+        color: $neutral-lm-700;
+      }
+    }
+  }
+
+  &.cc-badge-error:not(.cc-badge-modern) {
+    background-color: $error-50;
+    border-color: $error-200;
+    color: $error-700;
+
+    .cc-badge__icon {
+      color: $error-500;
+    }
+
+    .cc-badge__close {
+      color: $error-500;
+
+      &:hover {
+        color: $error-700;
+      }
+    }
+  }
+
+  &.cc-badge-warning:not(.cc-badge-modern) {
+    background-color: $warning-50;
+    border-color: $warning-200;
+    color: $warning-700;
+
+    .cc-badge__icon {
+      color: $warning-500;
+    }
+
+    .cc-badge__close {
+      color: $warning-500;
+
+      &:hover {
+        color: $warning-700;
+      }
+    }
+  }
+
+  &.cc-badge-success:not(.cc-badge-modern) {
+    background-color: $success-50;
+    border-color: $success-200;
+    color: $success-700;
+
+    .cc-badge__icon {
+      color: $success-500;
+    }
+
+    .cc-badge__close {
+      color: $success-500;
+
+      &:hover {
+        color: $success-700;
+      }
+    }
+  }
+
+  &.cc-badge-info:not(.cc-badge-modern) {
+    background-color: $info-50;
+    border-color: $info-200;
+    color: $info-700;
+
+    .cc-badge__icon {
+      color: $info-500;
+    }
+
+    .cc-badge__close {
+      color: $info-500;
+
+      &:hover {
+        color: $info-700;
+      }
+    }
+  }
+
+  // Modern type uses neutral text regardless of color prop
+  &.cc-badge-modern {
+    color: $neutral-lm-700;
+
+    .cc-badge__icon {
+      color: $neutral-lm-500;
+    }
+
+    .cc-badge__close {
+      color: $neutral-lm-400;
+
+      &:hover {
+        color: $neutral-lm-700;
+      }
+    }
+  }
+}
+
+// ----------------------------------------------------------
+// ELEMENTS
+// ----------------------------------------------------------
+.cc-badge__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.cc-badge__text {
+  display: inline-block;
+}
+
+.cc-badge__avatar {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: $radius-full;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.cc-badge__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: $radius-xxs;
+  transition: color 0.15s ease;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: $focus-ring;
+  }
+}

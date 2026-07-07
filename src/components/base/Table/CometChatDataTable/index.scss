@@ -1,0 +1,317 @@
+@import '../../../../assets/design-tokens.scss';
+
+// ============================================================
+// CometChatDataTable — Design-system-compliant data table
+// Source: Figma "❖ Dashboard – Design System (2025)" → Tables page
+// BEM Block: .cc-data-table
+// ============================================================
+
+// --- Container ---
+.cc-data-table {
+  background: $bg-primary;
+  border: 1px solid $border-default;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-xs;
+  overflow: visible;
+  font-family: $font-family-base;
+
+  // Remove Ant Design's default table borders and backgrounds
+  .ant-table {
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .ant-table-container {
+    border-radius: 0;
+  }
+
+  .ant-table-content {
+    // Allow the inner table to scroll horizontally on narrow viewports
+    // while keeping the outer container's overflow: visible so dropdowns
+    // and tooltips render outside the table bounds.
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    // Hide scrollbar visually (still scrollable via touch / shift+wheel)
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    scrollbar-width: none;
+  }
+
+  // Hide Ant Design's internal measurement row
+  .ant-table-measure-row {
+    display: none;
+  }
+
+  // Remove Ant Design's default wrapper border
+  .ant-table-wrapper {
+    border-radius: 0;
+  }
+}
+
+// --- No container modifier ---
+.cc-data-table-no-container {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+// ============================================================
+// TABLE HEADER (thead)
+// ============================================================
+
+.cc-data-table .ant-table-thead > tr > th {
+  background: $bg-secondary;
+  font-family: $font-family-base;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-text-xs;
+  line-height: $line-height-text-xs;
+  color: $text-quaternary;
+  border-bottom: 1px solid $border-default;
+  padding: $spacing-md $spacing-3xl;
+  height: 40px;
+  letter-spacing: 0;
+  transition: color 0.2s ease;
+
+  // Hide Ant Design's column separator
+  &::before {
+    display: none;
+  }
+
+  &:hover {
+    color: $text-tertiary;
+    background: $bg-secondary;
+  }
+}
+
+// --- Small size header ---
+.cc-data-table-sm .ant-table-thead > tr > th {
+  padding: $spacing-md $spacing-3xl;
+  height: 36px;
+}
+
+// ============================================================
+// TABLE BODY (tbody)
+// ============================================================
+
+.cc-data-table .ant-table-tbody > tr > td {
+  font-family: $font-family-base;
+  font-weight: $font-weight-regular;
+  font-size: $font-size-text-sm;
+  line-height: $line-height-text-sm;
+  color: $text-tertiary;
+  border-bottom: 1px solid $border-default;
+  padding: $spacing-xl $spacing-3xl;
+  height: 56px;
+  vertical-align: middle;
+  transition: background-color 0.2s ease;
+}
+
+// Anchor links inside cells inherit the cell's typography by default,
+// so the primary column rule below applies to <Link>s without per-page overrides.
+.cc-data-table .ant-table-tbody > tr > td a {
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $base-primary;
+  }
+}
+
+// --- Small size body ---
+.cc-data-table-sm .ant-table-tbody > tr > td {
+  padding: $spacing-lg $spacing-3xl;
+  height: 52px;
+}
+
+// --- Last row: no bottom border ---
+.cc-data-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: none;
+}
+
+// --- Last row border-radius when no pagination ---
+.cc-data-table-no-pagination .ant-table-tbody > tr:last-child > td:first-child {
+  border-bottom-left-radius: $radius-xl;
+}
+
+.cc-data-table-no-pagination .ant-table-tbody > tr:last-child > td:last-child {
+  border-bottom-right-radius: $radius-xl;
+}
+
+// --- Row hover ---
+.cc-data-table .ant-table-tbody > tr:hover > td {
+  background: $bg-primary-hover;
+}
+
+// --- Highlight rows (pointer cursor) ---
+.cc-data-table-highlight .ant-table-tbody > tr {
+  cursor: pointer;
+}
+
+// ============================================================
+// DIVIDER STYLE: ALTERNATING FILLS
+// ============================================================
+
+.cc-data-table-alternating .ant-table-tbody > tr:nth-child(odd) > td {
+  background: $bg-secondary;
+}
+
+.cc-data-table-alternating .ant-table-tbody > tr:nth-child(even) > td {
+  background: $bg-primary;
+}
+
+.cc-data-table-alternating .ant-table-tbody > tr:hover > td {
+  background: $bg-primary-hover;
+}
+
+// ============================================================
+// PRIMARY COLUMN STYLING
+// ============================================================
+
+// Primary column: heavier font weight, primary text color (typography only).
+// Layout (column widths) is left to antd's natural auto-layout so the column
+// sizes to its content rather than filling all remaining space.
+.cc-data-table .ant-table-tbody > tr > td.cc-data-table__col-primary {
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+}
+
+// ============================================================
+// CATEGORY / SUB-CATEGORY ROWS
+// ============================================================
+
+.cc-data-table .cc-data-table__row-category > td {
+  background: $bg-secondary;
+  font-weight: $font-weight-semibold;
+  color: $text-tertiary;
+  text-transform: uppercase;
+  font-size: $font-size-text-xs;
+  letter-spacing: 0.5px;
+}
+
+.cc-data-table .cc-data-table__row-category:hover > td {
+  background: $bg-secondary;
+}
+
+.cc-data-table .cc-data-table__row-subcategory > td {
+  background: $bg-secondary;
+  opacity: 0.8;
+}
+
+.cc-data-table .cc-data-table__row-subcategory:hover > td {
+  background: $bg-secondary;
+}
+
+// ============================================================
+// CARD HEADER
+// ============================================================
+
+.cc-data-table__header {
+  padding: $spacing-2xl $spacing-3xl 0;
+}
+
+.cc-data-table__header-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-xl;
+}
+
+.cc-data-table__header-text {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xxs;
+}
+
+.cc-data-table__header-title-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.cc-data-table__header-title {
+  font-family: $font-family-base;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-text-lg;
+  line-height: $line-height-text-lg;
+  color: $text-primary;
+  margin: 0;
+}
+
+.cc-data-table__header-desc {
+  font-family: $font-family-base;
+  font-weight: $font-weight-regular;
+  font-size: $font-size-text-sm;
+  line-height: $line-height-text-sm;
+  color: $text-tertiary;
+  margin: 0;
+}
+
+.cc-data-table__header-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  flex-shrink: 0;
+}
+
+.cc-data-table__header-divider {
+  height: 1px;
+  background: $border-default;
+  margin-top: $spacing-2xl;
+}
+
+// ============================================================
+// FILTERS BAR
+// ============================================================
+
+.cc-data-table__filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg $spacing-3xl;
+  border-bottom: 1px solid $border-default;
+  background: $bg-primary;
+}
+
+// ============================================================
+// EMPTY STATE
+// ============================================================
+
+.cc-data-table__empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 32px 48px;
+}
+
+// ============================================================
+// PAGINATION FOOTER
+// ============================================================
+//
+// Pagination is delegated to <CometChatPagination /> rendered as a sibling
+// after antd's <Table>. We only style the wrapper here: top border, padding,
+// and a stacked layout. All button/page-cell styling lives inside
+// CometChatPagination's own SCSS module.
+
+.cc-data-table__pagination-footer {
+  border-top: 1px solid $border-default;
+  padding: $spacing-lg $spacing-3xl $spacing-xl;
+}
+
+// ============================================================
+// LOADING STATE
+// ============================================================
+
+.cc-data-table .ant-spin-nested-loading > div > .ant-spin {
+  max-height: none;
+}
+
+.cc-data-table .ant-spin-dot {
+  font-size: 24px;
+  color: $base-primary;
+}

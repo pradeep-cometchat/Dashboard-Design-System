@@ -1,0 +1,343 @@
+@import '../../../../assets/design-tokens.scss';
+
+// ============================================================
+// CometChatTabs — Dashboard base tabs component styles
+// Source: Figma "❖ Dashboard – Design System (May 2026)" → Tabs
+//   - _Tab button base (single tab, 4 types × Current × State)
+//   - Horizontal tabs (Underline / Button border / Button minimal)
+//   - Vertical tabs (Button gray / Line / Button border / Button minimal)
+//
+// Strategy: keep antd's DOM and add cc- modifier classes that override
+// the visual layer. Specificity comes from `.cc-tabs.<modifier>` chains
+// rather than `!important`.
+// ============================================================
+
+.cc-tabs {
+  font-family: $font-family-base;
+
+  // Reset antd's outer margins so tab type styling owns the spacing
+  .ant-tabs-nav {
+    margin: 0;
+
+    &::before {
+      // antd renders a 1px bottom rule via ::before — turn it off and
+      // re-enable selectively via .cc-tabs-show-bottom-rule.
+      display: none;
+    }
+  }
+
+  .ant-tabs-tab {
+    font-family: $font-family-base;
+    font-size: $font-size-text-sm;
+    font-weight: $font-weight-medium;
+    line-height: $line-height-text-sm;
+    margin: 0;
+    transition: color 0.15s ease, background-color 0.15s ease,
+      border-color 0.15s ease, box-shadow 0.15s ease;
+    cursor: pointer;
+  }
+
+  .ant-tabs-tab-btn {
+    color: inherit;
+    transition: color 0.15s ease;
+  }
+
+  // antd's animated underline — hide for all variants except `underline`
+  .ant-tabs-ink-bar {
+    display: none;
+  }
+}
+
+// ============================================================
+// HORIZONTAL ORIENTATION
+// ============================================================
+.cc-tabs.cc-tabs-horizontal {
+  .ant-tabs-nav-list {
+    align-items: center;
+  }
+}
+
+// --- Type: Underline (horizontal default) ---
+// Figma: 110×32 tab, no bg, 2px bottom border for selected, container has bottom rule
+.cc-tabs.cc-tabs-horizontal.cc-tabs-type-underline {
+  .ant-tabs-nav {
+    position: relative;
+  }
+
+  .ant-tabs-nav-list {
+    gap: $spacing-md;
+  }
+
+  .ant-tabs-tab {
+    padding: $spacing-xs $spacing-xs $spacing-lg $spacing-xs;
+    border-bottom: 2px solid transparent;
+    color: $text-tertiary;
+
+    &:hover {
+      color: $text-secondary-hover;
+    }
+
+    &.ant-tabs-tab-active {
+      border-bottom-color: $base-primary;
+
+      .ant-tabs-tab-btn {
+        color: $text-brand-secondary;
+        font-weight: $font-weight-semibold;
+      }
+    }
+  }
+}
+
+// Bottom rule line on the underline container
+.cc-tabs.cc-tabs-horizontal.cc-tabs-type-underline.cc-tabs-show-bottom-rule {
+  .ant-tabs-nav::before {
+    display: block;
+    border-bottom: 1px solid $border-default;
+  }
+}
+
+// --- Type: Button border (horizontal) ---
+// Figma: outer container with border + 4px padding, 4px gap, pills inside
+.cc-tabs.cc-tabs-horizontal.cc-tabs-type-button-border {
+  .ant-tabs-nav-list {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-xs;
+    border: 1px solid $border-default;
+    border-radius: $radius-md;
+    background-color: $bg-primary;
+  }
+
+  .ant-tabs-tab {
+    padding: $spacing-md $spacing-lg;
+    border-radius: $radius-sm;
+    color: $text-tertiary;
+
+    &:hover {
+      color: $text-secondary-hover;
+      background-color: $bg-secondary;
+    }
+
+    &.ant-tabs-tab-active {
+      background-color: $bg-secondary;
+
+      .ant-tabs-tab-btn {
+        color: $text-secondary;
+        font-weight: $font-weight-semibold;
+      }
+    }
+  }
+}
+
+// --- Type: Button minimal (horizontal) ---
+// Figma: no outer border, 2px gap, pills with hover bg
+.cc-tabs.cc-tabs-horizontal.cc-tabs-type-button-minimal {
+  .ant-tabs-nav-list {
+    gap: $spacing-xxs;
+  }
+
+  .ant-tabs-tab {
+    padding: $spacing-md $spacing-lg;
+    border-radius: $radius-sm;
+    color: $text-tertiary;
+
+    &:hover {
+      color: $text-secondary-hover;
+      background-color: $bg-secondary;
+    }
+
+    &.ant-tabs-tab-active {
+      background-color: $bg-secondary;
+
+      .ant-tabs-tab-btn {
+        color: $text-secondary;
+        font-weight: $font-weight-semibold;
+      }
+    }
+  }
+}
+
+// --- Full width (horizontal only) ---
+.cc-tabs.cc-tabs-horizontal.cc-tabs-full-width {
+  .ant-tabs-nav-list {
+    display: flex;
+    width: 100%;
+  }
+
+  .ant-tabs-tab {
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+.cc-tabs.cc-tabs-horizontal.cc-tabs-type-button-border.cc-tabs-full-width,
+.cc-tabs.cc-tabs-horizontal.cc-tabs-type-button-minimal.cc-tabs-full-width {
+  // antd nests tab btn inside .ant-tabs-tab — keep the centering
+  .ant-tabs-tab .ant-tabs-tab-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+// ============================================================
+// VERTICAL ORIENTATION
+// ============================================================
+.cc-tabs.cc-tabs-vertical {
+  .ant-tabs-nav {
+    width: auto;
+  }
+
+  .ant-tabs-nav-list {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .ant-tabs-tab {
+    text-align: left;
+    justify-content: flex-start;
+  }
+}
+
+// --- Vertical: Button gray (default) ---
+// Figma: 4px gap, light gray bg for active
+.cc-tabs.cc-tabs-vertical.cc-tabs-type-button-gray {
+  .ant-tabs-nav-list {
+    gap: $spacing-xs;
+  }
+
+  .ant-tabs-tab {
+    padding: $spacing-md $spacing-lg;
+    border-radius: $radius-sm;
+    color: $text-tertiary;
+
+    &:hover {
+      color: $text-secondary-hover;
+      background-color: $bg-secondary;
+    }
+
+    &.ant-tabs-tab-active {
+      background-color: $bg-secondary;
+
+      .ant-tabs-tab-btn {
+        color: $text-secondary;
+        font-weight: $font-weight-semibold;
+      }
+    }
+  }
+}
+
+// --- Vertical: Line ---
+// Figma: 8px gap, 2px left border for selected, brand color text
+.cc-tabs.cc-tabs-vertical.cc-tabs-type-line {
+  .ant-tabs-nav-list {
+    gap: $spacing-md;
+  }
+
+  .ant-tabs-tab {
+    padding: $spacing-xxs $spacing-lg;
+    border-left: 2px solid transparent;
+    color: $text-tertiary;
+
+    &:hover {
+      color: $text-secondary-hover;
+    }
+
+    &.ant-tabs-tab-active {
+      border-left-color: $base-primary;
+
+      .ant-tabs-tab-btn {
+        color: $text-brand-secondary;
+        font-weight: $font-weight-semibold;
+      }
+    }
+  }
+}
+
+// --- Vertical: Button border ---
+// Figma: outer container with 4-6px padding & border, 4px gap
+.cc-tabs.cc-tabs-vertical.cc-tabs-type-button-border {
+  .ant-tabs-nav-list {
+    gap: $spacing-xs;
+    padding: $spacing-xs;
+    border: 1px solid $border-default;
+    border-radius: $radius-md;
+    background-color: $bg-primary;
+  }
+
+  .ant-tabs-tab {
+    padding: $spacing-md $spacing-lg;
+    border-radius: $radius-sm;
+    color: $text-tertiary;
+
+    &:hover {
+      color: $text-secondary-hover;
+      background-color: $bg-secondary;
+    }
+
+    &.ant-tabs-tab-active {
+      background-color: $bg-secondary;
+
+      .ant-tabs-tab-btn {
+        color: $text-secondary;
+        font-weight: $font-weight-semibold;
+      }
+    }
+  }
+}
+
+// --- Vertical: Button minimal ---
+// Figma: 2px gap, no outer border
+.cc-tabs.cc-tabs-vertical.cc-tabs-type-button-minimal {
+  .ant-tabs-nav-list {
+    gap: $spacing-xxs;
+  }
+
+  .ant-tabs-tab {
+    padding: $spacing-md $spacing-lg;
+    border-radius: $radius-sm;
+    color: $text-tertiary;
+
+    &:hover {
+      color: $text-secondary-hover;
+      background-color: $bg-secondary;
+    }
+
+    &.ant-tabs-tab-active {
+      background-color: $bg-secondary;
+
+      .ant-tabs-tab-btn {
+        color: $text-secondary;
+        font-weight: $font-weight-semibold;
+      }
+    }
+  }
+}
+
+// ============================================================
+// SIZE — md (vertical only per Figma)
+// ============================================================
+.cc-tabs.cc-tabs-vertical.cc-tabs-size-md {
+  .ant-tabs-tab {
+    padding: $spacing-md $spacing-xl;
+    font-size: $font-size-text-md;
+    line-height: $line-height-text-md;
+  }
+}
+
+.cc-tabs.cc-tabs-vertical.cc-tabs-size-md.cc-tabs-type-button-border {
+  .ant-tabs-nav-list {
+    padding: $spacing-sm;
+  }
+}
+
+// ============================================================
+// FOCUS STATE (keyboard accessibility)
+// ============================================================
+.cc-tabs .ant-tabs-tab:focus-visible {
+  outline: none;
+  box-shadow: $focus-ring;
+  border-radius: $radius-sm;
+}

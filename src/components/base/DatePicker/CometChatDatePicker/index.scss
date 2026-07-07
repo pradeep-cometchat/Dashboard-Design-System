@@ -1,0 +1,8 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+.cc-datepicker.ant-picker {
+  border-radius: $radius-md;
+  font-family: $font-family-base;
+  height: 40px;
+}

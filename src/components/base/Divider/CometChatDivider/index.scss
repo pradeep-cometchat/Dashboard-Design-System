@@ -1,0 +1,12 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+.cc-divider.ant-divider {
+  border-color: $border-default;
+  margin: $spacing-xl 0;
+}
+
+.cc-divider.ant-divider-vertical {
+  margin: 0 $spacing-lg;
+  height: auto;
+}

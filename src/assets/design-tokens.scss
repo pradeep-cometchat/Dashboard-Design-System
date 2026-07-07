@@ -1,0 +1,362 @@
+// ============================================================
+// DESIGN TOKENS — CometChat Dashboard
+// Source: Figma "❖ Dashboard – Design System (New)"
+// File Key: YRuXde1NJPrgi0JWFLX5ua
+// Generated: 2026-05-13
+// ============================================================
+
+// ============================================================
+// BASE COLORS
+// ============================================================
+$base-primary: #6852d6;
+$base-white: #ffffff;
+$base-black: #0a0d12;
+
+// ============================================================
+// COLOR PRIMITIVES — Extended Primary
+// ============================================================
+$primary-25: #fafaff;
+$primary-50: #f4f3ff;
+$primary-100: #ebe9fe;
+$primary-200: #d9d6fe;
+$primary-300: #bdb4fe;
+$primary-400: #9b8afb;
+$primary-500: #7b70e4;
+$primary-600: #6852d6;
+$primary-700: #5925dc;
+$primary-800: #4a1fb8;
+$primary-900: #3e1c96;
+$primary-950: #27115f;
+
+// ============================================================
+// COLOR PRIMITIVES — Neutral (Light Mode)
+// ============================================================
+$neutral-lm-25: #fdfdfd;
+$neutral-lm-50: #fafafa;
+$neutral-lm-100: #f5f5f5;
+$neutral-lm-200: #e9eaeb;
+$neutral-lm-300: #d5d7da;
+$neutral-lm-400: #a4a7ae;
+$neutral-lm-500: #717680;
+$neutral-lm-600: #535862;
+$neutral-lm-700: #414651;
+$neutral-lm-800: #252b37;
+$neutral-lm-900: #181d27;
+$neutral-lm-950: #0a0d12;
+
+// ============================================================
+// COLOR PRIMITIVES — Neutral (Dark Mode)
+// ============================================================
+$neutral-dm-25: #fafafa;
+$neutral-dm-50: #f7f7f7;
+$neutral-dm-100: #f0f0f1;
+$neutral-dm-200: #ececed;
+$neutral-dm-300: #cecfd2;
+$neutral-dm-400: #94979c;
+$neutral-dm-500: #85888e;
+$neutral-dm-600: #61656c;
+$neutral-dm-700: #373a41;
+$neutral-dm-800: #22262f;
+$neutral-dm-900: #13161b;
+$neutral-dm-950: #0c0e12;
+
+// ============================================================
+// COLOR PRIMITIVES — Error
+// ============================================================
+$error-25: #fffbfa;
+$error-50: #fef3f2;
+$error-100: #fee4e2;
+$error-200: #fecdca;
+$error-300: #fda29b;
+$error-400: #f97066;
+$error-500: #f04438;
+$error-600: #d92d20;
+$error-700: #b42318;
+$error-800: #912018;
+$error-900: #7a271a;
+$error-950: #55160c;
+
+// ============================================================
+// COLOR PRIMITIVES — Warning
+// ============================================================
+$warning-25: #fffcf5;
+$warning-50: #fffaeb;
+$warning-100: #fef0c7;
+$warning-200: #fedf89;
+$warning-300: #fec84b;
+$warning-400: #fdb022;
+$warning-500: #f79009;
+$warning-600: #dc6803;
+$warning-700: #b54708;
+$warning-800: #93370d;
+$warning-900: #7a2e0e;
+$warning-950: #4e1d09;
+
+// ============================================================
+// COLOR PRIMITIVES — Success
+// ============================================================
+$success-25: #f6fef9;
+$success-50: #ecfdf3;
+$success-100: #dcfae6;
+$success-200: #abefc6;
+$success-300: #75e0a7;
+$success-400: #47cd89;
+$success-500: #17b26a;
+$success-600: #079455;
+$success-700: #067647;
+$success-800: #085d3a;
+$success-900: #074d31;
+$success-950: #053321;
+
+// ============================================================
+// COLOR PRIMITIVES — Info
+// ============================================================
+$info-25: #f5f8ff;
+$info-50: #eff4ff;
+$info-100: #d1e0ff;
+$info-200: #b2ccff;
+$info-300: #84adff;
+$info-400: #528bff;
+$info-500: #2970ff;
+$info-600: #155eef;
+$info-700: #004eeb;
+$info-800: #0040c1;
+$info-900: #00359e;
+$info-950: #002266;
+
+// ============================================================
+// COLOR PRIMITIVES — Amber (flagged / moderation)
+// ============================================================
+$amber-25: #fffdf5;
+$amber-50: #fffbeb;
+$amber-100: #fef3c6;
+$amber-200: #fee6a3;
+$amber-300: #fed16e;
+$amber-400: #ffb838;
+$amber-500: #fe9a00;
+$amber-600: #e17100;
+$amber-700: #bb4d00;
+$amber-800: #973c00;
+$amber-900: #7b3306;
+$amber-950: #461901;
+
+// ============================================================
+// SEMANTIC COLORS (Light Mode)
+// ============================================================
+
+// --- Text ---
+$text-primary: $neutral-lm-900;
+$text-secondary: $neutral-lm-700;
+$text-secondary-hover: $neutral-lm-800;
+$text-tertiary: $neutral-lm-600;
+$text-tertiary-hover: $neutral-lm-700;
+$text-quaternary: $neutral-lm-500;
+$text-white: $base-white;
+$text-disabled: $neutral-lm-500;
+$text-placeholder: $neutral-lm-500;
+$text-placeholder-subtle: $neutral-lm-400;
+$text-brand-primary: $base-primary;
+$text-brand-secondary: $primary-700;
+$text-highlight: $base-primary;
+$text-highlight-hover: $primary-700;
+$text-error: $error-600;
+$text-error-hover: $error-700;
+$text-warning: $warning-600;
+$text-success: $success-600;
+
+// --- Border ---
+$border-light: $neutral-lm-100;
+$border-default: $neutral-lm-200;
+$border-default-hover: $neutral-lm-300;
+$border-dark: $neutral-lm-300;
+$border-dark-hover: $neutral-lm-400;
+$border-disabled: $neutral-lm-300;
+$border-disabled-subtle: $neutral-lm-200;
+$border-brand: $primary-500;
+$border-error: $error-500;
+$border-error-subtle: $error-200;
+
+// --- Background ---
+$bg-primary: $base-white;
+$bg-primary-hover: $neutral-lm-50;
+$bg-primary-solid: $neutral-lm-900;
+$bg-secondary: $neutral-lm-50;
+$bg-secondary-hover: $neutral-lm-100;
+$bg-secondary-solid: $neutral-lm-800;
+$bg-tertiary: $neutral-lm-100;
+$bg-tertiary-hover: $neutral-lm-200;
+$bg-quaternary: $neutral-lm-200;
+$bg-active: $neutral-lm-50;
+$bg-disabled: $neutral-lm-100;
+$bg-disabled-subtle: $neutral-lm-50;
+$bg-overlay: $neutral-lm-950;
+$bg-brand-primary: $primary-50;
+$bg-brand-primary-alt: $primary-100;
+$bg-brand-secondary: $primary-100;
+$bg-brand-solid: $base-primary;
+$bg-brand-solid-hover: $primary-700;
+$bg-error-primary: $error-50;
+$bg-error-secondary: $error-100;
+$bg-error-solid: $error-600;
+$bg-error-solid-hover: $error-700;
+$bg-warning-primary: $warning-50;
+$bg-warning-secondary: $warning-100;
+$bg-warning-solid: $warning-600;
+$bg-success-primary: $success-50;
+$bg-success-secondary: $success-100;
+$bg-success-solid: $success-600;
+$bg-info-primary: $info-50;
+$bg-info-secondary: $info-100;
+$bg-info-solid: $info-600;
+
+// --- Foreground (Icons) ---
+$fg-primary: $neutral-lm-900;
+$fg-secondary: $neutral-lm-800;
+$fg-secondary-hover: $neutral-lm-900;
+$fg-tertiary: $neutral-lm-600;
+$fg-tertiary-hover: $neutral-lm-700;
+$fg-quaternary: $neutral-lm-400;
+$fg-quaternary-hover: $neutral-lm-500;
+$fg-white: $base-white;
+$fg-disabled: $neutral-lm-400;
+$fg-disabled-subtle: $neutral-lm-300;
+$fg-brand-primary: $base-primary;
+$fg-brand-primary-alt: $primary-700;
+$fg-brand-secondary: $primary-500;
+$fg-brand-secondary-alt: $primary-600;
+$fg-error-primary: $error-600;
+$fg-error-secondary: $error-500;
+$fg-warning-primary: $warning-600;
+$fg-warning-secondary: $warning-500;
+$fg-success-primary: $success-600;
+$fg-success-secondary: $success-500;
+$fg-info-primary: $info-600;
+$fg-info-secondary: $info-500;
+
+// ============================================================
+// SEMANTIC COLORS — Moderation
+// ============================================================
+
+// --- Flagged (amber) ---
+$moderation-flagged-bg: $amber-50;
+$moderation-flagged-border: $amber-500;
+$moderation-flagged-badge-bg: $amber-100;
+$moderation-flagged-badge-text: $amber-700;
+$moderation-flagged-fg: $amber-600;
+
+// --- Blocked (error / red) ---
+$moderation-blocked-bg: $error-50;
+$moderation-blocked-border: $error-500;
+$moderation-blocked-badge-bg: $error-100;
+$moderation-blocked-badge-text: $error-700;
+$moderation-blocked-fg: $error-600;
+
+// --- Approved (success) ---
+$moderation-approved-badge-bg: $success-50;
+$moderation-approved-badge-text: $success-700;
+
+// ============================================================
+// TYPOGRAPHY
+// ============================================================
+$font-family-primary: 'SatoshiMedium', sans-serif;
+$font-family-regular: 'SatoshiRegular', sans-serif;
+$font-family-base: 'Satoshi', sans-serif;
+
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$font-size-display-2xl: 72px;
+$font-size-display-xl: 60px;
+$font-size-display-lg: 48px;
+$font-size-display-md: 36px;
+$font-size-display-sm: 32px;
+$font-size-display-xs: 24px;
+$font-size-text-xl: 20px;
+$font-size-text-lg: 18px;
+$font-size-text-md: 16px;
+$font-size-text-sm: 14px;
+$font-size-text-xs: 12px;
+
+$line-height-display-2xl: 90px;
+$line-height-display-xl: 72px;
+$line-height-display-lg: 60px;
+$line-height-display-md: 44px;
+$line-height-display-sm: 38px;
+$line-height-display-xs: 32px;
+$line-height-text-xl: 30px;
+$line-height-text-lg: 28px;
+$line-height-text-md: 24px;
+$line-height-text-sm: 20px;
+$line-height-text-xs: 18px;
+
+$letter-spacing-display-2xl: -0.02em;
+$letter-spacing-display-xl: -0.02em;
+$letter-spacing-display-lg: -0.02em;
+$letter-spacing-display-md: -0.02em;
+$letter-spacing-display-sm: 0;
+$letter-spacing-display-xs: 0;
+
+// ============================================================
+// EFFECTS — Shadows
+// ============================================================
+$shadow-xs: 0px 1px 2px 0px rgba(10, 13, 18, 0.05);
+$shadow-xs-skeuomorphic: 0px 1px 2px 0px rgba(10, 13, 18, 0.05), inset 0px -2px 0px 0px rgba(10, 13, 18, 0.05), inset 0px 0px 0px 1px rgba(10, 13, 18, 0.18);
+$shadow-sm: 0px 1px 2px -1px rgba(10, 13, 18, 0.1), 0px 1px 3px 0px rgba(10, 13, 18, 0.1);
+$shadow-md: 0px 2px 4px -2px rgba(10, 13, 18, 0.06), 0px 4px 6px -1px rgba(10, 13, 18, 0.1);
+$shadow-lg: 0px 2px 2px -1px rgba(10, 13, 18, 0.04), 0px 4px 6px -2px rgba(10, 13, 18, 0.03), 0px 12px 16px -4px rgba(10, 13, 18, 0.08);
+$shadow-xl: 0px 3px 3px -1.5px rgba(10, 13, 18, 0.04), 0px 8px 8px -4px rgba(10, 13, 18, 0.03), 0px 20px 24px -4px rgba(10, 13, 18, 0.08);
+$shadow-2xl: 0px 4px 4px -2px rgba(10, 13, 18, 0.04), 0px 24px 48px -12px rgba(10, 13, 18, 0.18);
+$shadow-3xl: 0px 5px 5px -2.5px rgba(10, 13, 18, 0.04), 0px 32px 64px -12px rgba(10, 13, 18, 0.14);
+
+// --- Focus Rings ---
+$focus-ring: 0px 0px 0px 4px rgba(123, 112, 228, 1), 0px 0px 0px 2px rgba(255, 255, 255, 1);
+$focus-ring-error: 0px 0px 0px 4px rgba(240, 68, 56, 1), 0px 0px 0px 2px rgba(255, 255, 255, 1);
+$focus-ring-shadow-xs: 0px 0px 0px 4px rgba(123, 112, 228, 1), 0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 1px 2px 0px rgba(10, 13, 18, 0.05);
+$focus-ring-shadow-sm: 0px 0px 0px 4px rgba(123, 112, 228, 1), 0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 1px 2px 0px rgba(10, 13, 18, 0.1), 0px 1px 3px 0px rgba(10, 13, 18, 0.1);
+$focus-ring-error-shadow-xs: 0px 0px 0px 4px rgba(240, 68, 56, 1), 0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 1px 2px 0px rgba(10, 13, 18, 0.05);
+$focus-ring-shadow-xs-skeuomorphic: 0px 0px 0px 4px rgba(123, 112, 228, 1), 0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 1px 2px 0px rgba(10, 13, 18, 0.05), inset 0px -2px 0px 0px rgba(10, 13, 18, 0.05), inset 0px 0px 0px 1px rgba(10, 13, 18, 0.18);
+$focus-ring-error-shadow-xs-skeuomorphic: 0px 0px 0px 4px rgba(240, 68, 56, 1), 0px 0px 0px 2px rgba(255, 255, 255, 1), 0px 1px 2px 0px rgba(10, 13, 18, 0.05), inset 0px -2px 0px 0px rgba(10, 13, 18, 0.05), inset 0px 0px 0px 1px rgba(10, 13, 18, 0.18);
+
+// --- Backdrop Blur ---
+$backdrop-blur-sm: 8px;
+$backdrop-blur-md: 16px;
+$backdrop-blur-lg: 24px;
+$backdrop-blur-xl: 40px;
+
+// ============================================================
+// SPACING
+// ============================================================
+$spacing-none: 0;
+$spacing-xxs: 2px;
+$spacing-xs: 4px;
+$spacing-sm: 6px;
+$spacing-md: 8px;
+$spacing-lg: 12px;
+$spacing-xl: 16px;
+$spacing-2xl: 20px;
+$spacing-3xl: 24px;
+$spacing-4xl: 32px;
+$spacing-5xl: 40px;
+$spacing-6xl: 48px;
+$spacing-7xl: 64px;
+$spacing-8xl: 80px;
+$spacing-9xl: 96px;
+$spacing-10xl: 128px;
+$spacing-11xl: 160px;
+
+// ============================================================
+// BORDER RADIUS
+// ============================================================
+$radius-none: 0;
+$radius-xxs: 2px;
+$radius-xs: 4px;
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 10px;
+$radius-xl: 12px;
+$radius-2xl: 16px;
+$radius-3xl: 20px;
+$radius-4xl: 24px;
+$radius-full: 9999px;

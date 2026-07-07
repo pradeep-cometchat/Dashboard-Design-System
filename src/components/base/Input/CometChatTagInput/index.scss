@@ -1,0 +1,215 @@
+@import '../../../../assets/design-tokens.scss';
+
+// ============================================================
+// CometChatTagInput — Mirrors CometChatInput surface (label, input,
+// hint/error) on top of antd `Select mode="tags"`. Tag chips reuse
+// the neutral pill recipe from the dashboard's read-only badge so
+// edit and view modes look like one family.
+//
+// Unlayered styles win over @layer antd / @layer legacy without
+// !important. See src/assets/layer-order.css.
+// ============================================================
+
+.cc-tag-input {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  width: 100%;
+}
+
+// --- Label ---
+.cc-tag-input__label-wrapper {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.cc-tag-input__label {
+  font-family: $font-family-base;
+  font-size: $font-size-text-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-text-sm;
+  color: $text-secondary;
+}
+
+.cc-tag-input__required {
+  color: $text-error;
+}
+
+.cc-tag-input__help-icon {
+  font-size: 14px;
+  color: $fg-quaternary;
+  cursor: help;
+}
+
+// --- Input (antd Select tags-mode override) ---
+// antd 5 mounts a structure roughly like:
+//   .ant-select
+//     .ant-select-selector          (visible bordered box, display:flex)
+//       .ant-select-selection-overflow  (inner flex row of chips + input)
+//         .ant-select-selection-overflow-item (each chip wrapper)
+//         .ant-select-selection-overflow-item-suffix (input)
+// We need both the selector AND the overflow container to grow vertically,
+// and the overflow row needs to wrap. Antd's default for tags mode is a
+// non-wrapping single-line row sized to the chip count, which is what was
+// pushing chips outside the visible bordered box in our showcase.
+.cc-tag-input .cc-tag-input__input.ant-select {
+  width: 100%;
+  height: auto;
+
+  .ant-select-selector {
+    font-family: $font-family-base;
+    font-size: $font-size-text-sm;
+    line-height: $line-height-text-sm;
+    color: $text-primary;
+    background-color: $base-white;
+    border: 1px solid $border-dark !important;
+    border-radius: $radius-md !important;
+    min-height: 40px;
+    height: auto !important;
+    // Symmetric horizontal padding — no suffix icon to clear (suffixIcon is
+    // disabled on this component), so tags use the full width on both sides.
+    padding: $spacing-xs $spacing-md !important;
+    box-shadow: $shadow-xs;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    align-items: center;
+    // Let antd's inner overflow flex container drive the height.
+    display: flex;
+  }
+
+  // Make the chip row wrap and contribute its full height back to the
+  // selector. `align-content: flex-start` keeps wrapped rows top-packed
+  // instead of distributing extra space between rows.
+  .ant-select-selection-overflow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: flex-start;
+    width: 100%;
+    row-gap: $spacing-xs;
+  }
+
+  // Each chip's wrapper should hug its content height (antd defaults to
+  // align-self: stretch on the search-suffix slot, which can stretch the
+  // selector to a single-row height instead of growing).
+  .ant-select-selection-overflow-item {
+    align-self: center;
+  }
+
+  &:not(.ant-select-disabled):hover .ant-select-selector {
+    border-color: $border-dark-hover !important;
+  }
+
+  &.ant-select-focused:not(.ant-select-disabled) .ant-select-selector {
+    border-color: $border-brand !important;
+    box-shadow: 0 0 0 1px $border-brand, $shadow-xs;
+  }
+
+  &.ant-select-disabled .ant-select-selector {
+    background-color: $bg-disabled-subtle !important;
+    border-color: $border-default !important;
+    color: $text-disabled !important;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .ant-select-selection-placeholder {
+    color: $text-placeholder;
+    font-size: $font-size-text-sm;
+  }
+
+  // Tag chips — match the read-only badge recipe in RolePermissions
+  .ant-select-selection-item {
+    height: 24px;
+    margin-block: 0;
+    margin-inline-end: $spacing-xs;
+    padding: $spacing-xxs $spacing-sm;
+    background-color: $base-white;
+    background-image: none;
+    border: 1px solid $border-default;
+    border-radius: $radius-sm;
+    color: $text-primary;
+    font-family: $font-family-base;
+    font-size: $font-size-text-xs;
+    font-weight: $font-weight-medium;
+    line-height: $line-height-text-xs;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .ant-select-selection-item-content {
+    margin-inline-end: $spacing-xxs;
+  }
+
+  .ant-select-selection-item-remove {
+    color: $fg-quaternary;
+    font-size: 10px;
+
+    &:hover {
+      color: $fg-tertiary;
+    }
+  }
+
+  .ant-select-selection-search-input {
+    font-family: $font-family-base;
+    font-size: $font-size-text-sm;
+    color: $text-primary;
+  }
+
+  // Arrow / clear icons stay anchored to the first 40px row so they don't
+  // float to the visual centre when the selector grows for wrapped rows.
+  .ant-select-arrow,
+  .ant-select-clear {
+    top: 20px;
+    transform: translateY(-50%);
+    margin-top: 0;
+    color: $fg-quaternary;
+  }
+}
+
+// --- Error state ---
+.cc-tag-input-error {
+  .cc-tag-input__input.ant-select .ant-select-selector {
+    border-color: $border-error !important;
+  }
+
+  .cc-tag-input__input.ant-select.ant-select-focused .ant-select-selector {
+    border-color: $error-500 !important;
+    box-shadow: 0 0 0 1px $error-500, $shadow-xs;
+  }
+}
+
+// --- Hint / error message ---
+.cc-tag-input__hint {
+  font-family: $font-family-base;
+  font-size: $font-size-text-sm;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-text-sm;
+  color: $text-tertiary;
+}
+
+.cc-tag-input__hint-error {
+  color: $text-error;
+}
+
+// --- Suggestion dropdown (only shown when caller passes `options`) ---
+.cc-tag-input__dropdown.ant-select-dropdown {
+  border-radius: $radius-md;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: $shadow-lg;
+  padding: $spacing-xs 0;
+  background-color: $base-white;
+
+  .ant-select-item {
+    font-family: $font-family-base;
+    font-size: $font-size-text-sm;
+    line-height: $line-height-text-sm;
+    padding: $spacing-md $spacing-lg;
+    color: $text-primary;
+
+    &.ant-select-item-option-active:not(.ant-select-item-option-disabled),
+    &.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+      background-color: $bg-secondary;
+    }
+  }
+}

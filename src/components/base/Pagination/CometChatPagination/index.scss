@@ -1,0 +1,458 @@
+@import '../../../../assets/design-tokens.scss';
+
+// ============================================================
+// CometChatPagination — Dashboard base pagination component styles
+// Source: Figma "❖ Dashboard – Design System (May 2026)" → Pagination
+// (nodes 225-7288, 1115:68622, 1114:69397)
+//
+// DOM:
+//   <nav class="cc-pagination ...">
+//     <CometChatButton .cc-pagination__btn-prev>      ← prev pill
+//     <ul class="ant-pagination">                     ← numbered cells (antd)
+//       <li class="ant-pagination-item">
+//       <li class="ant-pagination-jump-prev|next">    ← ellipsis
+//     </ul>
+//     <CometChatButton .cc-pagination__btn-next>      ← next pill
+//   </nav>
+//
+// Specificity strategy: chain `.cc-pagination` twice in selectors
+// (`.cc-pagination.cc-pagination .ant-pagination-item`) so we beat
+// antd 5's CSS-in-JS hash classes without `!important`.
+// ============================================================
+
+// ----- Root -----
+.cc-pagination {
+  display: flex;
+  align-items: center;
+  font-family: $font-family-base;
+  width: 100%;
+  box-sizing: border-box;
+  gap: $spacing-lg;
+}
+
+// ----- Variant: page (no card padding, top border) -----
+.cc-pagination.cc-pagination-variant-page {
+  padding-top: $spacing-2xl;
+  border-top: 1px solid $border-default;
+}
+
+// ----- Variant: card (sits inside a card footer) -----
+// .cc-pagination.cc-pagination-variant-card {
+//   padding: $spacing-lg $spacing-3xl $spacing-xl $spacing-3xl;
+// }
+
+// ============================================================
+// CHEVRON ICONS — mask-image so currentColor drives color
+// (CometChatButton text color flows through to currentColor)
+// ============================================================
+.cc-pagination__icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  flex-shrink: 0;
+}
+
+.cc-pagination__icon-left {
+  mask-image: url('~@assets/images/icons/pagination/chevron-left.svg');
+  -webkit-mask-image: url('~@assets/images/icons/pagination/chevron-left.svg');
+}
+
+.cc-pagination__icon-right {
+  mask-image: url('~@assets/images/icons/pagination/chevron-right.svg');
+  -webkit-mask-image: url('~@assets/images/icons/pagination/chevron-right.svg');
+}
+
+// ============================================================
+// PREV / NEXT BUTTONS (CometChatButton)
+// In `default` kind: pulled to the row edges
+// In `button-group` kind: rendered inside .cc-pagination__button-group
+// Per Figma DS (node 1115:68617):
+//   text color: $text-secondary (#414651), font-weight 600
+//   icon color: $fg-quaternary (#A4A7AE) — lighter than text
+// ============================================================
+.cc-pagination__btn-prev,
+.cc-pagination__btn-next {
+  flex-shrink: 0;
+}
+
+// Icon size override — pagination nav buttons use sm-sized CometChatButton
+// but Figma DS specifies 24×24 chevrons (larger than the sm default of 16px).
+.cc-pagination__btn-prev .cc-button__icon,
+.cc-pagination__btn-next .cc-button__icon {
+  width: $spacing-3xl; // 24px
+  height: $spacing-3xl;
+}
+
+// Text color override (CometChatButton secondary defaults to $text-primary).
+.cc-pagination__btn-prev.cc-button-secondary.ant-btn.ant-btn-default,
+.cc-pagination__btn-next.cc-button-secondary.ant-btn.ant-btn-default {
+  color: $text-secondary;
+  font-weight: $font-weight-semibold;
+
+  &:hover:not(:disabled) {
+    color: $text-primary;
+  }
+}
+
+// Chevron icons render lighter than the button text (per Figma DS).
+.cc-pagination__btn-prev .cc-pagination__icon,
+.cc-pagination__btn-next .cc-pagination__icon {
+  background-color: $fg-quaternary;
+}
+
+// ============================================================
+// ANTD PAGINATION DOM RE-SKIN — applies to kind="default"/"minimal"
+// Selectors chain `.cc-pagination` twice for specificity 0,2,1.
+// ============================================================
+
+// ----- Container (the <ul> that antd renders) -----
+.cc-pagination.cc-pagination .ant-pagination {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+  gap: $spacing-xxs;
+  margin: 0;
+  padding: 0;
+  font-family: $font-family-base;
+  list-style: none;
+}
+
+// ----- Numbered page cells (Figma _Pagination number base, 40×40) -----
+.cc-pagination.cc-pagination .ant-pagination-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  font-family: $font-family-base;
+  font-size: $font-size-text-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-text-sm;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  // Suppress the click-shrink antd applies via :active.
+  &:active {
+    transform: none;
+  }
+}
+
+.cc-pagination.cc-pagination .ant-pagination-item a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  color: $text-tertiary;
+  background: transparent;
+  text-decoration: none;
+  border-radius: inherit;
+  // Neutralize the legacy global rule in assets/cometchat/css/core.scss
+  // (`.ant-pagination-item:hover a { position: relative; left: 2px; ... }`)
+  // which nudged the link 2px on hover. In a centered flex row that shift
+  // moved the link out from under the cursor, causing a hover flicker loop.
+  position: static;
+  left: auto;
+
+  // Inherit transition timing from the <li> so both elements paint in sync.
+  transition: inherit;
+}
+
+// ----- Shape: square (default) -----
+.cc-pagination.cc-pagination-shape-square.cc-pagination-shape-square
+  .ant-pagination-item {
+  border-radius: $radius-md;
+}
+
+// ----- Shape: circle -----
+.cc-pagination.cc-pagination-shape-circle.cc-pagination-shape-circle
+  .ant-pagination-item {
+  border-radius: $radius-full;
+}
+
+// ----- Hover (non-active) -----
+.cc-pagination.cc-pagination
+  .ant-pagination-item:hover:not(.ant-pagination-item-active) {
+  background-color: $bg-secondary;
+}
+
+.cc-pagination.cc-pagination
+  .ant-pagination-item:hover:not(.ant-pagination-item-active)
+  a {
+  color: $text-secondary-hover;
+}
+
+// ----- Active page (Figma "Hover/active" state) -----
+// Apply background to BOTH the <li> and the <a> so the fill
+// is guaranteed to render regardless of which element antd paints.
+// Per Figma DS (node 1114:69632): active state changes color only.
+// Keep font-weight at 500 to avoid a click flicker from glyph reflow.
+.cc-pagination.cc-pagination
+  .ant-pagination-item.ant-pagination-item-active {
+  background-color: $bg-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.cc-pagination.cc-pagination
+  .ant-pagination-item.ant-pagination-item-active
+  a {
+  color: $text-secondary;
+  background-color: transparent;
+  font-weight: $font-weight-semibold;
+}
+
+// ----- Focus-visible -----
+.cc-pagination.cc-pagination .ant-pagination-item:focus-visible,
+.cc-pagination.cc-pagination .ant-pagination-item a:focus-visible {
+  outline: none;
+  box-shadow: $focus-ring;
+}
+
+// ============================================================
+// ELLIPSIS — rendered through itemRender so we control sizing
+// (antd's default is a tiny three-dot icon).
+// ============================================================
+.cc-pagination.cc-pagination .ant-pagination-jump-prev,
+.cc-pagination.cc-pagination .ant-pagination-jump-next {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.cc-pagination__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  color: $text-tertiary;
+  font-size: $font-size-text-md;
+  font-weight: $font-weight-medium;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  user-select: none;
+}
+
+// Hide antd's default tiny ellipsis icon (anticon ellipsis)
+.cc-pagination.cc-pagination .ant-pagination-item-link-icon,
+.cc-pagination.cc-pagination .ant-pagination-item-ellipsis,
+.cc-pagination.cc-pagination .ant-pagination-jump-prev .anticon,
+.cc-pagination.cc-pagination .ant-pagination-jump-next .anticon {
+  display: none;
+}
+
+// ----- Hide antd's built-in prev/next entirely (we render our own) -----
+.cc-pagination.cc-pagination .ant-pagination-prev,
+.cc-pagination.cc-pagination .ant-pagination-next {
+  display: none;
+}
+
+// ============================================================
+// MINIMAL kind — numbers only
+// page variant always centers; card variant respects align prop
+// ============================================================
+.cc-pagination.cc-pagination-variant-page.cc-pagination-kind-minimal
+  .ant-pagination,
+.cc-pagination.cc-pagination-variant-card.cc-pagination-kind-minimal.cc-pagination-align-default
+  .ant-pagination,
+.cc-pagination.cc-pagination-variant-card.cc-pagination-kind-minimal.cc-pagination-align-center
+  .ant-pagination {
+  justify-content: center;
+}
+
+.cc-pagination.cc-pagination-variant-card.cc-pagination-kind-minimal.cc-pagination-align-left
+  .ant-pagination {
+  justify-content: flex-start;
+}
+
+.cc-pagination.cc-pagination-variant-card.cc-pagination-kind-minimal.cc-pagination-align-right
+  .ant-pagination {
+  justify-content: flex-end;
+}
+
+// ============================================================
+// BORDERED — single rounded box wrapping prev + numbers + next
+// Figma node 1114:69397 ("Pagination button group")
+//
+// DOM in this mode:
+//   <nav class="cc-pagination cc-pagination-bordered ...">
+//     <div class="cc-pagination__bordered-box">
+//       <CometChatButton .cc-pagination__btn-prev>
+//       <ul class="ant-pagination">…</ul>
+//       <CometChatButton .cc-pagination__btn-next>
+//     </div>
+//   </nav>
+//
+// Alignment is driven by `justify-content` on the nav (the box is
+// inline-flex and shrinks to its content).
+// ============================================================
+
+// Make the inner box shrink to content and live as a single rounded pill.
+.cc-pagination__bordered-box {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid $border-default;
+  border-radius: $radius-md;
+  background-color: $bg-primary;
+  box-shadow: $shadow-xs;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+// In bordered mode, the nav becomes an alignment container only.
+// Default for bordered is centered (matches Figma "Pagination button group").
+.cc-pagination.cc-pagination-bordered {
+  justify-content: center;
+}
+
+// Card variant + bordered: drop the card padding (the box is the chrome).
+.cc-pagination.cc-pagination-bordered.cc-pagination-variant-card {
+  padding: 0;
+}
+
+// Alignment variants (apply to bordered too)
+.cc-pagination.cc-pagination-bordered.cc-pagination-align-left {
+  justify-content: flex-start;
+}
+
+.cc-pagination.cc-pagination-bordered.cc-pagination-align-right {
+  justify-content: flex-end;
+}
+
+.cc-pagination.cc-pagination-bordered.cc-pagination-align-center,
+.cc-pagination.cc-pagination-bordered.cc-pagination-align-default {
+  justify-content: center;
+}
+
+// Numbered list inside the box: cells touch each other
+.cc-pagination.cc-pagination-bordered.cc-pagination .ant-pagination {
+  gap: 0;
+  flex: 0 0 auto;
+  width: auto;
+}
+
+// Cell dividers (right border between every <li>)
+.cc-pagination.cc-pagination-bordered.cc-pagination .ant-pagination > li {
+  border-right: 1px solid $border-default;
+}
+
+.cc-pagination.cc-pagination-bordered.cc-pagination
+  .ant-pagination
+  > li:last-child {
+  border-right: 0;
+}
+
+// Square corners for cells inside the rounded box (overrides shape radius)
+.cc-pagination.cc-pagination-bordered.cc-pagination-shape-square.cc-pagination-shape-square
+  .ant-pagination-item,
+.cc-pagination.cc-pagination-bordered.cc-pagination-shape-circle.cc-pagination-shape-circle
+  .ant-pagination-item,
+.cc-pagination.cc-pagination-bordered.cc-pagination .ant-pagination-jump-prev,
+.cc-pagination.cc-pagination-bordered.cc-pagination .ant-pagination-jump-next {
+  border-radius: 0;
+}
+
+// ----- Strip chrome from prev/next CometChatButtons inside the box -----
+// `.cc-pagination__btn-prev` / `__btn-next` is the antd button element
+// itself (CometChatButton applies className directly to AntButton). So
+// these are compound selectors (no descendant combinator). Specificity
+// is bumped by chaining `.cc-pagination-bordered` + the button's own
+// class chain (`.cc-button-secondary.ant-btn.ant-btn-default`) to beat
+// CometChatButton's base rule (specificity 0,3,1).
+.cc-pagination.cc-pagination-bordered
+  .cc-pagination__btn-prev.cc-button-secondary.ant-btn.ant-btn-default,
+.cc-pagination.cc-pagination-bordered
+  .cc-pagination__btn-next.cc-button-secondary.ant-btn.ant-btn-default {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background-color: transparent;
+  color: $text-tertiary;
+  font-weight: $font-weight-medium;
+  height: 40px;
+}
+
+// Divider between prev/numbers and numbers/next (border-right on prev,
+// border-left on next so we get one divider line at each junction).
+.cc-pagination.cc-pagination-bordered
+  .cc-pagination__btn-prev.cc-button-secondary.ant-btn.ant-btn-default {
+  border-right: 1px solid $border-default;
+}
+
+.cc-pagination.cc-pagination-bordered
+  .cc-pagination__btn-next.cc-button-secondary.ant-btn.ant-btn-default {
+  border-left: 1px solid $border-default;
+}
+
+// Hover inside the bordered box
+.cc-pagination.cc-pagination-bordered
+  .cc-pagination__btn-prev.cc-button-secondary.ant-btn.ant-btn-default:hover:not(:disabled),
+.cc-pagination.cc-pagination-bordered
+  .cc-pagination__btn-next.cc-button-secondary.ant-btn.ant-btn-default:hover:not(:disabled) {
+  background-color: $bg-secondary;
+  color: $text-secondary-hover;
+}
+
+// Disabled inside the bordered box
+.cc-pagination.cc-pagination-bordered
+  .cc-pagination__btn-prev.cc-button-secondary.ant-btn.ant-btn-default:disabled,
+.cc-pagination.cc-pagination-bordered
+  .cc-pagination__btn-next.cc-button-secondary.ant-btn.ant-btn-default:disabled {
+  background-color: transparent;
+  color: $text-disabled;
+  box-shadow: none;
+}
+
+// ============================================================
+// KIND — button-group ("Page X of Y" + prev/next, no numbers)
+// Custom DOM (no antd Pagination underneath)
+// ============================================================
+.cc-pagination.cc-pagination-kind-button-group {
+  justify-content: space-between;
+  gap: $spacing-lg;
+}
+
+.cc-pagination.cc-pagination-kind-button-group.cc-pagination-align-center {
+  justify-content: center;
+}
+
+.cc-pagination__page-info {
+  color: $text-secondary;
+  font-size: $font-size-text-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-text-sm;
+}
+
+.cc-pagination__button-group {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex-shrink: 0;
+}
+
+// ============================================================
+// DISABLED state (whole component)
+// ============================================================
+.cc-pagination.cc-pagination-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}

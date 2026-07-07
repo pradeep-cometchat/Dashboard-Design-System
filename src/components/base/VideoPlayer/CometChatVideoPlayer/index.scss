@@ -1,0 +1,13 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+.cc-video-player {
+  border-radius: $radius-md;
+  overflow: hidden;
+  background-color: $base-black;
+}
+
+.cc-video-player video {
+  display: block;
+  border-radius: $radius-md;
+}

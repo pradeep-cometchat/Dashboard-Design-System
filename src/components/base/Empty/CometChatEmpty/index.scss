@@ -1,0 +1,244 @@
+@import '../../../../assets/design-tokens.scss';
+
+// ============================================================
+// CometChatEmpty — Dashboard base empty state component styles
+// Source: Figma "❖ Dashboard – Design System (May 2026)" → Empty states
+//   - Empty state component set (1182:317)
+//     • Size: sm (24 gap) | md (32 gap) | lg (32 gap)
+//     • Icon: featured-icon | illustration | file-type-icon | folder-icon
+//     • Optional: featured icon, actions, primary, secondary, background pattern
+//   - Illustration component set (1182:1085)
+//     • Style: cloud | box | documents | credit-card
+// ============================================================
+
+.cc-empty {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 512px;
+  max-width: 100%;
+  font-family: $font-family-base;
+}
+
+// ============================================================
+// BACKGROUND PATTERN (radial circles)
+// ============================================================
+.cc-empty__background-pattern {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 480px;
+  height: 480px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+
+  background-image: radial-gradient(
+    circle at center,
+    transparent 47px,
+    $border-light 47px,
+    $border-light 48px,
+    transparent 48px,
+    transparent 79px,
+    $border-light 79px,
+    $border-light 80px,
+    transparent 80px,
+    transparent 111px,
+    $border-light 111px,
+    $border-light 112px,
+    transparent 112px,
+    transparent 143px,
+    $border-light 143px,
+    $border-light 144px,
+    transparent 144px,
+    transparent 175px,
+    $border-light 175px,
+    $border-light 176px,
+    transparent 176px,
+    transparent 207px,
+    $border-light 207px,
+    $border-light 208px,
+    transparent 208px,
+    transparent 239px,
+    $border-light 239px,
+    $border-light 240px,
+    transparent 240px
+  );
+
+  // Soft fade-out at the edges
+  mask-image: radial-gradient(circle at center, black 0%, black 40%, transparent 70%);
+  -webkit-mask-image: radial-gradient(circle at center, black 0%, black 40%, transparent 70%);
+}
+
+// ============================================================
+// CONTENT (icon + text)
+// ============================================================
+.cc-empty__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-2xl;
+  text-align: center;
+}
+
+.cc-empty__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cc-empty__text {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.cc-empty__title {
+  color: $text-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.cc-empty__description {
+  color: $text-tertiary;
+  font-weight: $font-weight-regular;
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+.cc-empty__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-lg;
+  margin-top: $spacing-3xl;
+}
+
+// ============================================================
+// SIZE — sm
+// ============================================================
+.cc-empty.cc-empty-size-sm {
+  .cc-empty__title {
+    font-size: $font-size-text-md;
+    line-height: $line-height-text-md;
+  }
+
+  .cc-empty__description {
+    font-size: $font-size-text-sm;
+    line-height: $line-height-text-sm;
+  }
+
+  .cc-empty__actions {
+    margin-top: $spacing-3xl;
+  }
+}
+
+// ============================================================
+// SIZE — md
+// ============================================================
+.cc-empty.cc-empty-size-md {
+  .cc-empty__title {
+    font-size: $font-size-text-lg;
+    line-height: $line-height-text-lg;
+  }
+
+  .cc-empty__description {
+    font-size: $font-size-text-sm;
+    line-height: $line-height-text-sm;
+  }
+
+  .cc-empty__actions {
+    margin-top: $spacing-4xl;
+  }
+}
+
+// ============================================================
+// SIZE — lg
+// ============================================================
+.cc-empty.cc-empty-size-lg {
+  .cc-empty__title {
+    font-size: $font-size-text-xl;
+    line-height: $line-height-text-xl;
+  }
+
+  .cc-empty__description {
+    font-size: $font-size-text-md;
+    line-height: $line-height-text-md;
+  }
+
+  .cc-empty__actions {
+    margin-top: $spacing-4xl;
+  }
+}
+
+// ============================================================
+// ICON TYPE — featured-icon (48×48 default)
+// ============================================================
+.cc-empty.cc-empty-icon-featured-icon {
+  .cc-empty__icon {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+// ============================================================
+// ICON TYPE — illustration (built-in styles)
+// ============================================================
+.cc-empty.cc-empty-icon-illustration {
+  .cc-empty__icon {
+    width: 152px;
+    height: 120px;
+  }
+}
+
+.cc-empty.cc-empty-size-md.cc-empty-icon-illustration .cc-empty__icon {
+  width: 168px;
+  height: 132px;
+}
+
+.cc-empty.cc-empty-size-lg.cc-empty-icon-illustration .cc-empty__icon {
+  width: 200px;
+  height: 158px;
+}
+
+.cc-empty__illustration {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.cc-empty__illustration-cloud {
+  background-image: url('~@assets/images/icons/empty-state/cloud.svg');
+}
+
+.cc-empty__illustration-box {
+  background-image: url('~@assets/images/icons/empty-state/box.svg');
+}
+
+.cc-empty__illustration-documents {
+  background-image: url('~@assets/images/icons/empty-state/documents.svg');
+}
+
+.cc-empty__illustration-credit-card {
+  background-image: url('~@assets/images/icons/empty-state/credit-card.svg');
+}
+
+// ============================================================
+// ICON TYPE — file-type-icon / folder-icon
+// (Consumer passes the icon node; we just size the slot.)
+// ============================================================
+.cc-empty.cc-empty-icon-file-type-icon,
+.cc-empty.cc-empty-icon-folder-icon {
+  .cc-empty__icon {
+    width: 48px;
+    height: 56px;
+  }
+}

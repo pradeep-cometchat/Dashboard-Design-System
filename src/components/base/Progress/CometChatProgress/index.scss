@@ -1,0 +1,98 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+// ============================================================
+// CometChatProgress — Matches Figma "Progress bar" & "Progress circle"
+// Bar: 8px height, border-radius 8px, brand fill
+// Circle: brand stroke, centered label
+// Label: Body/Medium (14px, 500), neutral-lm-700
+// Source: Figma node 1154:89940
+// ============================================================
+
+.cc-progress {
+  // --- Progress Bar ---
+  &.ant-progress-line {
+    .ant-progress-bg {
+      background-color: $base-primary;
+      border-radius: $radius-md;
+    }
+
+    .ant-progress-inner {
+      border-radius: $radius-md;
+      background-color: $neutral-lm-200;
+    }
+  }
+
+  // --- Progress Text (percentage label) ---
+  .ant-progress-text {
+    font-family: $font-family-base;
+    font-size: $font-size-text-sm;
+    font-weight: $font-weight-medium;
+    color: $neutral-lm-700;
+  }
+
+  // --- Progress Circle ---
+  &.ant-progress-circle {
+    .ant-progress-inner {
+      .ant-progress-circle-trail {
+        stroke: $neutral-lm-200;
+      }
+
+      .ant-progress-circle-path {
+        stroke: $base-primary;
+      }
+    }
+
+    .ant-progress-text {
+      font-family: $font-family-base;
+      font-weight: $font-weight-semibold;
+      color: $text-primary;
+    }
+  }
+}
+
+// --- Wrapper for bottom label support ---
+.cc-progress-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
+  width: 100%;
+
+  .cc-progress.ant-progress-line {
+    width: 100%;
+  }
+}
+
+// --- Inner label (above percentage inside circle) ---
+.cc-progress__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cc-progress__label {
+  font-family: $font-family-base;
+  font-size: $font-size-text-xs;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-text-xs;
+  color: $text-tertiary;
+}
+
+.cc-progress__percent {
+  font-family: $font-family-base;
+  font-size: 32px;
+  font-weight: $font-weight-semibold;
+  line-height: 1.1875em;
+  color: $text-primary;
+}
+
+// --- Bottom label (outside, below circle) ---
+.cc-progress__bottom-label {
+  font-family: $font-family-base;
+  font-size: $font-size-text-xs;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-text-xs;
+  color: $text-tertiary;
+  text-align: center;
+}

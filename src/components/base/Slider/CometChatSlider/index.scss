@@ -1,0 +1,10 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+.cc-slider .ant-slider-handle::after {
+  box-shadow: 0 0 0 2px $base-primary;
+}
+
+.cc-slider .ant-slider-track {
+  background-color: $base-primary;
+}

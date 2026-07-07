@@ -1,0 +1,7 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+.cc-popover .ant-popover-inner {
+  font-family: $font-family-base;
+  border-radius: $radius-md;
+}

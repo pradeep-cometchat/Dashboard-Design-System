@@ -1,0 +1,858 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+// ============================================================
+// CometChatButton — Unified button component styles
+// Source: Figma "❖ Dashboard – Design System (2025)" → Buttons page
+// Uses design tokens + skeuomorphic shadow from Figma specs
+//
+// Specificity strategy: .cc-button-<name>.ant-btn.ant-btn-default
+// This beats antd's default hover/focus styles without !important
+// ============================================================
+
+// ============================================================
+// SHARED PLACEHOLDERS
+// ============================================================
+
+%btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-md;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-text-sm;
+  line-height: $line-height-text-sm;
+  font-family: $font-family-base;
+  gap: $spacing-xs;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+    box-shadow 0.2s ease, text-decoration 0.2s ease;
+}
+
+%btn-size-md {
+  padding: 10px 14px;
+  height: 40px;
+}
+
+%btn-disabled {
+  background-color: $bg-disabled;
+  border: 1px solid $border-default;
+  color: $text-disabled;
+  box-shadow: $shadow-xs;
+  cursor: not-allowed;
+}
+
+// ============================================================
+// WRAPPER
+// ============================================================
+
+.cc-button__wrapper {
+  display: inline-flex;
+  position: relative;
+
+  a {
+    text-decoration: none;
+  }
+}
+
+// ============================================================
+// PRIMARY HIERARCHY
+// ============================================================
+
+.cc-button-primary.ant-btn.ant-btn-default {
+  @extend %btn-base;
+  @extend %btn-size-md;
+  background-color: $base-primary;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  color: $text-white;
+  box-shadow: $shadow-xs-skeuomorphic;
+
+  &:hover {
+    background-color: $primary-700;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: $text-white;
+    box-shadow: $shadow-xs-skeuomorphic;
+  }
+
+  &:focus {
+    background-color: $base-primary;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: $text-white;
+    box-shadow: $focus-ring-shadow-xs-skeuomorphic;
+  }
+
+  &:disabled {
+    @extend %btn-disabled;
+  }
+
+  &.cc-button-disabled-colored:disabled {
+    background-color: $base-primary;
+    border-color: $base-primary;
+    color: $text-white;
+    opacity: 0.6;
+    box-shadow: none;
+  }
+}
+
+// ============================================================
+// SECONDARY HIERARCHY
+// ============================================================
+
+.cc-button-secondary.ant-btn.ant-btn-default {
+  @extend %btn-base;
+  @extend %btn-size-md;
+  background-color: $bg-primary;
+  border: 1px solid $border-dark;
+  color: $text-primary;
+  box-shadow: $shadow-xs-skeuomorphic;
+
+  &:hover {
+    background-color: $bg-secondary;
+    border-color: $border-dark;
+    color: $text-primary;
+    box-shadow: $shadow-xs-skeuomorphic;
+  }
+
+  &:focus {
+    background-color: $bg-primary;
+    border-color: $border-dark;
+    color: $text-primary;
+    box-shadow: $focus-ring-shadow-xs-skeuomorphic;
+  }
+
+  &:disabled {
+    @extend %btn-disabled;
+  }
+}
+
+// ============================================================
+// TERTIARY HIERARCHY
+// ============================================================
+
+.cc-button-tertiary.ant-btn.ant-btn-default {
+  @extend %btn-base;
+  @extend %btn-size-md;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: $text-tertiary;
+  box-shadow: none;
+
+  &:hover {
+    background-color: $bg-secondary;
+    border-color: transparent;
+    color: $text-tertiary;
+    box-shadow: none;
+  }
+
+  &:focus {
+    background-color: transparent;
+    border-color: transparent;
+    color: $text-tertiary;
+    box-shadow: $focus-ring;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    border-color: transparent;
+    color: $text-disabled;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+// ============================================================
+// LINK HIERARCHY
+// ============================================================
+
+.cc-button-link.ant-btn.ant-btn-default {
+  @extend %btn-base;
+  @extend %btn-size-md;
+  background-color: transparent;
+  border: none;
+  color: $primary-700;
+  box-shadow: none;
+  text-decoration: none;
+  border-radius: $radius-xs;
+
+  &:hover {
+    background-color: transparent;
+    border: none;
+    color: $primary-800;
+    box-shadow: none;
+    text-decoration: underline;
+  }
+
+  &:focus {
+    background-color: transparent;
+    border: none;
+    color: $primary-700;
+    box-shadow: $focus-ring;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    border: none;
+    color: $text-disabled;
+    cursor: not-allowed;
+    box-shadow: none;
+    text-decoration: none;
+  }
+}
+
+// ============================================================
+// BLACK HIERARCHY
+// ============================================================
+
+.cc-button-black.ant-btn.ant-btn-default {
+  @extend %btn-base;
+  @extend %btn-size-md;
+  background-color: $base-black;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  color: $text-white;
+  box-shadow: $shadow-xs-skeuomorphic;
+
+  &:hover {
+    background-color: $neutral-lm-800;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: $text-white;
+    box-shadow: $shadow-xs-skeuomorphic;
+  }
+
+  &:focus {
+    background-color: $base-black;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: $text-white;
+    box-shadow: $focus-ring-shadow-xs-skeuomorphic;
+  }
+
+  &:disabled {
+    @extend %btn-disabled;
+  }
+}
+
+// ============================================================
+// LEGACY ALIASES — Backward Compatibility
+// ============================================================
+
+// --- cc-button-dark → same as cc-button-black ---
+.cc-button-dark.ant-btn.ant-btn-default {
+  @extend %btn-base;
+  @extend %btn-size-md;
+  background-color: $base-black;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  color: $text-white;
+  box-shadow: $shadow-xs-skeuomorphic;
+
+  &:hover {
+    background-color: $neutral-lm-800;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: $text-white;
+    box-shadow: $shadow-xs-skeuomorphic;
+  }
+
+  &:focus {
+    background-color: $base-black;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: $text-white;
+    box-shadow: $focus-ring-shadow-xs-skeuomorphic;
+  }
+
+  &:disabled {
+    @extend %btn-disabled;
+  }
+}
+
+// --- cc-button-ghost → same as cc-button-tertiary ---
+.cc-button-ghost.ant-btn.ant-btn-default {
+  @extend %btn-base;
+  @extend %btn-size-md;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: $text-tertiary;
+  box-shadow: none;
+
+  &:hover {
+    background-color: $bg-secondary;
+    border-color: transparent;
+    color: $text-tertiary;
+    box-shadow: none;
+  }
+
+  &:focus {
+    background-color: transparent;
+    border-color: transparent;
+    color: $text-tertiary;
+    box-shadow: $focus-ring;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    border-color: transparent;
+    color: $text-disabled;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+// --- cc-button-danger → same as destructive primary (handled in task 4.2) ---
+.cc-button-danger.ant-btn.ant-btn-default {
+  @extend %btn-base;
+  @extend %btn-size-md;
+  background-color: $error-500;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  color: $text-white;
+  box-shadow: $shadow-xs-skeuomorphic;
+
+  &:hover {
+    background-color: $error-700;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: $text-white;
+    box-shadow: $shadow-xs-skeuomorphic;
+  }
+
+  &:focus {
+    background-color: $error-500;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: $text-white;
+    box-shadow: $focus-ring-error-shadow-xs-skeuomorphic;
+  }
+
+  &:disabled {
+    @extend %btn-disabled;
+  }
+}
+
+// --- cc-button-icon → same as secondary + icon-only ---
+.cc-button-icon.ant-btn.ant-btn-default {
+  @extend %btn-base;
+  background-color: $bg-primary;
+  border: 1px solid $border-dark;
+  border-radius: $radius-md;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $fg-tertiary;
+  box-shadow: $shadow-xs-skeuomorphic;
+
+  &:hover {
+    background-color: $bg-secondary;
+    border-color: $border-dark;
+    color: $fg-primary;
+    box-shadow: $shadow-xs-skeuomorphic;
+  }
+
+  &:focus {
+    background-color: $bg-primary;
+    border-color: $border-dark;
+    color: $fg-primary;
+    box-shadow: $focus-ring-shadow-xs-skeuomorphic;
+  }
+
+  &:disabled {
+    background-color: $bg-disabled;
+    border: 1px solid $border-default;
+    color: $fg-disabled;
+    cursor: not-allowed;
+    box-shadow: $shadow-xs;
+  }
+}
+
+// ============================================================
+// DESTRUCTIVE VARIANTS
+// ============================================================
+
+// --- Destructive Primary ---
+.cc-button-primary.cc-button-destructive.ant-btn.ant-btn-default {
+  background-color: $error-500;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  color: $text-white;
+  box-shadow: $shadow-xs-skeuomorphic;
+
+  &:hover {
+    background-color: $error-700;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: $text-white;
+    box-shadow: $shadow-xs-skeuomorphic;
+  }
+
+  &:focus {
+    background-color: $error-500;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: $text-white;
+    box-shadow: $focus-ring-error-shadow-xs-skeuomorphic;
+  }
+
+  &:disabled {
+    @extend %btn-disabled;
+  }
+}
+
+// --- Destructive Secondary ---
+.cc-button-secondary.cc-button-destructive.ant-btn.ant-btn-default {
+  background-color: $bg-primary;
+  border: 1px solid $error-300;
+  color: $error-600;
+  box-shadow: $shadow-xs-skeuomorphic;
+
+  &:hover {
+    background-color: $bg-secondary;
+    border-color: $error-300;
+    color: $error-600;
+    box-shadow: $shadow-xs-skeuomorphic;
+  }
+
+  &:focus {
+    background-color: $bg-primary;
+    border-color: $error-300;
+    color: $error-600;
+    box-shadow: $focus-ring-error-shadow-xs-skeuomorphic;
+  }
+
+  &:disabled {
+    @extend %btn-disabled;
+  }
+}
+
+// --- Destructive Tertiary ---
+.cc-button-tertiary.cc-button-destructive.ant-btn.ant-btn-default {
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: $error-600;
+  box-shadow: none;
+
+  &:hover {
+    background-color: $bg-secondary;
+    border-color: transparent;
+    color: $error-600;
+    box-shadow: none;
+  }
+
+  &:focus {
+    background-color: transparent;
+    border-color: transparent;
+    color: $error-600;
+    box-shadow: $focus-ring-error-shadow-xs-skeuomorphic;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    border-color: transparent;
+    color: $text-disabled;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+// --- Destructive Link ---
+.cc-button-link.cc-button-destructive.ant-btn.ant-btn-default {
+  background-color: transparent;
+  border: none;
+  color: $error-600;
+  box-shadow: none;
+
+  &:hover {
+    background-color: transparent;
+    border: none;
+    color: $error-600;
+    box-shadow: none;
+    text-decoration: underline;
+  }
+
+  &:focus {
+    background-color: transparent;
+    border: none;
+    color: $error-600;
+    box-shadow: $focus-ring-error-shadow-xs-skeuomorphic;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    border: none;
+    color: $text-disabled;
+    cursor: not-allowed;
+    box-shadow: none;
+    text-decoration: none;
+  }
+}
+
+// ============================================================
+// SIZE VARIANTS
+// ============================================================
+
+// --- Small (sm) ---
+.cc-button-sm.ant-btn.ant-btn-default {
+  padding: $spacing-md $spacing-lg;
+  height: 36px;
+  font-size: $font-size-text-sm;
+  line-height: $line-height-text-sm;
+  border-radius: $radius-md;
+}
+
+// --- Medium (md) — explicit class, same as default ---
+.cc-button-md.ant-btn.ant-btn-default {
+  padding: 10px 14px;
+  height: 40px;
+  font-size: $font-size-text-sm;
+  line-height: $line-height-text-sm;
+  border-radius: $radius-md;
+}
+
+// --- Large (lg) ---
+.cc-button-lg.ant-btn.ant-btn-default {
+  padding: 10px $spacing-xl;
+  height: 44px;
+  font-size: $font-size-text-md;
+  line-height: $line-height-text-md;
+  border-radius: $radius-md;
+  gap: $spacing-sm;
+}
+
+// ============================================================
+// UTILITY BUTTON VARIANT
+// ============================================================
+
+// --- Utility Secondary (default utility hierarchy) ---
+.cc-button-utility.ant-btn.ant-btn-default {
+  @extend %btn-base;
+  background-color: $bg-primary;
+  border: 1px solid $border-dark;
+  color: $text-primary;
+  box-shadow: $shadow-xs-skeuomorphic;
+  border-radius: $radius-sm;
+  font-size: $font-size-text-xs;
+  line-height: $line-height-text-xs;
+
+  &:hover {
+    background-color: $bg-secondary;
+    border-color: $border-dark;
+    color: $text-primary;
+    box-shadow: $shadow-xs-skeuomorphic;
+  }
+
+  &:focus {
+    background-color: $bg-primary;
+    border-color: $border-dark;
+    color: $text-primary;
+    box-shadow: $focus-ring-shadow-xs-skeuomorphic;
+  }
+
+  &:disabled {
+    background-color: $bg-disabled;
+    border: 1px solid $border-default;
+    color: $text-disabled;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+// --- Utility Tertiary ---
+.cc-button-utility-tertiary.ant-btn.ant-btn-default {
+  @extend %btn-base;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: $text-tertiary;
+  box-shadow: none;
+  border-radius: $radius-sm;
+  font-size: $font-size-text-xs;
+  line-height: $line-height-text-xs;
+
+  &:hover {
+    background-color: $bg-secondary;
+    border-color: transparent;
+    color: $text-tertiary;
+    box-shadow: none;
+  }
+
+  &:focus {
+    background-color: transparent;
+    border-color: transparent;
+    color: $text-tertiary;
+    box-shadow: $focus-ring;
+  }
+
+  &:disabled {
+    background-color: $bg-disabled;
+    border: 1px solid $border-default;
+    color: $text-disabled;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+// --- Utility XS Size ---
+.cc-button-utility-xs.ant-btn.ant-btn-default {
+  padding: $spacing-xs $spacing-md;
+  font-size: $font-size-text-xs;
+  line-height: $line-height-text-xs;
+  border-radius: $radius-sm;
+}
+
+// --- Utility SM Size ---
+.cc-button-utility-sm.ant-btn.ant-btn-default {
+  padding: $spacing-sm 10px;
+  font-size: $font-size-text-xs;
+  line-height: $line-height-text-xs;
+  border-radius: $radius-sm;
+}
+
+// ============================================================
+// CLOSE BUTTON VARIANT
+// ============================================================
+
+// --- Close Button (Light mode — default) ---
+.cc-button-close.ant-btn.ant-btn-default {
+  @extend %btn-base;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $fg-tertiary;
+  box-shadow: none;
+
+  &:hover {
+    background-color: $bg-secondary;
+    border-color: transparent;
+    color: $fg-tertiary;
+    box-shadow: none;
+  }
+
+  &:focus {
+    background-color: transparent;
+    border-color: transparent;
+    color: $fg-tertiary;
+    box-shadow: $focus-ring;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    border-color: transparent;
+    color: $fg-disabled;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  // --- Close Button Sizes ---
+  &.cc-button-sm {
+    width: 36px;
+    height: 36px;
+  }
+
+  &.cc-button-md {
+    width: 40px;
+    height: 40px;
+  }
+
+  &.cc-button-lg {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+// --- Close Button (Dark background variant) ---
+.cc-button-close-dark.ant-btn.ant-btn-default {
+  @extend %btn-base;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $fg-white;
+  box-shadow: none;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: transparent;
+    color: $fg-white;
+    box-shadow: none;
+  }
+
+  &:focus {
+    background-color: transparent;
+    border-color: transparent;
+    color: $fg-white;
+    box-shadow: $focus-ring;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    border-color: transparent;
+    color: $fg-disabled;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  // --- Close Dark Button Sizes ---
+  &.cc-button-sm {
+    width: 36px;
+    height: 36px;
+  }
+
+  &.cc-button-md {
+    width: 40px;
+    height: 40px;
+  }
+
+  &.cc-button-lg {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+// ============================================================
+// ICON ELEMENTS & TEXT
+// ============================================================
+
+.cc-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $spacing-2xl; // 20px default (md)
+  height: $spacing-2xl;
+  flex-shrink: 0;
+}
+
+// Icon sizes per button size
+.cc-button-sm .cc-button__icon {
+  width: $spacing-xl; // 16px
+  height: $spacing-xl;
+}
+
+.cc-button-md .cc-button__icon {
+  width: $spacing-2xl; // 20px
+  height: $spacing-2xl;
+}
+
+.cc-button-lg .cc-button__icon {
+  width: $spacing-3xl; // 24px
+  height: $spacing-3xl;
+}
+
+.cc-button__content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: inherit;
+}
+
+.cc-button__text {
+  display: inline-flex;
+  align-items: center;
+  // Per Figma DS: every button-with-icon contains a "Text padding" frame
+  // with 2px (xxs) horizontal padding around the label, contributing to
+  // the visible icon-to-text spacing alongside the parent button gap.
+  padding-left: $spacing-xxs;
+  padding-right: $spacing-xxs;
+}
+
+// Recolorable mask-image span emitted when consumers pass a string
+// (SVG URL) to `iconLeading` / `iconTrailing`. The icon's source URL
+// is provided via the `--cc-icon-src` CSS variable set inline by the
+// component; color follows the button's `currentColor`.
+.cc-button__icon-mask {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  background-color: currentColor;
+  mask-image: var(--cc-icon-src);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: var(--cc-icon-src);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+// ============================================================
+// ICON-ONLY MODE
+// ============================================================
+
+.cc-button-icon-only.ant-btn.ant-btn-default {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  // sm: 36px × 36px, 8px padding
+  &.cc-button-sm {
+    width: 36px;
+    height: 36px;
+    padding: $spacing-md; // 8px
+  }
+
+  // md: 40px × 40px, 10px padding
+  &.cc-button-md {
+    width: 40px;
+    height: 40px;
+    padding: 10px;
+  }
+
+  // lg: 44px × 44px, 12px padding
+  &.cc-button-lg {
+    width: 44px;
+    height: 44px;
+    padding: $spacing-lg; // 12px
+  }
+}
+
+// ============================================================
+// SCREEN READER ONLY (Visually Hidden)
+// ============================================================
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+
+// ============================================================
+// LOADING STATE
+// ============================================================
+
+.cc-button__loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+}
+
+.cc-button__spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: cc-button-spin 0.6s linear infinite;
+}
+
+.cc-button__loading-text {
+  display: inline-flex;
+  align-items: center;
+}
+
+@keyframes cc-button-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

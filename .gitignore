@@ -7,3 +7,5 @@ storybook-static/
 !.env*.example
 .DS_Store
 *.log
+
+*storybook.log

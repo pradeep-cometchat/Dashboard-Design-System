@@ -1,0 +1,24 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+.cc-popconfirm .ant-popconfirm-message-title {
+  font-family: $font-family-base;
+  font-size: $font-size-text-sm;
+  font-weight: $font-weight-medium;
+}
+
+.cc-popconfirm .ant-btn-primary {
+  background-color: $error-600;
+  border-color: $error-600;
+  border-radius: $radius-full;
+  color: $base-white;
+
+  &:hover {
+    background-color: $error-700;
+    border-color: $error-700;
+  }
+}
+
+.cc-popconfirm .ant-btn-default {
+  border-radius: $radius-full;
+}

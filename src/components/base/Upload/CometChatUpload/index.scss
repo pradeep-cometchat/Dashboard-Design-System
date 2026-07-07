@@ -1,0 +1,11 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+.cc-upload .ant-upload-drag {
+  border-radius: $radius-md;
+  font-family: $font-family-base;
+}
+
+.cc-upload .ant-upload-list-item {
+  border-radius: $radius-sm;
+}

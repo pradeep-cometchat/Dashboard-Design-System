@@ -1,0 +1,266 @@
+@import '../../../../assets/design-tokens.scss';
+
+// ============================================================
+// CometChatSelect — Matches Figma "Select" component
+//
+// Unlayered styles win over @layer antd / @layer legacy / @layer bootstrap
+// (see src/assets/layer-order.css), so we don't need !important to beat
+// antd's CSS-in-JS defaults. Specificity within this file just needs to
+// disambiguate our own rules.
+//
+// Source: Figma node 3281:377673
+// ============================================================
+
+.cc-select {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+// --- Label ---
+.cc-select__label-wrapper {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xxs;
+}
+
+.cc-select__label {
+  font-family: $font-family-base;
+  font-size: $font-size-text-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-text-sm;
+  color: $text-secondary;
+}
+
+.cc-select__required {
+  color: $text-error;
+}
+
+.cc-select__help-icon {
+  font-size: 14px;
+  color: $fg-quaternary;
+  cursor: help;
+}
+
+// --- Select Input ---
+.cc-select .cc-select__input.ant-select {
+  width: 100%;
+  // Antd 5 sets a fixed `height` on the outer .ant-select / .ant-select-sm
+  // wrapper (32px / 24px). That clips our taller selector. Let the wrapper
+  // grow to fit the selector instead.
+  height: auto;
+
+  // Default (md) size — matches Figma "Type=Select dropdown, Size=md"
+  // (node 3281:379940). Input is 44h with 10/14 padding, 16/24 text.
+  .ant-select-selector {
+    font-family: $font-family-base;
+    font-size: $font-size-text-md;
+    line-height: $line-height-text-md;
+    background-color: $bg-primary;
+    border: 1px solid $border-dark;
+    border-radius: $radius-md;
+    padding: 10px $spacing-lg;
+    box-shadow: $shadow-xs;
+    height: auto;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    align-items: center;
+  }
+
+  // Small size — matches Figma "Type=Select dropdown, Size=sm"
+  // (node 9405:710407). Resting height is 36px.
+  //
+  // Single mode: fixed 36px, content vertically centered (deterministic —
+  // doesn't depend on the inner line-box, which is what made it drift to 40px).
+  // Multiple mode: floors at 36px for a single row of tags and grows as tags
+  // wrap onto additional rows.
+  &.ant-select-sm {
+    height: auto;
+
+    &:not(.ant-select-multiple) .ant-select-selector {
+      height: 36px;
+      padding: 0 $spacing-lg;
+    }
+
+    &.ant-select-multiple .ant-select-selector {
+      min-height: 36px;
+      // Match the single-select padding (0 vertical) so the placeholder and
+      // tag row align with the other dropdowns in the same row. The 4px
+      // vertical padding antd-style chips need is absorbed by the chip's own
+      // margin within the 36px min-height row, not by selector padding.
+      // Extra inline-end padding reserves space for the absolutely-positioned
+      // dropdown arrow so the last tag chip doesn't slide under it.
+      padding: $spacing-xs $spacing-3xl $spacing-xs $spacing-xs;
+    }
+  }
+
+  // Hover & focus share one brand treatment so they look identical, matching
+  // CometChatInput (brand border on both hover and focus). A 1px border + 1px
+  // brand ring reads as a 2px brand edge without changing border-width, which
+  // avoids the 1px reflow/flicker on click. Error state is excluded so a red
+  // field stays red on hover/focus (the error rules below own those states).
+  &:not(.ant-select-disabled):not(.ant-select-status-error):hover .ant-select-selector,
+  &.ant-select-focused:not(.ant-select-disabled):not(.ant-select-status-error) .ant-select-selector {
+    border-color: $border-brand;
+    box-shadow: 0 0 0 1px $border-brand, $shadow-xs;
+  }
+
+  // Disabled
+  &.ant-select-disabled .ant-select-selector {
+    background-color: $bg-disabled-subtle;
+    border-color: $border-dark;
+    color: $text-disabled;
+    cursor: not-allowed;
+  }
+
+  // Placeholder
+  .ant-select-selection-placeholder {
+    color: $text-placeholder;
+  }
+
+  // Selected value text (tags in multiple mode)
+  .ant-select-selection-item {
+    color: $text-primary;
+    font-weight: $font-weight-regular;
+    font-size: $font-size-text-sm;
+    background-image: none;
+    background-color: $base-white;
+    border: 1px solid $border-dark;
+    border-radius: $radius-sm;
+    padding: $spacing-xxs $spacing-xs $spacing-xxs 5px;
+    line-height: $line-height-text-sm;
+    height: auto;
+    margin-inline-end: $spacing-sm;
+  }
+
+  // Multi-select tag chips — match the CometChatTagInput / read-only badge
+  // recipe so all role/value pills look like one family: 24h, fully-rounded
+  // pill, white fill, primary text, 12/18 text per Figma DS.
+  &.ant-select-multiple .ant-select-selection-item {
+    height: 24px;
+    border-radius: $radius-sm;
+    border: 1px solid $border-default;
+    background-color: $base-white;
+    color: $text-primary;
+    font-size: $font-size-text-xs;
+    line-height: $line-height-text-xs;
+    font-weight: $font-weight-medium;
+    padding: $spacing-xxs $spacing-sm;
+    margin-inline-end: $spacing-xs;
+    align-items: center;
+    display: inline-flex;
+  }
+
+  // Tag close icon
+  .ant-select-selection-item-remove {
+    color: $fg-quaternary;
+    font-size: 10px;
+
+    // Override the legacy-layer svg sizing (14px) so the × glyph reads 12px.
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    &:hover {
+      color: $fg-tertiary;
+    }
+  }
+
+  // Single select - no tag styling on selection item
+  &:not(.ant-select-multiple) .ant-select-selection-item {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+  }
+
+  // Arrow icon
+  .ant-select-arrow {
+    color: $fg-quaternary;
+  }
+
+  // Clear icon
+  .ant-select-clear {
+    color: $fg-quaternary;
+
+    &:hover {
+      color: $fg-tertiary;
+    }
+  }
+}
+
+// --- Error state ---
+.cc-select-error {
+  .cc-select__input.ant-select .ant-select-selector {
+    border-color: $border-error;
+  }
+
+  .cc-select__input.ant-select.ant-select-focused .ant-select-selector {
+    border-color: $error-500;
+    box-shadow: $focus-ring-error-shadow-xs;
+  }
+}
+
+// --- Hint text ---
+.cc-select__hint {
+  font-family: $font-family-base;
+  font-size: $font-size-text-sm;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-text-sm;
+  color: $text-tertiary;
+}
+
+.cc-select__hint-error {
+  color: $text-error;
+}
+
+// --- Dropdown popup (rendered in portal, scoped via popupClassName) ---
+.cc-select__input-dropdown.ant-select-dropdown {
+  border-radius: $radius-md;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: $shadow-lg;
+  padding: $spacing-xs 0;
+  background-color: $base-white;
+
+  .ant-select-item {
+    font-family: $font-family-base;
+    font-size: $font-size-text-md;
+    line-height: $line-height-text-md;
+    padding: $spacing-md $spacing-lg;
+    border-radius: 0;
+    color: $text-primary;
+    min-height: auto;
+
+    .ant-select-item-option-content {
+      padding: 0;
+    }
+
+    // Hover state
+    &.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+      background-color: $bg-secondary;
+    }
+
+    // Selected state
+    &.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+      background-color: $bg-secondary;
+      font-weight: $font-weight-medium;
+      color: $text-primary;
+    }
+
+    // Default state
+    &:not(.ant-select-item-option-active):not(.ant-select-item-option-selected) {
+      background-color: $base-white;
+    }
+
+    // Checkmark icon on selected items
+    .ant-select-item-option-state {
+      display: flex;
+      align-items: center;
+      color: $base-primary;
+    }
+
+    // Hide checkmark on non-selected
+    &:not(.ant-select-item-option-selected) .ant-select-item-option-state {
+      display: none;
+    }
+  }
+}

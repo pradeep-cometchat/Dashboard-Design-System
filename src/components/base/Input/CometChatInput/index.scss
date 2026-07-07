@@ -1,0 +1,149 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+// ============================================================
+// CometChatInput — Matches Figma "Input field" component
+// States: Placeholder, Filled, Focused, Disabled, Destructive (Error)
+// Source: Figma node 1090:57817
+// ============================================================
+
+// --- Container ---
+.cc-input-field {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm; // 6px gap between label, input, hint
+  width: 100%;
+
+  // --- Label ---
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    &-text {
+      font-family: $font-family-base;
+      font-size: $font-size-text-sm;
+      font-weight: $font-weight-medium;
+      color: $text-secondary;
+      line-height: $line-height-text-sm;
+    }
+
+    &-required {
+      color: $error-500;
+    }
+
+    &-help {
+      display: inline-flex;
+      align-items: center;
+      cursor: help;
+
+      img {
+        width: 16px;
+        height: 16px;
+        opacity: 0.6;
+      }
+    }
+  }
+
+  // --- Input (antd override) ---
+  &__input.ant-input,
+  &__input.ant-input-affix-wrapper {
+    font-family: $font-family-base;
+    font-size: $font-size-text-sm;
+    font-weight: $font-weight-regular;
+    color: $text-primary;
+    background: $base-white;
+    border: 1px solid $border-dark;
+    border-radius: $radius-md;
+    height: 40px;
+    padding: 8px 12px;
+    gap: $spacing-md;
+    box-shadow: $shadow-xs;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    .ant-input-prefix {
+      margin-inline-end: 0;
+    }
+
+    &::before {
+      display: none;
+    }
+
+    // Placeholder state
+    &::placeholder {
+      color: $text-placeholder;
+      font-weight: $font-weight-regular;
+    }
+
+    // Hover
+    &:hover:not(:disabled):not(.ant-input-status-error) {
+      border-color: $border-brand;
+      border-width: 2px;
+      padding: 7px 11px; // compensate for 2px border
+    }
+
+    // Focused state (Figma: 2px brand border + shadow-xs only, no outer ring)
+    &:focus,
+    &.ant-input-affix-wrapper-focused {
+      border-color: $border-brand;
+      border-width: 2px;
+      padding: 7px 11px; // compensate for 2px border
+      box-shadow: $shadow-xs;
+    }
+
+    // Disabled state
+    &:disabled,
+    &.ant-input-disabled {
+      background-color: $bg-secondary;
+      border-color: $border-default;
+      color: $text-disabled;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  }
+
+  // --- Hint text ---
+  &__hint {
+    font-family: $font-family-base;
+    font-size: $font-size-text-sm;
+    font-weight: $font-weight-regular;
+    color: $text-tertiary;
+    line-height: $line-height-text-sm;
+  }
+
+  // --- Error message ---
+  &__error {
+    font-family: $font-family-base;
+    font-size: $font-size-text-sm;
+    font-weight: $font-weight-regular;
+    color: $error-600;
+    line-height: $line-height-text-sm;
+  }
+
+  // --- Destructive (Error) state modifier ---
+  &-destructive {
+    .cc-input-field__input.ant-input,
+    .cc-input-field__input.ant-input-affix-wrapper {
+      border-color: $error-500;
+
+      &:hover {
+        border-color: $error-500;
+      }
+
+      &:focus,
+      &.ant-input-affix-wrapper-focused {
+        border-color: $error-500;
+        border-width: 2px;
+        padding: 7px 11px;
+        box-shadow: $shadow-xs;
+      }
+    }
+  }
+
+  // --- Disabled state modifier ---
+  &-disabled {
+    .cc-input-field__label-text {
+      color: $text-disabled;
+    }
+  }
+}

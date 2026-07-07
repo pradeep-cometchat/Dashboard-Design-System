@@ -1,0 +1,147 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+// ============================================================
+// CometChatCheckbox — Matches Figma "Checkbox" component
+// Sizes: sm (16×16, 4px radius), md (20×20, 6px radius)
+// States: Default, Hover, Focused, Disabled
+// Checked: brand purple bg with white check icon
+// ============================================================
+
+.cc-checkbox {
+  display: inline-flex;
+  align-items: flex-start;
+
+  // Override Ant Design checkbox styles
+  .ant-checkbox-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-lg;
+    font-family: $font-family-base;
+  }
+
+  .ant-checkbox {
+    top: 3px; // Align checkbox with first line of label text
+
+    .ant-checkbox-inner {
+      border: 1px solid $border-dark;
+      border-radius: $radius-sm;
+      transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    &.ant-checkbox-checked .ant-checkbox-inner {
+      background-color: $base-primary;
+      border-color: $base-primary;
+    }
+
+    &.ant-checkbox-indeterminate .ant-checkbox-inner::after {
+      background-color: $bg-primary;
+      width: 10px;
+      height: 2px;
+      border-radius: 1px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: none;
+    }
+
+    &.ant-checkbox-checked .ant-checkbox-inner,
+    &.ant-checkbox-indeterminate .ant-checkbox-inner {
+      background-color: $base-primary;
+      border-color: $base-primary;
+    }
+
+    // Focus state
+    &.ant-checkbox-checked::after,
+    &::after {
+      border: none;
+    }
+
+    .ant-checkbox-input:focus-visible + .ant-checkbox-inner {
+      box-shadow: $focus-ring;
+    }
+
+    // Disabled
+    &.ant-checkbox-disabled .ant-checkbox-inner {
+      background-color: $bg-secondary;
+      border-color: $border-dark;
+    }
+
+    &.ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner {
+      background-color: $bg-secondary;
+      border-color: $border-dark;
+    }
+  }
+}
+
+// --- MD size (default): 20×20, 6px radius ---
+.cc-checkbox-md .ant-checkbox .ant-checkbox-inner {
+  width: 20px;
+  height: 20px;
+  border-radius: $radius-sm;
+
+  &::after {
+    width: 6px;
+    height: 10px;
+    top: 45%;
+    inset-inline-start: 25%;
+  }
+}
+
+// --- SM size: 16×16, 4px radius ---
+.cc-checkbox-sm .ant-checkbox .ant-checkbox-inner {
+  width: 16px;
+  height: 16px;
+  border-radius: $radius-xs;
+
+  &::after {
+    width: 5px;
+    height: 8px;
+    top: 45%;
+    inset-inline-start: 25%;
+  }
+}
+
+// ============================================================
+// TEXT (label + supporting text)
+// ============================================================
+
+.cc-checkbox__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 0;
+}
+
+.cc-checkbox__label {
+  font-family: $font-family-base;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+}
+
+.cc-checkbox-md .cc-checkbox__label {
+  font-size: $font-size-text-md;
+  line-height: $line-height-text-md;
+}
+
+.cc-checkbox-sm .cc-checkbox__label {
+  font-size: $font-size-text-sm;
+  line-height: $line-height-text-sm;
+}
+
+.cc-checkbox__supporting-text {
+  font-family: $font-family-base;
+  font-weight: $font-weight-regular;
+  color: $text-tertiary;
+}
+
+.cc-checkbox-md .cc-checkbox__supporting-text {
+  font-size: $font-size-text-sm;
+  line-height: $line-height-text-sm;
+}
+
+.cc-checkbox-sm .cc-checkbox__supporting-text {
+  font-size: $font-size-text-xs;
+  line-height: $line-height-text-xs;
+}

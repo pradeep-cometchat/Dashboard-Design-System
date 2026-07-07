@@ -1,0 +1,30 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+// ============================================================
+// CometChatTooltip — Matches Figma "Tooltip" component
+// Background: #0A0D12 (base-black)
+// Border radius: 8px (radius-md)
+// Padding: 8px 12px (simple), 12px (with supporting text)
+// Text: Caption 1/Semibold (12px, 600), white
+// Shadow: shadow-lg
+// Source: Figma node 1052:489
+// ============================================================
+
+.cc-tooltip.ant-tooltip {
+  .ant-tooltip-inner {
+    font-family: $font-family-base;
+    font-size: $font-size-text-xs;
+    font-weight: $font-weight-semibold;
+    line-height: $line-height-text-xs;
+    background-color: $base-black;
+    color: $base-white;
+    border-radius: $radius-md;
+    padding: $spacing-md $spacing-lg;
+    box-shadow: $shadow-lg;
+  }
+
+  .ant-tooltip-arrow::before {
+    background-color: $base-black;
+  }
+}

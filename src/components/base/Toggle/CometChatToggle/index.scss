@@ -1,0 +1,136 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+// ============================================================
+// CometChatToggle — Unified toggle/switch component
+// Figma: Dashboard – Design System (2025) → Toggles
+// ============================================================
+
+// --- MD size (default): 44×24 track, 20×20 knob ---
+.cc-toggle.ant-switch {
+  min-width: 44px;
+  height: 24px;
+  border-radius: 9999px;
+  background-color: $border-default;
+  border: none;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+
+  .ant-switch-handle {
+    width: 20px;
+    height: 20px;
+    top: 2px;
+    inset-inline-start: 2px;
+
+    &::before {
+      border-radius: 9999px;
+      background: $bg-primary;
+      box-shadow: $shadow-sm;
+    }
+  }
+
+  &.ant-switch-checked {
+    background-color: $base-primary;
+
+    .ant-switch-handle {
+      inset-inline-start: calc(100% - 22px);
+    }
+
+    &:hover {
+      background-color: $primary-700;
+    }
+  }
+
+  &:hover:not(.ant-switch-disabled):not(.ant-switch-checked) {
+    background-color: $border-default;
+  }
+
+  &:focus-visible,
+  &.ant-switch-focused {
+    box-shadow: $focus-ring;
+    outline: none;
+  }
+
+  &.ant-switch-disabled {
+    background-color: $bg-disabled;
+    opacity: 1;
+    cursor: not-allowed;
+
+    .ant-switch-handle::before {
+      background: $bg-secondary;
+      box-shadow: $shadow-sm;
+    }
+  }
+}
+
+// --- SM size: 36×20 track, 16×16 knob ---
+.cc-toggle-sm.ant-switch {
+  min-width: 36px;
+  height: 20px;
+
+  .ant-switch-handle {
+    width: 16px;
+    height: 16px;
+    top: 2px;
+    inset-inline-start: 2px;
+
+    &::before {
+      border-radius: 9999px;
+    }
+  }
+
+  &.ant-switch-checked .ant-switch-handle {
+    inset-inline-start: calc(100% - 18px);
+  }
+}
+
+// ============================================================
+// WRAPPER (toggle + label/supporting text)
+// ============================================================
+
+.cc-toggle__wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-lg;
+}
+
+.cc-toggle__wrapper-sm {
+  gap: $spacing-md;
+}
+
+.cc-toggle__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cc-toggle__label {
+  font-family: $font-family-base;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+}
+
+.cc-toggle__wrapper-md .cc-toggle__label {
+  font-size: $font-size-text-md;
+  line-height: $line-height-text-md;
+}
+
+.cc-toggle__wrapper-sm .cc-toggle__label {
+  font-size: $font-size-text-sm;
+  line-height: $line-height-text-sm;
+}
+
+.cc-toggle__supporting-text {
+  font-family: $font-family-base;
+  font-weight: $font-weight-regular;
+  color: $text-tertiary;
+}
+
+.cc-toggle__wrapper-md .cc-toggle__supporting-text {
+  font-size: $font-size-text-md;
+  line-height: $line-height-text-md;
+}
+
+.cc-toggle__wrapper-sm .cc-toggle__supporting-text {
+  font-size: $font-size-text-sm;
+  line-height: $line-height-text-sm;
+}

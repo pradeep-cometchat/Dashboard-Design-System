@@ -1,0 +1,354 @@
+@import '../../../../assets/design-tokens.scss';
+
+// ============================================================
+// CometChatModal — Dashboard base modal component styles
+// Source: Figma "❖ Dashboard – Design System (May 2026)" → Modals
+// node-id: 172-4293
+//
+// Variants supported:
+//   - Header layout: left, center, horizontal
+//   - Tone: default, success, warning, destructive
+//   - Actions layout: horizontal, vertical, horizontal-checkbox
+//   - Optional: featured icon, close, header/footer divider, tertiary action, checkbox
+// ============================================================
+
+.cc-modal .ant-modal-content {
+  padding: 0;
+  border-radius: $radius-xl;
+  font-family: $font-family-base;
+  background-color: $bg-primary;
+  box-shadow: $shadow-3xl;
+  overflow: hidden;
+}
+
+.cc-modal .ant-modal-body {
+  padding: 0;
+}
+
+// ============================================================
+// HEADER
+// ============================================================
+.cc-modal__header {
+  position: relative;
+  display: flex;
+  gap: $spacing-xl;
+  padding: $spacing-3xl $spacing-3xl 0 $spacing-3xl;
+  align-items: flex-start;
+}
+
+.cc-modal-header-left .cc-modal__header,
+.cc-modal-header-center .cc-modal__header {
+  flex-direction: column;
+  gap: $spacing-xl;
+}
+
+.cc-modal-header-horizontal .cc-modal__header {
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.cc-modal-header-center .cc-modal__header {
+  align-items: center;
+  text-align: center;
+}
+
+.cc-modal__header-content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xxs;
+  flex: 1;
+  min-width: 0;
+}
+
+.cc-modal__title {
+  color: $text-primary;
+  font-family: $font-family-base;
+  font-size: $font-size-text-md;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-text-md;
+}
+
+.cc-modal__description {
+  color: $text-tertiary;
+  font-family: $font-family-base;
+  font-size: $font-size-text-sm;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-text-sm;
+}
+
+// ============================================================
+// FEATURED ICON (tone-driven)
+// ============================================================
+.cc-modal__featured-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+// SVG icon rendered via CSS mask-image so the foreground color
+// follows the tone class via background-color.
+.cc-modal__featured-svg {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+.cc-modal__featured-svg-check-circle {
+  mask-image: url('~@assets/images/icons/modal/check-circle.svg');
+  -webkit-mask-image: url('~@assets/images/icons/modal/check-circle.svg');
+}
+
+.cc-modal__featured-svg-alert-circle {
+  mask-image: url('~@assets/images/icons/modal/alert-circle.svg');
+  -webkit-mask-image: url('~@assets/images/icons/modal/alert-circle.svg');
+}
+
+.cc-modal__featured-svg-alert-triangle {
+  mask-image: url('~@assets/images/icons/modal/alert-triangle.svg');
+  -webkit-mask-image: url('~@assets/images/icons/modal/alert-triangle.svg');
+}
+
+.cc-modal__featured-svg-trash-01 {
+  mask-image: url('~@assets/images/icons/modal/trash-01.svg');
+  -webkit-mask-image: url('~@assets/images/icons/modal/trash-01.svg');
+}
+
+// --- Featured icon container styles (Figma: Featured icon vs Featured icon outline) ---
+.cc-modal-icon-circle .cc-modal__featured-icon {
+  border-radius: $radius-full;
+}
+
+.cc-modal-icon-square .cc-modal__featured-icon {
+  border-radius: $radius-md;
+  background-color: $bg-primary;
+  border: 1px solid $border-default;
+  box-shadow: $shadow-xs;
+}
+
+// In square mode, the inner icon picks up the tone foreground;
+// the container background is white instead of the tone-tinted bg.
+.cc-modal-icon-square.cc-modal-tone-default .cc-modal__featured-icon,
+.cc-modal-icon-square.cc-modal-tone-success .cc-modal__featured-icon,
+.cc-modal-icon-square.cc-modal-tone-warning .cc-modal__featured-icon,
+.cc-modal-icon-square.cc-modal-tone-destructive .cc-modal__featured-icon {
+  background-color: $bg-primary;
+}
+
+.cc-modal-icon-square.cc-modal-tone-default .cc-modal__featured-icon {
+  color: $fg-quaternary;
+}
+
+.cc-modal-tone-default .cc-modal__featured-icon {
+  background-color: $bg-brand-primary;
+  color: $fg-brand-primary;
+}
+
+.cc-modal-tone-success .cc-modal__featured-icon {
+  background-color: $bg-success-secondary;
+  color: $fg-success-primary;
+}
+
+.cc-modal-tone-warning .cc-modal__featured-icon {
+  background-color: $bg-warning-secondary;
+  color: $fg-warning-primary;
+}
+
+.cc-modal-tone-destructive .cc-modal__featured-icon {
+  background-color: $bg-error-secondary;
+  color: $fg-error-primary;
+}
+
+// In horizontal header layout, the icon hugs its content
+.cc-modal-header-horizontal .cc-modal__featured-icon {
+  margin-top: 0;
+}
+
+// ============================================================
+// CLOSE BUTTON
+// ============================================================
+.cc-modal__close {
+  position: absolute;
+  top: $spacing-lg;
+  right: $spacing-lg;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  border-radius: $radius-md;
+  color: $fg-quaternary;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background-color: $bg-secondary;
+    color: $fg-quaternary-hover;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: $focus-ring;
+  }
+}
+
+.cc-modal__close-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-color: currentColor;
+  mask-image: url('~@assets/images/icons/modal/x-close.svg');
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: url('~@assets/images/icons/modal/x-close.svg');
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+// ============================================================
+// BODY
+// ============================================================
+.cc-modal__body {
+  padding: $spacing-xl $spacing-3xl 0 $spacing-3xl;
+  color: $text-tertiary;
+  font-family: $font-family-base;
+  font-size: $font-size-text-sm;
+  line-height: $line-height-text-sm;
+}
+
+// ============================================================
+// DIVIDER
+// ============================================================
+.cc-modal__divider {
+  height: 1px;
+  background-color: $border-default;
+  margin-top: $spacing-2xl;
+}
+
+.cc-modal__body + .cc-modal__divider {
+  margin-top: $spacing-2xl;
+}
+
+// ============================================================
+// FOOTER (actions)
+// ============================================================
+.cc-modal__footer {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  padding: $spacing-2xl $spacing-3xl $spacing-3xl $spacing-3xl;
+}
+
+.cc-modal__footer-actions {
+  display: flex;
+  gap: $spacing-lg;
+  margin-left: auto;
+}
+
+.cc-modal__footer-checkbox {
+  display: inline-flex;
+  align-items: center;
+  font-family: $font-family-base;
+  font-size: $font-size-text-sm;
+  color: $text-secondary;
+}
+
+// --- Horizontal (default = "Horizontal fill container"): full-width side-by-side ---
+.cc-modal-actions-horizontal .cc-modal__footer {
+  align-items: stretch;
+}
+
+.cc-modal-actions-horizontal .cc-modal__footer-actions {
+  display: flex;
+  width: 100%;
+  margin-left: 0;
+}
+
+.cc-modal-actions-horizontal .cc-modal__footer-actions .cc-modal__btn-cancel,
+.cc-modal-actions-horizontal .cc-modal__footer-actions .cc-modal__btn-ok {
+  flex: 1;
+}
+
+// --- Vertical: stacked, primary on top, full width ---
+.cc-modal-actions-vertical .cc-modal__footer {
+  flex-direction: column-reverse;
+  align-items: stretch;
+}
+
+.cc-modal-actions-vertical .cc-modal__footer-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: $spacing-lg;
+  margin-left: 0;
+  width: 100%;
+}
+
+.cc-modal-actions-vertical .cc-modal__footer-actions .cc-modal__btn-cancel,
+.cc-modal-actions-vertical .cc-modal__footer-actions .cc-modal__btn-ok {
+  width: 100%;
+}
+
+// --- Horizontal-right: hug content, right-aligned (optional checkbox on the left) ---
+.cc-modal-actions-horizontal-right .cc-modal__footer {
+  justify-content: flex-end;
+}
+
+// Tertiary button sits on the left
+.cc-modal__btn-tertiary.ant-btn {
+  margin-right: auto;
+}
+
+// ============================================================
+// SIZES
+// ============================================================
+// Width is controlled by the antd `width` prop (driven by `size`).
+// No additional rules needed here, but expose hooks for consumers.
+
+// ============================================================
+// MOBILE
+// ============================================================
+@media (max-width: 480px) {
+  .cc-modal .ant-modal {
+    max-width: calc(100vw - 32px);
+    margin: 16px;
+  }
+
+  .cc-modal__header {
+    padding: $spacing-xl $spacing-xl 0 $spacing-xl;
+  }
+
+  .cc-modal__body {
+    padding: $spacing-xl $spacing-xl 0 $spacing-xl;
+  }
+
+  .cc-modal__footer {
+    padding: $spacing-xl;
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .cc-modal__footer-actions {
+    flex-direction: column-reverse;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .cc-modal__footer-actions .cc-modal__btn-cancel,
+  .cc-modal__footer-actions .cc-modal__btn-ok {
+    width: 100%;
+  }
+}

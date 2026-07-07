@@ -1,0 +1,35 @@
+@import '../../../../assets/design-tokens.scss';
+
+// --- Base Drawer ---
+.cc-drawer .ant-drawer-header {
+  font-family: $font-family-base;
+  background: $bg-secondary;
+  border-bottom: none;
+  padding: $spacing-2xl;
+}
+
+.cc-drawer .ant-drawer-title {
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-text-lg;
+  line-height: $line-height-text-lg;
+  color: $text-primary;
+}
+
+.cc-drawer .ant-drawer-body {
+  font-family: $font-family-base;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cc-drawer .ant-drawer-close {
+  padding: $spacing-md;
+  border-radius: $radius-md;
+  color: $fg-quaternary;
+
+  &:hover {
+    color: $fg-secondary;
+    background: $bg-secondary-hover;
+  }
+}

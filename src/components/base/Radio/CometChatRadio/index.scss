@@ -1,0 +1,172 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+// ============================================================
+// CometChatRadio — Matches Figma "Checkbox" component (Type=Radio)
+// All styles STRICTLY scoped under .cc-radio to avoid leaking
+// ============================================================
+
+.cc-radio {
+  display: inline-flex;
+
+  .ant-radio-group {
+    display: flex;
+    gap: $spacing-xl;
+  }
+
+  &.cc-radio-vertical .ant-radio-group {
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  &.cc-radio-horizontal .ant-radio-group {
+    flex-direction: row;
+    gap: $spacing-xl;
+  }
+
+  .ant-radio-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-lg;
+    font-family: $font-family-base;
+    margin-inline-end: 0;
+  }
+
+  // --- Radio circle styles (scoped) ---
+  .ant-radio {
+    top: 3px;
+  }
+
+  .ant-radio .ant-radio-inner {
+    border: 1px solid $border-dark;
+    background-color: $bg-primary;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .ant-radio .ant-radio-inner::after {
+    background-color: $bg-primary;
+    border-radius: 9999px;
+  }
+
+  // Checked: solid purple fill + white dot
+  .ant-radio-checked .ant-radio-inner {
+    background-color: $base-primary;
+    border-color: $base-primary;
+  }
+
+  .ant-radio-checked .ant-radio-inner::after {
+    opacity: 1;
+    background-color: $bg-primary;
+  }
+
+  // Hover on wrapper
+  .ant-radio-wrapper:hover .ant-radio:not(.ant-radio-disabled) .ant-radio-inner {
+    border-color: $base-primary;
+  }
+
+  // Focus
+  .ant-radio .ant-radio-input:focus-visible + .ant-radio-inner {
+    box-shadow: $focus-ring;
+  }
+
+  // Disabled
+  .ant-radio-disabled .ant-radio-inner {
+    background-color: $bg-secondary;
+    border-color: $border-dark;
+  }
+
+  .ant-radio-disabled.ant-radio-checked .ant-radio-inner {
+    background-color: $bg-secondary;
+    border-color: $border-dark;
+  }
+
+  .ant-radio-disabled.ant-radio-checked .ant-radio-inner::after {
+    background-color: $border-dark;
+  }
+}
+
+// --- MD size (default): 20×20, dot 8×8 ---
+.cc-radio.cc-radio-md {
+  .ant-radio .ant-radio-inner {
+    width: 20px;
+    height: 20px;
+  }
+
+  .ant-radio .ant-radio-inner::after {
+    width: 8px;
+    height: 8px;
+    margin-block-start: 0;
+    margin-inline-start: 0;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  .ant-radio-checked .ant-radio-inner::after {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+// --- SM size: 16×16, dot 6×6 ---
+.cc-radio.cc-radio-sm {
+  .ant-radio .ant-radio-inner {
+    width: 16px;
+    height: 16px;
+  }
+
+  .ant-radio .ant-radio-inner::after {
+    width: 6px;
+    height: 6px;
+    margin-block-start: 0;
+    margin-inline-start: 0;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  .ant-radio-checked .ant-radio-inner::after {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+// ============================================================
+// TEXT (label + supporting text)
+// ============================================================
+
+.cc-radio__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cc-radio__label {
+  font-family: $font-family-base;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+}
+
+.cc-radio-md .cc-radio__label {
+  font-size: $font-size-text-md;
+  line-height: $line-height-text-md;
+}
+
+.cc-radio-sm .cc-radio__label {
+  font-size: $font-size-text-sm;
+  line-height: $line-height-text-sm;
+}
+
+.cc-radio__supporting-text {
+  font-family: $font-family-base;
+  font-weight: $font-weight-regular;
+  color: $text-tertiary;
+}
+
+.cc-radio-md .cc-radio__supporting-text {
+  font-size: $font-size-text-sm;
+  line-height: $line-height-text-sm;
+}
+
+.cc-radio-sm .cc-radio__supporting-text {
+  font-size: $font-size-text-xs;
+  line-height: $line-height-text-xs;
+}

@@ -1,0 +1,150 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+// ============================================================
+// CometChatTextArea — Matches Figma "Textarea input field" component
+// States: Placeholder, Default, Focused, Disabled, Destructive (Error)
+// Source: Figma node 1238:278
+// ============================================================
+
+// --- Container ---
+.cc-textarea-field {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  width: 100%;
+
+  // --- Label ---
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    &-text {
+      font-family: $font-family-base;
+      font-size: $font-size-text-sm;
+      font-weight: $font-weight-medium;
+      color: $text-secondary;
+      line-height: $line-height-text-sm;
+    }
+
+    &-required {
+      color: $base-primary;
+    }
+
+    &-help {
+      display: inline-flex;
+      align-items: center;
+      cursor: help;
+
+      img {
+        width: 16px;
+        height: 16px;
+        opacity: 0.6;
+      }
+    }
+  }
+
+  // --- TextArea (antd override) ---
+  // Using repeated class for specificity to beat antd's CSS-in-JS
+  &__input.ant-input.ant-input {
+    font-family: $font-family-base;
+    font-size: $font-size-text-md;
+    font-weight: $font-weight-regular;
+    color: $text-primary;
+    border: 1px solid $border-dark;
+    border-radius: $radius-md;
+    padding: $spacing-lg 14px;
+    box-shadow: $shadow-xs;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    resize: vertical;
+    outline: none;
+
+    &::placeholder {
+      color: $text-placeholder;
+      font-weight: $font-weight-regular;
+    }
+
+    &:hover:not(:disabled):not(.ant-input-status-error):not(:focus) {
+      border-color: $border-dark;
+    }
+
+    &:focus,
+    &:focus-within,
+    &.ant-input-focused {
+      border-color: $border-brand;
+      border-width: 2px;
+      padding: calc(#{$spacing-lg} - 1px) 13px; // compensate for 2px border
+      box-shadow: $shadow-xs;
+      outline: none;
+    }
+
+    &:disabled {
+      background-color: $bg-secondary;
+      border-color: $border-default;
+      color: $text-disabled;
+      cursor: not-allowed;
+      box-shadow: none;
+      resize: none;
+    }
+  }
+
+  // Suppress Ant Design's wrapper focus outline
+  .ant-input-textarea-show-count,
+  .ant-input-affix-wrapper {
+    outline: none;
+    box-shadow: none;
+
+    &:focus,
+    &:focus-within,
+    &.ant-input-affix-wrapper-focused {
+      outline: none;
+      box-shadow: none;
+      border-color: transparent;
+    }
+  }
+
+  // --- Hint text ---
+  &__hint {
+    font-family: $font-family-base;
+    font-size: $font-size-text-sm;
+    font-weight: $font-weight-regular;
+    color: $text-tertiary;
+    line-height: $line-height-text-sm;
+  }
+
+  // --- Error message ---
+  &__error {
+    font-family: $font-family-base;
+    font-size: $font-size-text-sm;
+    font-weight: $font-weight-regular;
+    color: $error-600;
+    line-height: $line-height-text-sm;
+  }
+
+  // --- Destructive (Error) state ---
+  &-destructive {
+    .cc-textarea-field__input.ant-input {
+      border-color: $error-500;
+
+      &:hover {
+        border-color: $error-500;
+      }
+
+      &:focus {
+        border-color: $error-500;
+        border-width: 2px;
+        padding: calc(#{$spacing-lg} - 1px) 13px;
+        box-shadow: $shadow-xs;
+        outline: none;
+      }
+    }
+  }
+
+  // --- Disabled state ---
+  &-disabled {
+    .cc-textarea-field__label-text {
+      color: $text-disabled;
+    }
+  }
+}

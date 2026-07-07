@@ -1,0 +1,42 @@
+@import '../../../../assets/design-tokens.scss';
+
+
+// ============================================================
+// CometChatAvatar — Matches Figma "Avatar" component
+// Sizes: xs (24px), sm (32px), md (40px), lg (48px), xl (56px), 2xl (64px)
+// Shape: Always circle (border-radius: 9999px)
+// Inner border: rgba(0,0,0,0.08) to separate from background
+// Text fallback: #F5F5F5 bg, #E9EAEB border, #717680 text
+// ============================================================
+
+.cc-avatar.ant-avatar {
+  font-family: $font-family-base;
+  font-weight: $font-weight-semibold;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+
+  // Text/initials fallback colors
+  &.ant-avatar-string,
+  &:not(.ant-avatar-image) {
+    background-color: $neutral-lm-100;
+    border: 1px solid $neutral-lm-200;
+    color: $neutral-lm-500;
+  }
+
+  // Image avatar — just the inner shadow for separation
+  &.ant-avatar-image {
+    border: none;
+  }
+}
+
+// Size-specific font sizing for initials
+.cc-avatar.ant-avatar-sm {
+  font-size: $font-size-text-xs;
+}
+
+.cc-avatar.ant-avatar {
+  font-size: $font-size-text-sm;
+}
+
+.cc-avatar.ant-avatar-lg {
+  font-size: $font-size-text-md;
+}
