@@ -5,7 +5,7 @@ import CometChatInput from "components/base/Input/CometChatInput";
 import { c, s, r, font, shadow } from "./theme";
 import type { Message, GroupType, Poll } from "./data";
 import { StatusAvatar, RoleBadge, GroupTypeBadge, DualAvatar } from "./ui";
-import { SearchLg, Flag02, CheckIcon, CornerDownRight } from "./icons";
+import { SearchLg, Flag02, CheckIcon, CornerDownRight, ChevronUp, ChevronDown } from "./icons";
 
 const cap2: React.CSSProperties = { fontFamily: "var(--font-family-base)", fontSize: "var(--font-size-text-xs)", lineHeight: "16px", fontWeight: 400 };
 
@@ -129,7 +129,43 @@ function MediaBubble({ msg, onOpenMedia }: { msg: Message; onOpenMedia?: (m: Mes
   );
 }
 
-function Bubble({ msg, selected, onSelect, onOpenMedia, onOpenThread }: { msg: Message; selected?: boolean; onSelect?: () => void; onOpenMedia?: (m: Message) => void; onOpenThread?: (m: Message) => void }) {
+/** Inline thread — replies unfold below the parent in a fixed-height scrollable container with a collapse control. */
+function InlineThread({ msg, expanded, onToggle, selectedMessageId, onSelectMessage, onOpenMedia }: {
+  msg: Message; expanded: boolean; onToggle: () => void;
+  selectedMessageId?: string; onSelectMessage?: (m: Message) => void; onOpenMedia?: (m: Message) => void;
+}) {
+  const n = msg.replies?.length ?? 0;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", marginTop: s.sm, width: "100%" }}>
+      <button
+        onClick={(e) => { e.stopPropagation(); onToggle(); }}
+        style={{ all: "unset", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: s.sm, padding: `0 ${s.xs}`, color: c.textSecondary }}
+      >
+        <CornerDownRight size={16} />
+        <span style={{ ...font.bodyMd, color: c.textSecondary }}>{n} Replies</span>
+        {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+      </button>
+      {expanded && (
+        <div style={{ width: "100%", boxSizing: "border-box", marginTop: s.sm, border: `1px solid ${c.borderDefault}`, borderRadius: r.xl, background: c.bgPrimary, overflow: "hidden" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: `${s.md} ${s.xl}`, borderBottom: `1px solid ${c.borderDefault}` }}>
+            <span style={{ ...font.captionReg, color: c.textTertiary }}>{n} Replies</span>
+            <button onClick={(e) => { e.stopPropagation(); onToggle(); }} style={{ all: "unset", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: s.xs, color: c.textTertiary }}>
+              <span style={{ ...font.caption }}>Collapse</span>
+              <ChevronUp size={16} />
+            </button>
+          </div>
+          <div style={{ height: 264, overflowY: "auto", background: c.bgSecondary, padding: `${s.xs} 0` }} onClick={(e) => e.stopPropagation()}>
+            {msg.replies?.map((reply) => (
+              <Bubble key={reply.id} msg={reply} selected={reply.id === selectedMessageId} onSelect={() => onSelectMessage?.(reply)} onOpenMedia={onOpenMedia} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Bubble({ msg, selected, onSelect, onOpenMedia, onOpenThread, inlineThread }: { msg: Message; selected?: boolean; onSelect?: () => void; onOpenMedia?: (m: Message) => void; onOpenThread?: (m: Message) => void; inlineThread?: { expanded: boolean; onToggle: () => void; selectedMessageId?: string; onSelectMessage?: (m: Message) => void } }) {
   const blocked = msg.moderation?.status === "blocked";
   const nameColor = msg.sender.online ? "var(--info-700)" : "var(--neutral-lm-700)";
   const isMedia = (msg.type === "image" || msg.type === "video") && msg.media?.length;
@@ -166,7 +202,9 @@ function Bubble({ msg, selected, onSelect, onOpenMedia, onOpenThread }: { msg: M
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
           {body}
           <Reactions msg={msg} />
-          {msg.replies?.length && onOpenThread ? (
+          {msg.replies?.length && inlineThread ? (
+            <InlineThread msg={msg} expanded={inlineThread.expanded} onToggle={inlineThread.onToggle} selectedMessageId={inlineThread.selectedMessageId} onSelectMessage={inlineThread.onSelectMessage} onOpenMedia={onOpenMedia} />
+          ) : msg.replies?.length && onOpenThread ? (
             <button
               onClick={(e) => { e.stopPropagation(); onOpenThread(msg); }}
               style={{ all: "unset", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: s.sm, marginTop: s.sm, padding: `0 ${s.xs}`, color: c.textSecondary }}
@@ -181,7 +219,7 @@ function Bubble({ msg, selected, onSelect, onOpenMedia, onOpenThread }: { msg: M
   );
 }
 
-export function ChatView({ header, messages, selectedMessageId, onSelectMessage, onOpenMedia, onOpenThread, onCloseThread, thread, initialSearchOpen }: {
+export function ChatView({ header, messages, selectedMessageId, onSelectMessage, onOpenMedia, onOpenThread, onCloseThread, thread, initialSearchOpen, inlineThreads, initialExpandedThreadId }: {
   header: { title: string; groupType?: GroupType; members: number; online: number; messages: number; avatar?: string; avatarB?: string; initials: string };
   messages: Message[];
   selectedMessageId?: string;
@@ -191,9 +229,14 @@ export function ChatView({ header, messages, selectedMessageId, onSelectMessage,
   onCloseThread?: () => void;
   thread?: Message;
   initialSearchOpen?: boolean;
+  /** Expand threads inline below the message (fixed-height container) instead of the full-panel thread view. */
+  inlineThreads?: boolean;
+  initialExpandedThreadId?: string;
 }) {
   const [searching, setSearching] = React.useState(!!initialSearchOpen);
   const [query, setQuery] = React.useState("");
+  const [expandedThreads, setExpandedThreads] = React.useState<string[]>(initialExpandedThreadId ? [initialExpandedThreadId] : []);
+  const toggleThread = (id: string) => setExpandedThreads((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
   const q = query.trim().toLowerCase();
   const shown = q ? messages.filter((m) => (m.text ?? "").toLowerCase().includes(q) || (m.poll?.question ?? "").toLowerCase().includes(q)) : messages;
 
@@ -252,7 +295,8 @@ export function ChatView({ header, messages, selectedMessageId, onSelectMessage,
         ) : shown.map((m) => (
           <React.Fragment key={m.id}>
             {!q && m.divider && <DateDivider label={m.divider} />}
-            <Bubble msg={m} selected={m.id === selectedMessageId} onSelect={() => onSelectMessage?.(m)} onOpenMedia={onOpenMedia} onOpenThread={onOpenThread} />
+            <Bubble msg={m} selected={m.id === selectedMessageId} onSelect={() => onSelectMessage?.(m)} onOpenMedia={onOpenMedia} onOpenThread={inlineThreads ? undefined : onOpenThread}
+              inlineThread={inlineThreads && m.replies?.length ? { expanded: expandedThreads.includes(m.id), onToggle: () => toggleThread(m.id), selectedMessageId, onSelectMessage } : undefined} />
           </React.Fragment>
         ))}
       </div>

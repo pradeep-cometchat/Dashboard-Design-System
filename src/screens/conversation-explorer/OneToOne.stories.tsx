@@ -5,7 +5,7 @@ import { conversations, oneToOneHeader, oneToOneMessages, people, VIDEO_PREVIEW 
 /** Hide the data-plumbing args from the Docs controls table. */
 const HIDDEN = [
   "conversations", "flowConversationId", "header", "messages", "members", "searchPlaceholder",
-  "initialConversationId", "initialMessageId", "initialOverlay", "exportVariant", "receiverType", "initialSearchOpen", "initialThreadId", "initialFilterOpen",
+  "initialConversationId", "initialMessageId", "initialOverlay", "exportVariant", "receiverType", "initialSearchOpen", "initialThreadId", "initialFilterOpen", "inlineThreads",
 ].reduce<Record<string, { table: { disable: true } }>>((a, k) => { a[k] = { table: { disable: true } }; return a; }, {});
 
 const meta: Meta<typeof Explorer> = {
@@ -65,6 +65,11 @@ export const Filters: Story = {
 export const Thread: Story = {
   args: { ...base, initialConversationId: "c4", initialThreadId: "m5", initialMessageId: "m5" },
   parameters: { docs: { description: { story: "Thread view. A message with replies shows a “↳ N Replies” affordance; clicking it opens the thread in the center panel — the parent message, a replies divider, and every reply — with a back arrow to return. Clicking any message in the thread selects it and populates the right-panel details." } } },
+};
+
+export const InlineThread: Story = {
+  args: { ...base, initialConversationId: "c4", initialThreadId: "m5", initialMessageId: "m5", inlineThreads: true },
+  parameters: { docs: { description: { story: "Inline thread expansion. Clicking “↳ N Replies” unfolds the replies directly below the message in a fixed-height, scrollable container with a Collapse control — the conversation stays in view. Clicking a reply selects it into the right-panel details." } } },
 };
 
 const imageMsg = oneToOneMessages.find((m) => m.id === "m3")!;

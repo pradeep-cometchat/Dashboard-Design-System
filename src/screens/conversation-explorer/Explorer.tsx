@@ -21,6 +21,8 @@ export interface ExplorerProps {
   initialSearchOpen?: boolean;
   initialThreadId?: string;
   initialFilterOpen?: boolean;
+  /** Expand threads inline below the message instead of the full-panel thread view. */
+  inlineThreads?: boolean;
 }
 
 /** Stateful Conversation Explorer — drives selection + media overlays for the stories. */
@@ -31,7 +33,7 @@ export function Explorer(props: ExplorerProps) {
   );
   const [overlay, setOverlay] = React.useState(props.initialOverlay);
   const [thread, setThread] = React.useState<Message | undefined>(
-    props.messages.find((m) => m.id === props.initialThreadId)
+    props.inlineThreads ? undefined : props.messages.find((m) => m.id === props.initialThreadId)
   );
 
   const openMedia = (m: Message) => {
@@ -48,7 +50,8 @@ export function Explorer(props: ExplorerProps) {
   const active = convId === props.flowConversationId;
 
   const center = active
-    ? <ChatView header={props.header} messages={props.messages} selectedMessageId={msg?.id} onSelectMessage={setMsg} onOpenMedia={openMedia} initialSearchOpen={props.initialSearchOpen} thread={thread} onOpenThread={setThread} onCloseThread={() => setThread(undefined)} />
+    ? <ChatView header={props.header} messages={props.messages} selectedMessageId={msg?.id} onSelectMessage={setMsg} onOpenMedia={openMedia} initialSearchOpen={props.initialSearchOpen} thread={thread} onOpenThread={setThread} onCloseThread={() => setThread(undefined)}
+        inlineThreads={props.inlineThreads} initialExpandedThreadId={props.inlineThreads ? props.initialThreadId : undefined} />
     : <ConversationEmpty />;
 
   const right = active && msg
