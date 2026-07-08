@@ -5,7 +5,7 @@ import { conversations, oneToOneHeader, oneToOneMessages, people, VIDEO_PREVIEW 
 /** Hide the data-plumbing args from the Docs controls table. */
 const HIDDEN = [
   "conversations", "flowConversationId", "header", "messages", "members", "searchPlaceholder",
-  "initialConversationId", "initialMessageId", "initialOverlay", "exportVariant", "receiverType",
+  "initialConversationId", "initialMessageId", "initialOverlay", "exportVariant", "receiverType", "initialSearchOpen", "initialThreadId", "initialFilterOpen",
 ].reduce<Record<string, { table: { disable: true } }>>((a, k) => { a[k] = { table: { disable: true } }; return a; }, {});
 
 const meta: Meta<typeof Explorer> = {
@@ -52,10 +52,28 @@ export const MessageSelected: Story = {
   parameters: { docs: { description: { story: "A message is selected — the right panel is fully populated with the message overview, members, media preview, reactions, read receipts and moderation cards." } } },
 };
 
+export const Search: Story = {
+  args: { ...base, initialConversationId: "c4", initialSearchOpen: true },
+  parameters: { docs: { description: { story: "Full-text search within the conversation. Clicking the search icon in the chat header swaps it for a search field; typing filters the messages live (close with the ✕)." } } },
+};
+
+export const Filters: Story = {
+  args: { ...base, initialConversationId: "c4", initialFilterOpen: true },
+  parameters: { docs: { description: { story: "Clicking the filter button reveals a filter-chip bar (Type · Moderation · Tags). Each chip opens a dropdown with a search box, a checkbox list of options with counts, and a Clear Filters footer; a Reset clears everything." } } },
+};
+
+export const Thread: Story = {
+  args: { ...base, initialConversationId: "c4", initialThreadId: "m5", initialMessageId: "m5" },
+  parameters: { docs: { description: { story: "Thread view. A message with replies shows a “↳ N Replies” affordance; clicking it opens the thread in the center panel — the parent message, a replies divider, and every reply — with a back arrow to return. Clicking any message in the thread selects it and populates the right-panel details." } } },
+};
+
+const imageMsg = oneToOneMessages.find((m) => m.id === "m3")!;
+const videoMsg = oneToOneMessages.find((m) => m.id === "m4")!;
+
 export const ImagePreview: Story = {
   args: {
     ...base, initialConversationId: "c4", initialMessageId: "m3",
-    initialOverlay: { type: "image", src: oneToOneMessages[2].media![0].src },
+    initialOverlay: { type: "image", src: imageMsg.media![0].src },
   },
   parameters: { docs: { description: { story: "Image lightbox opened over a dimmed, blurred workspace." } } },
 };
@@ -63,7 +81,7 @@ export const ImagePreview: Story = {
 export const VideoPreview: Story = {
   args: {
     ...base, initialConversationId: "c4", initialMessageId: "m4", exportVariant: "csv-json",
-    initialOverlay: { type: "video", src: VIDEO_PREVIEW, duration: "0:24", thumbnails: oneToOneMessages[3].media!.map((m) => m.src) },
+    initialOverlay: { type: "video", src: VIDEO_PREVIEW, duration: "0:24", thumbnails: videoMsg.media!.map((m) => m.src) },
   },
   parameters: { docs: { description: { story: "Video lightbox with a scrubber and thumbnail strip. The page header switches to CSV / JSON export actions." } } },
 };

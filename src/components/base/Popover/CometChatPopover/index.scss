@@ -5,3 +5,11 @@
   font-family: $font-family-base;
   border-radius: $radius-md;
 }
+
+// Flush variant — content manages its own padding (menus, filter dropdowns).
+// antd v6 puts the padding on .ant-popover-container; older versions on -inner/-inner-content.
+.cc-popover-flush .ant-popover-container,
+.cc-popover-flush .ant-popover-inner,
+.cc-popover-flush .ant-popover-inner-content {
+  padding: 0;
+}

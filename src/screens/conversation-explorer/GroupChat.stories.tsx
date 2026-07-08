@@ -4,7 +4,7 @@ import { conversations, groupHeader, groupMessages, groupMembers, IMAGE_PREVIEW 
 
 const HIDDEN = [
   "conversations", "flowConversationId", "header", "messages", "members", "searchPlaceholder",
-  "initialConversationId", "initialMessageId", "initialOverlay", "exportVariant", "receiverType",
+  "initialConversationId", "initialMessageId", "initialOverlay", "exportVariant", "receiverType", "initialSearchOpen", "initialThreadId",
 ].reduce<Record<string, { table: { disable: true } }>>((a, k) => { a[k] = { table: { disable: true } }; return a; }, {});
 
 const meta: Meta<typeof Explorer> = {
@@ -56,4 +56,9 @@ export const MediaPreview: Story = {
     initialOverlay: { type: "image", src: IMAGE_PREVIEW },
   },
   parameters: { docs: { description: { story: "Media lightbox for a group message, over the dimmed workspace." } } },
+};
+
+export const Thread: Story = {
+  args: { ...base, initialConversationId: "c1", initialThreadId: "g8", initialMessageId: "g8" },
+  parameters: { docs: { description: { story: "Thread view in a group conversation. The “↳ N Replies” affordance opens the thread — parent message, replies divider, and each reply (with role-coloured names) — and clicking any message selects it into the right-panel details. Back arrow returns to the conversation." } } },
 };

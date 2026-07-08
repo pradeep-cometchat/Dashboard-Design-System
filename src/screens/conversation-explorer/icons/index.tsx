@@ -45,6 +45,30 @@ export function Shield01({ size = 12, style }: P) {
   );
 }
 
+export function PlusCircle({ size = 16, style }: P) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" style={base(size, style)} xmlns="http://www.w3.org/2000/svg" aria-hidden>
+      <path d="M8 5.333V10.667M5.333 8H10.667M14.667 8C14.667 11.682 11.682 14.667 8 14.667C4.318 14.667 1.333 11.682 1.333 8C1.333 4.318 4.318 1.333 8 1.333C11.682 1.333 14.667 4.318 14.667 8Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function XClose({ size = 16, style }: P) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" style={base(size, style)} xmlns="http://www.w3.org/2000/svg" aria-hidden>
+      <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function CornerDownRight({ size = 16, style }: P) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" style={base(size, style)} xmlns="http://www.w3.org/2000/svg" aria-hidden>
+      <path d="M5 5v3.5A2.5 2.5 0 0 0 7.5 11H15m0 0l-3.333-3.333M15 11l-3.333 3.333" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function Flag02({ size = 12, style }: P) {
   return (
     <svg viewBox="0 0 12 12" fill="none" style={base(size, style)} xmlns="http://www.w3.org/2000/svg" aria-hidden>

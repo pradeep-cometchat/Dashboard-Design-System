@@ -5,6 +5,7 @@ import { c, s, r, font, SOFT_RING } from "./theme";
 import type { Conversation } from "./data";
 import { GroupAvatar, StatusAvatar, DualAvatar, GroupTypeBadge, MemberCountBadge } from "./ui";
 import { SearchLg, FilterLines } from "./icons";
+import { FilterBar } from "./FilterBar";
 
 function UnreadPill({ n }: { n: number }) {
   // Solid brand pill (design uses filled purple #6852d6, text #fafafa) — colors are tokens.
@@ -59,9 +60,10 @@ function ConversationRow({ conv, selected, onClick }: { conv: Conversation; sele
   );
 }
 
-export function ConversationList({ conversations, selectedId, onSelect, searchPlaceholder = "Search by user..." }: {
-  conversations: Conversation[]; selectedId?: string; onSelect?: (id: string) => void; searchPlaceholder?: string;
+export function ConversationList({ conversations, selectedId, onSelect, searchPlaceholder = "Search by user...", initialFilterOpen }: {
+  conversations: Conversation[]; selectedId?: string; onSelect?: (id: string) => void; searchPlaceholder?: string; initialFilterOpen?: boolean;
 }) {
+  const [filterOpen, setFilterOpen] = React.useState(!!initialFilterOpen);
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", background: c.bgPrimary }}>
       <div style={{ display: "flex", alignItems: "center", gap: s.md, height: 58, padding: `0 ${s.xl}`, borderBottom: `1px solid ${c.borderDefault}` }}>
@@ -76,8 +78,10 @@ export function ConversationList({ conversations, selectedId, onSelect, searchPl
             suffix={<kbd style={{ ...font.captionReg, color: c.textQuaternary, border: `1px solid ${c.borderDefault}`, borderRadius: r.xs, padding: `0 ${s.xs}` }}>⌘K</kbd>}
           />
         </div>
-        <CometChatButton hierarchy="secondary" iconOnly ariaLabel="Filter conversations" iconLeading={<FilterLines size={20} />} style={{ boxShadow: SOFT_RING, borderColor: "var(--border-default)" }} />
+        <CometChatButton hierarchy="secondary" iconOnly ariaLabel="Filter conversations" iconLeading={<FilterLines size={20} style={filterOpen ? { color: "var(--text-secondary-hover)" } : undefined} />} onClick={() => setFilterOpen((o) => !o)}
+          style={{ boxShadow: SOFT_RING, borderColor: filterOpen ? "var(--border-dark)" : "var(--border-default)", background: filterOpen ? c.bgSecondary : undefined }} />
       </div>
+      {filterOpen && <FilterBar initialOpenKey={initialFilterOpen ? "type" : undefined} />}
       <div style={{ flex: 1, overflowY: "auto" }}>
         {conversations.map((conv) => (
           <ConversationRow key={conv.id} conv={conv} selected={conv.id === selectedId} onClick={() => onSelect?.(conv.id)} />

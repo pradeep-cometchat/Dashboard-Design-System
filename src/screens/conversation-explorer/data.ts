@@ -35,6 +35,7 @@ export interface Message {
   reactors?: { person: Person; emoji: string }[];
   moderation?: { status: ModStatus; violationType?: string; reasonLabel?: string; reason?: string; reportedBy?: string };
   poll?: Poll;
+  replies?: Message[]; // thread replies — surfaces a "↳ N Replies" affordance and opens a thread view
   divider?: string; // day divider rendered before this message (e.g. "Yesterday", "Today")
   detail?: MessageDetail;
 }
@@ -107,6 +108,15 @@ export const oneToOneMessages: Message[] = [
     detail: { messageId: "msg_01HP4F3Z2K", category: "Message", type: "Image", delivery: "Delivered", sentAt: { date: "2026-05-04", time: "18:12" }, updatedAt: { date: "2026-05-04", time: "18:12" } },
   },
   {
+    id: "m5", sender: A.olivia, text: "It's ₹7,999", time: "4:56 pm", type: "text", detail: textDetail("msg_01HP4F3Z15", "16:56"),
+    replies: [
+      { id: "m5r1", sender: A.alec, text: "That's a great price for it.", time: "4:57 pm", type: "text", detail: textDetail("msg_01HP4F3Z16", "16:57") },
+      { id: "m5r2", sender: A.olivia, text: "Right? I'm grabbing one now.", time: "4:58 pm", type: "text", detail: textDetail("msg_01HP4F3Z17", "16:58") },
+      { id: "m5r3", sender: A.alec, text: "Send me the link when you can.", time: "5:00 pm", type: "text", detail: textDetail("msg_01HP4F3Z18", "17:00") },
+      { id: "m5r4", sender: A.olivia, text: "Sent 👍", time: "5:01 pm", type: "text", detail: textDetail("msg_01HP4F3Z19", "17:01") },
+    ],
+  },
+  {
     id: "m4", sender: A.alec, time: "6:05 pm", type: "video",
     media: [{ kind: "video", src: WATCH, duration: "0:24" }, { kind: "video", src: WATCH2, duration: "0:18" }],
     moderation: { status: "flagged", violationType: "profanity-filter", reasonLabel: "Sexual Content", reason: "Potentially sensitive media", reportedBy: "auto-moderator" },
@@ -164,6 +174,14 @@ export const groupMessages: Message[] = [
       ],
     },
     detail: { messageId: "msg_01HP4F3ZB2", category: "Message", type: "Poll", delivery: "Delivered", sentAt: { date: "2026-05-05", time: "13:12" }, updatedAt: { date: "2026-05-05", time: "13:12" } },
+  },
+  {
+    id: "g8", sender: gLana, text: "Anyone up for the summit hike this weekend?", time: "1:20 pm", type: "text", detail: textDetail("msg_01HP4F3ZC0", "13:20", "2026-05-05"),
+    replies: [
+      { id: "g8r1", sender: gGeorge, text: "I'm in! 🥾", time: "1:22 pm", type: "text", detail: textDetail("msg_01HP4F3ZC1", "13:22", "2026-05-05") },
+      { id: "g8r2", sender: gOlivia, text: "Same here — what time are we starting?", time: "1:23 pm", type: "text", detail: textDetail("msg_01HP4F3ZC2", "13:23", "2026-05-05") },
+      { id: "g8r3", sender: gPhoenix, text: "7am at the trailhead works for me.", time: "1:25 pm", type: "text", detail: textDetail("msg_01HP4F3ZC3", "13:25", "2026-05-05") },
+    ],
   },
 ];
 

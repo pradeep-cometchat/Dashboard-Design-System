@@ -18,6 +18,9 @@ export interface ExplorerProps {
   initialMessageId?: string;
   initialOverlay?: { type: "image" | "video"; src: string; duration?: string; thumbnails?: string[] };
   exportVariant?: "single" | "csv-json";
+  initialSearchOpen?: boolean;
+  initialThreadId?: string;
+  initialFilterOpen?: boolean;
 }
 
 /** Stateful Conversation Explorer — drives selection + media overlays for the stories. */
@@ -27,6 +30,9 @@ export function Explorer(props: ExplorerProps) {
     props.messages.find((m) => m.id === props.initialMessageId)
   );
   const [overlay, setOverlay] = React.useState(props.initialOverlay);
+  const [thread, setThread] = React.useState<Message | undefined>(
+    props.messages.find((m) => m.id === props.initialThreadId)
+  );
 
   const openMedia = (m: Message) => {
     setMsg(m);
@@ -42,7 +48,7 @@ export function Explorer(props: ExplorerProps) {
   const active = convId === props.flowConversationId;
 
   const center = active
-    ? <ChatView header={props.header} messages={props.messages} selectedMessageId={msg?.id} onSelectMessage={setMsg} onOpenMedia={openMedia} />
+    ? <ChatView header={props.header} messages={props.messages} selectedMessageId={msg?.id} onSelectMessage={setMsg} onOpenMedia={openMedia} initialSearchOpen={props.initialSearchOpen} thread={thread} onOpenThread={setThread} onCloseThread={() => setThread(undefined)} />
     : <ConversationEmpty />;
 
   const right = active && msg
@@ -57,7 +63,7 @@ export function Explorer(props: ExplorerProps) {
 
   return (
     <Workspace
-      left={<ConversationList conversations={props.conversations} selectedId={convId} onSelect={setConvId} searchPlaceholder={props.searchPlaceholder} />}
+      left={<ConversationList conversations={props.conversations} selectedId={convId} onSelect={setConvId} searchPlaceholder={props.searchPlaceholder} initialFilterOpen={props.initialFilterOpen} />}
       center={center}
       right={right}
       overlay={overlayNode}

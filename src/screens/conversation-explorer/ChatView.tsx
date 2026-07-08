@@ -1,9 +1,11 @@
 import React from "react";
+import { CloseOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import CometChatButton from "components/base/Button/CometChatButton";
+import CometChatInput from "components/base/Input/CometChatInput";
 import { c, s, r, font, shadow } from "./theme";
 import type { Message, GroupType, Poll } from "./data";
 import { StatusAvatar, RoleBadge, GroupTypeBadge, DualAvatar } from "./ui";
-import { SearchLg, Flag02, CheckIcon } from "./icons";
+import { SearchLg, Flag02, CheckIcon, CornerDownRight } from "./icons";
 
 const cap2: React.CSSProperties = { fontFamily: "var(--font-family-base)", fontSize: "var(--font-size-text-xs)", lineHeight: "16px", fontWeight: 400 };
 
@@ -127,7 +129,7 @@ function MediaBubble({ msg, onOpenMedia }: { msg: Message; onOpenMedia?: (m: Mes
   );
 }
 
-function Bubble({ msg, selected, onSelect, onOpenMedia }: { msg: Message; selected?: boolean; onSelect?: () => void; onOpenMedia?: (m: Message) => void }) {
+function Bubble({ msg, selected, onSelect, onOpenMedia, onOpenThread }: { msg: Message; selected?: boolean; onSelect?: () => void; onOpenMedia?: (m: Message) => void; onOpenThread?: (m: Message) => void }) {
   const blocked = msg.moderation?.status === "blocked";
   const nameColor = msg.sender.online ? "var(--info-700)" : "var(--neutral-lm-700)";
   const isMedia = (msg.type === "image" || msg.type === "video") && msg.media?.length;
@@ -164,41 +166,93 @@ function Bubble({ msg, selected, onSelect, onOpenMedia }: { msg: Message; select
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
           {body}
           <Reactions msg={msg} />
+          {msg.replies?.length && onOpenThread ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); onOpenThread(msg); }}
+              style={{ all: "unset", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: s.sm, marginTop: s.sm, padding: `0 ${s.xs}`, color: c.textSecondary }}
+            >
+              <CornerDownRight size={16} />
+              <span style={{ ...font.bodyMd, color: c.textSecondary }}>{msg.replies.length} Replies</span>
+            </button>
+          ) : null}
         </div>
       </div>
     </div>
   );
 }
 
-export function ChatView({ header, messages, selectedMessageId, onSelectMessage, onOpenMedia }: {
+export function ChatView({ header, messages, selectedMessageId, onSelectMessage, onOpenMedia, onOpenThread, onCloseThread, thread, initialSearchOpen }: {
   header: { title: string; groupType?: GroupType; members: number; online: number; messages: number; avatar?: string; avatarB?: string; initials: string };
   messages: Message[];
   selectedMessageId?: string;
   onSelectMessage?: (m: Message) => void;
   onOpenMedia?: (m: Message) => void;
+  onOpenThread?: (m: Message) => void;
+  onCloseThread?: () => void;
+  thread?: Message;
+  initialSearchOpen?: boolean;
 }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: c.bgPrimary }}>
-      <div style={{ display: "flex", alignItems: "center", gap: s.md, height: 58, padding: `0 ${s.xl}`, borderBottom: `1px solid ${c.borderDefault}`, flexShrink: 0 }}>
-        {header.avatarB
-          ? <DualAvatar a={header.avatar} b={header.avatarB} size={36} />
-          : <StatusAvatar person={{ uid: "h", name: header.title, initials: header.initials, avatar: header.avatar, online: header.online > 0 }} size={36} showStatus={!header.groupType} />}
-        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: s.xxs, justifyContent: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: s.md }}>
-            <span style={{ ...font.bodyMd, fontWeight: 600, color: c.textPrimary }}>{header.title}</span>
-            {header.groupType && <GroupTypeBadge type={header.groupType} />}
-          </div>
-          <div style={{ ...font.captionReg, color: c.textSecondary }}>
-            {header.members} Members · {header.online} Online · {header.messages} Messages
+  const [searching, setSearching] = React.useState(!!initialSearchOpen);
+  const [query, setQuery] = React.useState("");
+  const q = query.trim().toLowerCase();
+  const shown = q ? messages.filter((m) => (m.text ?? "").toLowerCase().includes(q) || (m.poll?.question ?? "").toLowerCase().includes(q)) : messages;
+
+  // Thread view — parent message + all replies, with a back affordance.
+  if (thread) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", height: "100%", background: c.bgPrimary }}>
+        <div style={{ display: "flex", alignItems: "center", gap: s.md, height: 58, padding: `0 ${s.xl}`, borderBottom: `1px solid ${c.borderDefault}`, flexShrink: 0 }}>
+          <CometChatButton hierarchy="tertiary" iconOnly ariaLabel="Back to conversation" iconLeading={<ArrowLeftOutlined style={{ color: c.textPrimary }} />} onClick={onCloseThread} />
+          <div style={{ display: "flex", flexDirection: "column", gap: s.xxs, justifyContent: "center" }}>
+            <span style={{ ...font.bodyMd, fontWeight: 600, color: c.textPrimary }}>Thread</span>
+            <span style={{ ...font.captionReg, color: c.textSecondary }}>{thread.replies?.length ?? 0} Replies</span>
           </div>
         </div>
-        <CometChatButton hierarchy="tertiary" iconOnly ariaLabel="Search in conversation" iconLeading={<SearchLg size={20} style={{ color: c.textQuaternary }} />} />
+        <div style={{ flex: 1, overflowY: "auto", background: c.bgSecondary, padding: `${s.md} 0` }}>
+          <Bubble msg={thread} selected={thread.id === selectedMessageId} onSelect={() => onSelectMessage?.(thread)} onOpenMedia={onOpenMedia} />
+          <div style={{ display: "flex", alignItems: "center", gap: s.md, padding: `${s.sm} ${s.xl}` }}>
+            <span style={{ ...font.captionReg, color: c.textTertiary, whiteSpace: "nowrap" }}>{thread.replies?.length ?? 0} Replies</span>
+            <div style={{ flex: 1, height: 1, background: c.borderDefault }} />
+          </div>
+          {thread.replies?.map((reply) => <Bubble key={reply.id} msg={reply} selected={reply.id === selectedMessageId} onSelect={() => onSelectMessage?.(reply)} onOpenMedia={onOpenMedia} />)}
+        </div>
       </div>
+    );
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: c.bgPrimary }}>
+      {searching ? (
+        <div style={{ display: "flex", alignItems: "center", gap: s.md, height: 58, padding: `0 ${s.xl}`, borderBottom: `1px solid ${c.borderDefault}`, flexShrink: 0 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <CometChatInput autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search in this conversation" prefix={<SearchLg size={20} style={{ color: c.textQuaternary }} />} />
+          </div>
+          <CometChatButton hierarchy="tertiary" iconOnly ariaLabel="Close search" iconLeading={<CloseOutlined style={{ color: c.textQuaternary }} />} onClick={() => { setSearching(false); setQuery(""); }} />
+        </div>
+      ) : (
+        <div style={{ display: "flex", alignItems: "center", gap: s.md, height: 58, padding: `0 ${s.xl}`, borderBottom: `1px solid ${c.borderDefault}`, flexShrink: 0 }}>
+          {header.avatarB
+            ? <DualAvatar a={header.avatar} b={header.avatarB} size={36} />
+            : <StatusAvatar person={{ uid: "h", name: header.title, initials: header.initials, avatar: header.avatar, online: header.online > 0 }} size={36} showStatus={!header.groupType} />}
+          <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: s.xxs, justifyContent: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: s.md }}>
+              <span style={{ ...font.bodyMd, fontWeight: 600, color: c.textPrimary }}>{header.title}</span>
+              {header.groupType && <GroupTypeBadge type={header.groupType} />}
+            </div>
+            <div style={{ ...font.captionReg, color: c.textSecondary }}>
+              {header.members} Members · {header.online} Online · {header.messages} Messages
+            </div>
+          </div>
+          <CometChatButton hierarchy="tertiary" iconOnly ariaLabel="Search in conversation" iconLeading={<SearchLg size={20} style={{ color: c.textQuaternary }} />} onClick={() => setSearching(true)} />
+        </div>
+      )}
       <div style={{ flex: 1, overflowY: "auto", background: c.bgSecondary, padding: `${s.md} 0` }}>
-        {messages.map((m) => (
+        {searching && q && shown.length === 0 ? (
+          <div style={{ ...font.body, color: c.textTertiary, textAlign: "center", padding: `${s["4xl"]} ${s.xl}` }}>No messages match “{query}”.</div>
+        ) : shown.map((m) => (
           <React.Fragment key={m.id}>
-            {m.divider && <DateDivider label={m.divider} />}
-            <Bubble msg={m} selected={m.id === selectedMessageId} onSelect={() => onSelectMessage?.(m)} onOpenMedia={onOpenMedia} />
+            {!q && m.divider && <DateDivider label={m.divider} />}
+            <Bubble msg={m} selected={m.id === selectedMessageId} onSelect={() => onSelectMessage?.(m)} onOpenMedia={onOpenMedia} onOpenThread={onOpenThread} />
           </React.Fragment>
         ))}
       </div>
