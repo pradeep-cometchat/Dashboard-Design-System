@@ -4,9 +4,9 @@ import CometChatButton from "components/base/Button/CometChatButton";
 import CometChatBadge from "components/base/Badge/CometChatBadge";
 import CometChatInput from "components/base/Input/CometChatInput";
 import { c, s, r, font, SOFT_RING } from "./theme";
-import type { Message, Person } from "./data";
+import type { Message, Person, ConversationDetail } from "./data";
 import { StatusAvatar, MemberCountBadge, RoleBadge } from "./ui";
-import { FeaturedIcon, Database01, Copy06, Image01, CalendarCheck02, Clock, Expand01, ArrowUpRight, ChevronUp, ChevronDown, Download01, Flag02, SearchLg } from "./icons";
+import { FeaturedIcon, Database01, Copy06, Image01, CalendarCheck02, Clock, Expand01, ArrowUpRight, ChevronUp, ChevronDown, Download01, Flag02, SearchLg, Hash } from "./icons";
 
 const cap: React.CSSProperties = { fontFamily: "var(--font-family-base)", fontSize: "var(--font-size-text-xs)", lineHeight: "var(--line-height-text-xs)", fontWeight: 500 };
 const labelStyle: React.CSSProperties = { ...cap, color: c.textQuaternary, whiteSpace: "nowrap", flexShrink: 0 };
@@ -134,6 +134,70 @@ function ReadReceipts({ reader }: { reader: Person }) {
   );
 }
 
+/** Members overview card — shared by Message Details and Conversation Details. */
+function MembersCard({ members }: { members: Person[] }) {
+  return (
+    <Card title="Members">
+      {members.length > 2 && (
+        <div style={{ padding: `${s.lg} ${s.lg} 0`, boxSizing: "border-box", width: "100%" }}>
+          <CometChatInput placeholder="Search members" prefix={<SearchLg size={20} style={{ color: c.textQuaternary }} />} />
+        </div>
+      )}
+      {members.map((m) => <MemberRow key={m.uid} p={m} trailing={m.role ? <RoleBadge role={m.role} /> : undefined} />)}
+    </Card>
+  );
+}
+
+/** Right panel when a conversation (but no message) is selected — conversation-level metadata + member roster. */
+export function ConversationDetails({ conversation, members, exportVariant = "single" }: {
+  conversation: ConversationDetail; members: Person[]; exportVariant?: "single" | "csv-json";
+}) {
+  const isGroup = conversation.conversationType === "group";
+  const [cDate, cTime = ""] = conversation.createdAt.split(", ");
+  const [uDate, uTime = ""] = conversation.updatedAt.split(", ");
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: c.bgPrimary }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: s.md, height: 58, padding: `0 ${s.xl}`, borderBottom: `1px solid ${c.borderDefault}`, flexShrink: 0 }}>
+        <span style={font.h4}>Conversation Details</span>
+        {exportVariant === "single"
+          ? <CometChatButton hierarchy="secondary" size="sm" iconLeading={<Download01 size={20} />} style={{ boxShadow: SOFT_RING, borderColor: "var(--border-default)" }}>Export</CometChatButton>
+          : <div style={{ display: "flex", gap: s.sm }}>
+              <CometChatButton hierarchy="secondary" size="sm" iconLeading={<Download01 size={20} />} style={{ boxShadow: SOFT_RING, borderColor: "var(--border-default)" }}>CSV</CometChatButton>
+              <CometChatButton hierarchy="dark" size="sm" iconLeading={<Download01 size={20} />}>JSON</CometChatButton>
+            </div>}
+      </div>
+
+      <div style={{ flex: 1, overflowY: "auto", background: c.bgPrimary }}>
+        <Card title="Conversation">
+          <Row label="ID">{conversation.conversationId}<Copy06 size={14} style={{ color: c.textQuaternary }} /></Row>
+          <Row label="Conversation Type"><CometChatBadge size="sm" type="badge" color="brand">{conversation.conversationType}</CometChatBadge></Row>
+          {isGroup && <>
+            <Row label="Group Name">{conversation.groupName}</Row>
+            <Row label="Group Type">{conversation.groupType?.toLowerCase()}</Row>
+            <Row label="Owner">{conversation.owner}</Row>
+          </>}
+          <Row label="Members"><MemberCountBadge count={conversation.members} /></Row>
+          <Row label="Messages">{conversation.messages}</Row>
+          <Row label="Unread Count">{conversation.unreadCount}</Row>
+          <Row label="Created At"><DateTimeBadges date={cDate} time={cTime} /></Row>
+          <Row label="Updated At"><DateTimeBadges date={uDate} time={uTime} /></Row>
+          <Row label="Tags">
+            <span style={{ display: "flex", gap: s.sm, flexWrap: "wrap", justifyContent: "flex-end" }}>
+              {conversation.tags.map((t) => (
+                <span key={t} style={{ display: "inline-flex", alignItems: "center", gap: s.xs, padding: `2px ${s.md} 2px ${s.sm}`, borderRadius: r.sm, background: c.bgSecondary, border: `1px solid ${c.borderDefault}`, ...font.caption, color: c.textSecondary }}>
+                  <Hash size={12} style={{ color: c.textQuaternary }} />{t}
+                </span>
+              ))}
+            </span>
+          </Row>
+        </Card>
+
+        <MembersCard members={members} />
+      </div>
+    </div>
+  );
+}
+
 export function MessageDetails({ message, members, exportVariant = "single", onOpenMedia, receiverType = "User" }: {
   message: Message; members: Person[]; exportVariant?: "single" | "csv-json"; onOpenMedia?: (m: Message) => void; receiverType?: string;
 }) {
@@ -171,14 +235,7 @@ export function MessageDetails({ message, members, exportVariant = "single", onO
         </Card>
 
         {/* Members */}
-        <Card title="Members">
-          {members.length > 2 && (
-            <div style={{ padding: `${s.lg} ${s.lg} 0`, boxSizing: "border-box", width: "100%" }}>
-              <CometChatInput placeholder="Search members" prefix={<SearchLg size={20} style={{ color: c.textQuaternary }} />} />
-            </div>
-          )}
-          {members.map((m) => <MemberRow key={m.uid} p={m} trailing={m.role ? <RoleBadge role={m.role} /> : undefined} />)}
-        </Card>
+        <MembersCard members={members} />
 
         {/* Media Preview */}
         {message.media?.length ? (

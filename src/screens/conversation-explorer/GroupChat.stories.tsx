@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Explorer } from "./Explorer";
-import { conversations, groupHeader, groupMessages, groupMembers, IMAGE_PREVIEW } from "./data";
+import { conversations, groupHeader, groupMessages, groupMembers, groupConversationDetail, IMAGE_PREVIEW } from "./data";
 
 const HIDDEN = [
   "conversations", "flowConversationId", "header", "messages", "members", "searchPlaceholder",
-  "initialConversationId", "initialMessageId", "initialOverlay", "exportVariant", "receiverType", "initialSearchOpen", "initialThreadId",
+  "initialConversationId", "initialMessageId", "initialOverlay", "exportVariant", "receiverType", "initialSearchOpen", "initialThreadId", "inlineThreads", "conversationDetail",
 ].reduce<Record<string, { table: { disable: true } }>>((a, k) => { a[k] = { table: { disable: true } }; return a; }, {});
 
 const meta: Meta<typeof Explorer> = {
@@ -32,6 +32,7 @@ const base = {
   header: groupHeader,
   messages: groupMessages,
   members: groupMembers,
+  conversationDetail: groupConversationDetail,
   searchPlaceholder: "Search by user or gro...",
 };
 

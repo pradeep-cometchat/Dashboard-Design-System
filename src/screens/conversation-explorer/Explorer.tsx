@@ -2,9 +2,9 @@ import React from "react";
 import { Workspace, ConversationEmpty } from "./Workspace";
 import { ConversationList } from "./ConversationList";
 import { ChatView } from "./ChatView";
-import { MessageDetails, DetailsEmpty } from "./DetailsPanel";
+import { MessageDetails, ConversationDetails, DetailsEmpty } from "./DetailsPanel";
 import { ImageOverlay, VideoOverlay } from "./Overlays";
-import type { Conversation, Message, Person, GroupType } from "./data";
+import type { Conversation, Message, Person, GroupType, ConversationDetail } from "./data";
 
 export interface ExplorerProps {
   conversations: Conversation[];
@@ -13,6 +13,7 @@ export interface ExplorerProps {
   header: { title: string; groupType?: GroupType; members: number; online: number; messages: number; avatar?: string; initials: string };
   messages: Message[];
   members: Person[];
+  conversationDetail?: ConversationDetail;
   searchPlaceholder?: string;
   initialConversationId?: string;
   initialMessageId?: string;
@@ -54,8 +55,12 @@ export function Explorer(props: ExplorerProps) {
         inlineThreads={props.inlineThreads} initialExpandedThreadId={props.inlineThreads ? props.initialThreadId : undefined} />
     : <ConversationEmpty />;
 
-  const right = active && msg
+  const right = !active
+    ? <DetailsEmpty />
+    : msg
     ? <MessageDetails message={msg} members={props.members} exportVariant={props.exportVariant} onOpenMedia={openMedia} receiverType={props.header.groupType ? "Group" : "User"} />
+    : props.conversationDetail
+    ? <ConversationDetails conversation={props.conversationDetail} members={props.members} exportVariant={props.exportVariant} />
     : <DetailsEmpty />;
 
   const overlayNode = overlay

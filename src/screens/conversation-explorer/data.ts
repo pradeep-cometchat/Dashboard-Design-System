@@ -93,6 +93,35 @@ export const people = A;
 // ---- 1:1 conversation (Olivia & Alec) ----
 export const oneToOneHeader = { title: "Olivia Rhye & Alec Whitten", members: 2, online: 1, messages: 4, avatar: A.olivia.avatar, avatarB: A.alec.avatar, initials: "OA" };
 
+export interface ConversationDetail {
+  conversationId: string;
+  conversationType: "user" | "group";
+  groupName?: string;
+  groupType?: GroupType;
+  owner?: string;
+  members: number;
+  messages: number;
+  unreadCount: number;
+  createdAt: string;
+  updatedAt: string;
+  tags: string[];
+}
+
+export const oneToOneConversationDetail: ConversationDetail = {
+  conversationId: "conv-4", conversationType: "user",
+  members: 2, messages: 5, unreadCount: 0,
+  createdAt: "4 Dec 2025, 15:30", updatedAt: "10 Mar 2026, 20:02",
+  tags: ["support", "priority"],
+};
+
+export const groupConversationDetail: ConversationDetail = {
+  conversationId: "conv-1", conversationType: "group",
+  groupName: "Hiking Group", groupType: "Private", owner: "Alec Whitten",
+  members: 5, messages: 8, unreadCount: 24,
+  createdAt: "20 Nov 2025, 14:30", updatedAt: "10 Mar 2026, 16:45",
+  tags: ["recreation", "weekend"],
+};
+
 const textDetail = (id: string, time: string, date = "2026-05-04"): MessageDetail => ({
   messageId: id, category: "Message", type: "Text", delivery: "Delivered",
   sentAt: { date, time }, updatedAt: { date, time },

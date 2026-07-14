@@ -45,6 +45,14 @@ export function Shield01({ size = 12, style }: P) {
   );
 }
 
+export function Hash({ size = 12, style }: P) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" style={base(size, style)} xmlns="http://www.w3.org/2000/svg" aria-hidden>
+      <path d="M6.667 2L4.667 14M11.333 2L9.333 14M2.667 5.333H14M2 10.667H13.333" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function PlusCircle({ size = 16, style }: P) {
   return (
     <svg viewBox="0 0 16 16" fill="none" style={base(size, style)} xmlns="http://www.w3.org/2000/svg" aria-hidden>

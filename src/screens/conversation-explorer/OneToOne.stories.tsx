@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Explorer } from "./Explorer";
-import { conversations, oneToOneHeader, oneToOneMessages, people, VIDEO_PREVIEW } from "./data";
+import { conversations, oneToOneHeader, oneToOneMessages, oneToOneConversationDetail, people, VIDEO_PREVIEW } from "./data";
 
 /** Hide the data-plumbing args from the Docs controls table. */
 const HIDDEN = [
   "conversations", "flowConversationId", "header", "messages", "members", "searchPlaceholder",
-  "initialConversationId", "initialMessageId", "initialOverlay", "exportVariant", "receiverType", "initialSearchOpen", "initialThreadId", "initialFilterOpen", "inlineThreads",
+  "initialConversationId", "initialMessageId", "initialOverlay", "exportVariant", "receiverType", "initialSearchOpen", "initialThreadId", "initialFilterOpen", "inlineThreads", "conversationDetail",
 ].reduce<Record<string, { table: { disable: true } }>>((a, k) => { a[k] = { table: { disable: true } }; return a; }, {});
 
 const meta: Meta<typeof Explorer> = {
@@ -35,6 +35,7 @@ const base = {
   header: oneToOneHeader,
   messages: oneToOneMessages,
   members: oneToOneMembers,
+  conversationDetail: oneToOneConversationDetail,
 };
 
 export const EmptyState: Story = {
