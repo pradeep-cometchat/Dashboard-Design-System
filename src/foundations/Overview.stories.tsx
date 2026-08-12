@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import React from "react";
 import { tokens } from "./tokens";
 import { Page, Section, CodeBlock, InlineCode, styles } from "./Foundations";
+import { base2026, ramps2026, semantic2026 } from "./colors-may2026";
+import { scale2026 } from "./typography-may2026";
+import { spacing2026, radius2026 } from "./spacing-may2026";
 
 const meta: Meta = {
   title: "Foundations/Overview",
@@ -12,15 +15,16 @@ type Story = StoryObj;
 
 const { ink } = styles;
 
+/** Colors, Typography and Spacing & Radius are documented from the May 2026 file; Elevation still tracks the shipping tokens. */
 const count = {
-  primitives: Object.values(tokens.primitives).reduce((a, s) => a + s.length, 0),
-  semantic: Object.values(tokens.semantic).reduce((a, s) => a + s.length, 0),
-  sizes: tokens.typography.sizes.length,
-  spacing: tokens.spacing.length,
-  radius: tokens.radius.length,
+  primitives: base2026.length + ramps2026.reduce((a, r) => a + r.steps.length, 0),
+  semantic: Object.values(semantic2026).reduce((a, s) => a + s.length, 0),
+  levels: scale2026.length,
+  spacing: spacing2026.length,
+  radius: radius2026.length,
   shadows: tokens.shadows.length,
 };
-const total = count.primitives + count.semantic + count.sizes + count.spacing + count.radius + count.shadows;
+const total = count.primitives + count.semantic + count.levels + count.spacing + count.radius + count.shadows;
 
 /* ---------- category preview cards ---------- */
 
@@ -114,20 +118,20 @@ export const Overview: Story = {
       title="Foundations"
       intro="The design tokens that everything else is built from. Primitives define the raw scales; semantic tokens map them to roles; components and screens only ever consume the semantic layer."
       meta={[
-        <>Source: Figma “❖ Dashboard – Design System (New)”</>,
+        <>Source: Figma “❖ Dashboard – Design System (May 2026)”</>,
         <>{total} tokens</>,
         <>Auto-generated — do not edit by hand</>,
       ]}
     >
-      <Section title="Token categories" desc="Four families of tokens cover the entire visual language. Each has its own reference page in the sidebar.">
+      <Section title="Token categories" desc="Four families of tokens cover the entire visual language. Colors, Typography and Spacing & Radius document the May 2026 proposal; Elevation & Effects reflects the tokens shipping today.">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: 16 }}>
-          <CardShell title="Colors" desc={`${count.primitives} primitives · ${count.semantic} semantic`}>
+          <CardShell title="Colors (May 2026)" desc={`${count.primitives} primitives · ${count.semantic} semantic`}>
             <ColorsPreview />
           </CardShell>
-          <CardShell title="Typography" desc={`${count.sizes} sizes · Satoshi family`}>
+          <CardShell title="Typography (May 2026)" desc={`${count.levels} levels · Satoshi family`}>
             <TypePreview />
           </CardShell>
-          <CardShell title="Spacing & Radius" desc={`${count.spacing} spacing steps · ${count.radius} radii`}>
+          <CardShell title="Spacing & Radius (May 2026)" desc={`${count.spacing} spacing steps · ${count.radius} radii`}>
             <SpacingPreview />
           </CardShell>
           <CardShell title="Elevation & Effects" desc={`${count.shadows} shadows · focus rings · blur`}>

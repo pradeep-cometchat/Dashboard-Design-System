@@ -27,7 +27,7 @@ const preview: Preview = {
       storySort: {
         order: [
           'Foundations',
-          ['Overview', 'Colors', 'Colors (May 2026)', ['Overview', 'Primitive Ramps', 'Semantic Colors', 'Changes vs Current'], 'Typography', 'Typography (May 2026)', ['Overview', 'Type Styles', 'Changes vs Current'], 'Spacing & Radius', 'Spacing & Radius (May 2026)', ['Overview', 'Scales', 'Changes vs Current'], 'Icons (May 2026)', ['Overview', 'Icon Library'], 'Misc Icons (May 2026)', ['Overview', 'Icon Library'], 'Elevation & Effects'],
+          ['Overview', 'Colors (May 2026)', ['Overview', 'Primitive Ramps', 'Semantic Colors', 'Changes vs Current'], 'Typography (May 2026)', ['Overview', 'Type Styles', 'Changes vs Current'], 'Spacing & Radius (May 2026)', ['Overview', 'Scales', 'Changes vs Current'], 'Icons (May 2026)', ['Overview', 'Icon Library'], 'Misc Icons (May 2026)', ['Overview', 'Icon Library'], 'Elevation & Effects'],
           'Base Components',
           'Screens',
           ['Conversation Explorer', ['Overview', '1:1 Chat', 'Group Chat']],
