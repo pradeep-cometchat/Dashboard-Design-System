@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import React from "react";
 import { tokens } from "./tokens";
 import { Page, Section, Ramp, TokenTable, MetaChip, styles } from "./Foundations";
-import { SOURCE, base2026, ramps2026, semantic2026, type NewToken } from "./colors-may2026";
+import { SOURCE, base2026, ramps2026, semantic2026, CORRECTIONS, type NewToken } from "./colors-may2026";
 
 const meta: Meta = {
   title: "Foundations/Colors (May 2026)",
@@ -176,30 +176,11 @@ function computeAudit() {
 
 const audit = computeAudit();
 
-/** Recommended replacement values. `figma` is the value these were raised against — if the
- *  file is re-pulled and the value has moved, the row reports itself as resolved. */
-const proposedFixes = [
-  {
-    token: "Text Brand",
-    figma: "#403679",
-    proposed: "#6852d6",
-    why: "Brand text and brand icons match today (both #6852d6) and split here. Text Brand Hover is already Brand/700, which is base+1 for a Brand/600 base — so the hover is correct and the base is what drifted.",
-  },
-  {
-    token: "BG Disabled Subtle",
-    figma: "#13161b",
-    proposed: "#fafafa",
-    why: "The only value in the light palette taken from the dark-mode ramp. Swapping ramps alone does not fix it — Neutral (light)/900 is #181d27, still near-black — so both ramp and step are wrong.",
-  },
-  {
-    token: "Text Placeholder Subtle",
-    figma: "#d5d7da",
-    proposed: "#a4a7ae",
-    why: "Reverting stops the regression but neither value clears AA; reaching 4.5:1 needs Neutral/500, which is what Text Placeholder already is.",
-  },
-].map((f) => {
-  const live = allSemantic.find((t) => t.name === f.token);
-  return { ...f, live: live?.value, resolved: !!live && !eq(live.value, f.figma) };
+/** The corrections carried by colors-may2026.ts, each re-checked against the live data so
+ *  the page cannot claim an override that is no longer in the token list. */
+const corrections = CORRECTIONS.map((c) => {
+  const live = allSemantic.find((t) => t.name === c.token);
+  return { ...c, live: live?.value, inForce: !!live && eq(live.value, c.applied) };
 });
 
 const pageMeta = [
@@ -244,12 +225,13 @@ export const Overview: Story = {
         </ul>
       </Section>
 
-      <Section title="Needs design review" desc="Values that look like authoring slips rather than deliberate changes. Full evidence and proposed replacements on the “Open Questions” page.">
-        <div style={{ border: "1px solid #fedf89", background: "#fffaeb", borderRadius: 12, padding: "14px 16px", maxWidth: 720 }}>
-          <div style={{ fontSize: 13.5, lineHeight: 1.7, color: "#b54708" }}>
-            <strong>{proposedFixes.filter((f) => !f.resolved).length} values look wrong</strong> — {proposedFixes.filter((f) => !f.resolved).map((f) => f.token).join(", ")}.
-            {audit.altCollapsed.length > 0 && <> A further <strong>{audit.altCollapsed.length} “Alt” tokens</strong> collapsed onto their base and need a keep-or-retire decision.</>}
-            {" "}The brand rollout is blocked on these; spacing, radius and the Info colours are not.
+      <Section title="Corrected from the Figma export" desc="Authoring slips in the source file, fixed here so every page shows the palette as intended. The original values and the reasoning are on the “Open Questions” page.">
+        <div style={{ border: "1px solid #a9d8c1", background: "#f0fdf6", borderRadius: 12, padding: "14px 16px", maxWidth: 720 }}>
+          <div style={{ fontSize: 13.5, lineHeight: 1.7, color: "#067647" }}>
+            <strong>{corrections.filter((c) => c.inForce).length} values corrected</strong> — {corrections.filter((c) => c.inForce).map((c) => c.token).join(", ")}.
+            {audit.altCollapsed.length > 0 && (
+              <> Still open: <strong>{audit.altCollapsed.length} “Alt” tokens</strong> collapsed onto their base, which needs a keep-or-retire answer from design rather than a value fix.</>
+            )}
           </div>
         </div>
       </Section>
@@ -302,7 +284,12 @@ function semanticRows(items: NewToken[]) {
 export const Semantic: Story = {
   name: "Semantic Colors",
   render: () => (
-    <Page eyebrow="Foundations · Proposed update" title="Semantic Colors (May 2026)" intro="Every semantic color from the May 2026 file, with the current token it corresponds to. “New token” marks roles that don’t exist in the current foundations." meta={pageMeta}>
+    <Page
+      eyebrow="Foundations · Proposed update"
+      title="Semantic Colors (May 2026)"
+      intro="Every semantic color from the May 2026 file, with the current token it corresponds to. “New token” marks roles that don’t exist in the current foundations. Three values are corrected from the raw Figma export — see “Open Questions” for what changed and why."
+      meta={pageMeta}
+    >
       <Section title="Base">
         <TokenTable head={["", "Figma variable", "Maps to (current)", "Value"]} rows={semanticRows(base2026)} />
       </Section>
@@ -382,19 +369,19 @@ export const Changes: Story = {
 export const OpenQuestions: Story = {
   name: "Open Questions",
   render: () => {
-    const open = proposedFixes.filter((f) => !f.resolved);
-    const cleared = proposedFixes.filter((f) => f.resolved);
+    const applied = corrections.filter((c) => c.inForce);
+    const lapsed = corrections.filter((c) => !c.inForce);
     return (
       <Page
         eyebrow="Foundations · Proposed update"
         title="Open Questions"
-        intro="Values in the May 2026 file that look like authoring slips rather than deliberate changes, with the evidence each one rests on and a proposed replacement. Everything here is computed from the pulled Figma data — the staging values themselves are left exactly as the file defines them, so the diff on the other pages stays honest."
+        intro="Authoring slips found in the May 2026 file, the evidence each one rests on, and the correction applied in their place. The other pages show the corrected palette; this page is the record of what was changed and what design still has to answer."
         meta={pageMeta}
       >
-        <Section title="Status" desc="Counted live from the pulled data, so these numbers follow the Figma file rather than this prose.">
+        <Section title="Status" desc="Counted live from the token data, so these numbers follow the palette rather than this prose.">
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: 14 }}>
             {[
-              { n: open.length, label: "Values to correct", color: "#d92d20" },
+              { n: applied.length, label: "Values corrected", color: "#079455" },
               { n: audit.altCollapsed.length, label: "Awaiting a decision", color: "#dc6803" },
               { n: audit.hoverOk.length, label: "Hover pairs correct", color: "#079455" },
               { n: audit.orphans.length, label: "Untraceable values", color: "#079455" },
@@ -407,34 +394,37 @@ export const OpenQuestions: Story = {
           </div>
         </Section>
 
-        {open.length > 0 && (
-          <Section title={`Suspected errors (${open.length})`} desc="Each row is a single value change. Nothing else in the palette depends on them being wrong.">
+        {applied.length > 0 && (
+          <Section
+            title={`Corrections applied (${applied.length})`}
+            desc="These are live in the token data — every other page shows the corrected value. Once the Figma file is fixed at source, the override can be dropped and nothing else changes."
+          >
             <TokenTable
-              head={["Token", "File says", "Should be", "Why"]}
-              rows={open.map((f) => [
-                <span style={{ fontWeight: 600, fontSize: 13 }}>{f.token}</span>,
+              head={["Token", "Figma exports", "Applied here", "Why"]}
+              rows={applied.map((c) => [
+                <span style={{ fontWeight: 600, fontSize: 13 }}>{c.token}</span>,
                 <span style={{ whiteSpace: "nowrap" }}>
-                  <Chip value={f.figma} /> <Code>{f.figma}</Code>
-                  <div style={{ fontSize: 11, color: ink.quaternary, marginTop: 2 }}>{stepLabel(f.figma)}</div>
+                  <Chip value={c.figma} /> <Code>{c.figma}</Code>
+                  <div style={{ fontSize: 11, color: ink.quaternary, marginTop: 2 }}>{stepLabel(c.figma)}</div>
                 </span>,
                 <span style={{ whiteSpace: "nowrap" }}>
-                  <Chip value={f.proposed} /> <Code>{f.proposed}</Code>
-                  <div style={{ fontSize: 11, color: ink.quaternary, marginTop: 2 }}>{stepLabel(f.proposed)}</div>
+                  <Chip value={c.applied} /> <Code>{c.applied}</Code>
+                  <div style={{ fontSize: 11, color: "#067647", marginTop: 2 }}>{stepLabel(c.applied)}</div>
                 </span>,
-                <span style={{ fontSize: 13, color: ink.tertiary, lineHeight: 1.6 }}>{f.why}</span>,
+                <span style={{ fontSize: 13, color: ink.tertiary, lineHeight: 1.6 }}>{c.reason}</span>,
               ])}
             />
           </Section>
         )}
 
-        {cleared.length > 0 && (
-          <Section title={`Resolved in the latest pull (${cleared.length})`} desc="Raised against an earlier export; the file no longer carries the flagged value.">
+        {lapsed.length > 0 && (
+          <Section title={`Overrides no longer in force (${lapsed.length})`} desc="Recorded as corrections but the token data now carries a different value — most likely a re-pull that fixed the value at source.">
             <TokenTable
-              head={["Token", "Was", "Now"]}
-              rows={cleared.map((f) => [
-                <span style={{ fontWeight: 600, fontSize: 13 }}>{f.token}</span>,
-                <Code>{f.figma}</Code>,
-                <span style={{ whiteSpace: "nowrap" }}><Chip value={f.live!} /> <Code>{f.live}</Code></span>,
+              head={["Token", "Correction was", "Data now holds"]}
+              rows={lapsed.map((c) => [
+                <span style={{ fontWeight: 600, fontSize: 13 }}>{c.token}</span>,
+                <Code>{c.applied}</Code>,
+                <span style={{ whiteSpace: "nowrap" }}>{c.live ? <><Chip value={c.live} /> <Code>{c.live}</Code></> : <span style={{ fontSize: 13, color: ink.tertiary }}>token not found</span>}</span>,
               ])}
             />
           </Section>
@@ -464,7 +454,7 @@ export const OpenQuestions: Story = {
           </Section>
         )}
 
-        <Section title="What the audit cleared" desc="Checks that ran across every semantic token and came back clean — useful for knowing what not to re-litigate.">
+        <Section title="Audit checks" desc="These run across every semantic token in the corrected palette, so they double as a regression check — if a re-pull reintroduces one of the values above, the matching row stops reading clean.">
           <TokenTable
             head={["Check", "Result"]}
             rows={[

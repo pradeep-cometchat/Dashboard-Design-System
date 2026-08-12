@@ -16,6 +16,39 @@ export const SOURCE = {
 
 export interface NewToken { name: string; value: string; maps: string | null }
 
+/**
+ * Values below that deliberately differ from the raw Figma export.
+ *
+ * The May 2026 file carries three values that are authoring slips rather than design
+ * intent (evidence on the "Open Questions" story). The corrected value is what the
+ * token list above uses, so every downstream page — the diff, the ramps, the semantic
+ * tables — reflects the palette as intended. This list keeps what Figma actually says,
+ * so the override is auditable and can be dropped once the file is fixed at source.
+ */
+export const CORRECTIONS: { token: string; figma: string; applied: string; reason: string }[] = [
+  {
+    token: "Text Brand",
+    figma: "#403679",
+    applied: "#6852d6",
+    reason:
+      "Figma has Brand/900, which splits brand text from brand icons (FG Brand Primary is Brand/600) where they match today. Text Brand Hover is already Brand/700 — base+1 for a Brand/600 base — so the hover was correct and the base had drifted.",
+  },
+  {
+    token: "BG Disabled Subtle",
+    figma: "#13161b",
+    applied: "#fafafa",
+    reason:
+      "Figma has Neutral (dark mode)/900 — the only dark-ramp value in the light palette. Correcting the ramp alone is not enough (Neutral (light)/900 is #181d27, still near-black); Neutral (light)/50 is the step that fits the BG 01 → 02 → 03 ladder.",
+  },
+  {
+    token: "Text Placeholder Subtle",
+    figma: "#d5d7da",
+    applied: "#a4a7ae",
+    reason:
+      "Figma has Neutral (light)/300, which drops contrast on white to 1.44:1 — effectively invisible. Neutral (light)/400 restores today's value. Neither clears AA, which is a separate question for design.",
+  },
+];
+
 export const base2026: NewToken[] = [
   { name: "Base/white", value: "#ffffff", maps: "base-white" },
   { name: "Base/black", value: "#000000", maps: "base-black" },
@@ -78,8 +111,8 @@ export const semantic2026: Record<"text" | "border" | "foreground" | "background
     { name: "Text White (Same)", value: "#ffffff", maps: "text-white" },
     { name: "Text Disabled", value: "#717680", maps: "text-disabled" },
     { name: "Text Placeholder", value: "#717680", maps: "text-placeholder" },
-    { name: "Text Placeholder Subtle", value: "#d5d7da", maps: "text-placeholder-subtle" },
-    { name: "Text Brand", value: "#403679", maps: "text-brand-primary" },
+    { name: "Text Placeholder Subtle", value: "#a4a7ae", maps: "text-placeholder-subtle" },
+    { name: "Text Brand", value: "#6852d6", maps: "text-brand-primary" },
     { name: "Text Brand Hover", value: "#5b45bd", maps: null },
     { name: "Text Error", value: "#d92d20", maps: "text-error" },
     { name: "Text Warning", value: "#dc6803", maps: "text-warning" },
@@ -135,7 +168,7 @@ export const semantic2026: Record<"text" | "border" | "foreground" | "background
     { name: "BG Black Solid", value: "#0a0d12", maps: null },
     { name: "BG Black Solid Hover", value: "#252b37", maps: null },
     { name: "BG Disabled", value: "#f5f5f5", maps: "bg-disabled" },
-    { name: "BG Disabled Subtle", value: "#13161b", maps: "bg-disabled-subtle" },
+    { name: "BG Disabled Subtle", value: "#fafafa", maps: "bg-disabled-subtle" },
     { name: "BG Overlay", value: "#0a0d12", maps: "bg-overlay" },
     { name: "BG Brand Primary", value: "#f0f2fd", maps: "bg-brand-primary" },
     { name: "BG Brand Primary Alt", value: "#f0f2fd", maps: "bg-brand-primary-alt" },
