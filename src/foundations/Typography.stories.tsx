@@ -16,7 +16,7 @@ const Code = ({ children }: { children: string }) => (
 export const Families: Story = {
   name: "Font Families",
   render: () => (
-    <Page title="Font Families" intro="Satoshi is the Dashboard typeface. Medium is the primary UI weight; Regular is used for longer-form body copy.">
+    <Page eyebrow="Foundations" title="Font Families" intro="Satoshi is the Dashboard typeface. Medium is the primary UI weight; Regular is used for longer-form body copy.">
       <Section title="Families">
         <TokenTable
           head={["Token", "Value"]}
@@ -30,7 +30,7 @@ export const Families: Story = {
 export const Weights: Story = {
   name: "Font Weights",
   render: () => (
-    <Page title="Font Weights" intro="Four weights cover the system, from regular body text to bold emphasis.">
+    <Page eyebrow="Foundations" title="Font Weights" intro="Four weights cover the system, from regular body text to bold emphasis.">
       <Section title="Weights">
         <TokenTable
           head={["Token", "Value", "Sample"]}
@@ -48,7 +48,7 @@ export const Weights: Story = {
 export const Scale: Story = {
   name: "Type Scale",
   render: () => (
-    <Page title="Type Scale" intro="Display sizes are for headings and hero text; text sizes cover body and UI copy. Each row shows the token, its size / line-height, and a live sample.">
+    <Page eyebrow="Foundations" title="Type Scale" intro="Display sizes are for headings and hero text; text sizes cover body and UI copy. Each row shows the token, its size / line-height, and a live sample.">
       <Section title="Scale">
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           {tokens.typography.sizes.map((s) => (

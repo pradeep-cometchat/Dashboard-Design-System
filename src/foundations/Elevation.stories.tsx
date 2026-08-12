@@ -11,7 +11,7 @@ type Story = StoryObj;
 
 export const ElevationAndEffects: Story = {
   render: () => (
-    <Page title="Elevation & Effects" intro="Shadows convey elevation and hierarchy; focus rings communicate keyboard focus state; backdrop blur is used for overlays and glass surfaces.">
+    <Page eyebrow="Foundations" title="Elevation & Effects" intro="Shadows convey elevation and hierarchy; focus rings communicate keyboard focus state; backdrop blur is used for overlays and glass surfaces.">
       <Section title="Shadows">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 28, padding: "12px 8px" }}>
           {tokens.shadows.map((s) => (

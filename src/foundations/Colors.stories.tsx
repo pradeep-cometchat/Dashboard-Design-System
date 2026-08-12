@@ -21,7 +21,7 @@ function semanticRows(items: { name: string; ref: string; value: string }[]) {
 }
 function SemanticTable({ title, group }: { title: string; group: keyof typeof tokens.semantic }) {
   return (
-    <Page title={title} intro="Semantic tokens map primitive colors to a role. Reference the semantic token in components — never a raw primitive — so themes and future changes propagate automatically.">
+    <Page eyebrow="Foundations" title={title} intro="Semantic tokens map primitive colors to a role. Reference the semantic token in components — never a raw primitive — so themes and future changes propagate automatically.">
       <Section title={title}>
         <TokenTable head={["", "Token", "Reference", "Value"]} rows={semanticRows(tokens.semantic[group])} />
       </Section>
@@ -31,7 +31,7 @@ function SemanticTable({ title, group }: { title: string; group: keyof typeof to
 
 export const Base: Story = {
   render: () => (
-    <Page title="Base Colors" intro="The core brand anchors. $base-primary is CometChat’s purple; white and black bound the neutral range.">
+    <Page eyebrow="Foundations" title="Base Colors" intro="The core brand anchors. $base-primary is CometChat’s purple; white and black bound the neutral range.">
       <Section title="Base">
         <Grid min={160}>
           {tokens.base.map((c) => (
@@ -46,7 +46,7 @@ export const Base: Story = {
 export const Primitives: Story = {
   name: "Primitive Ramps",
   render: () => (
-    <Page title="Primitive Ramps" intro="The full 25→950 tonal ramps. These are raw values — reference them through semantic tokens rather than directly in components.">
+    <Page eyebrow="Foundations" title="Primitive Ramps" intro="The full 25→950 tonal ramps. These are raw values — reference them through semantic tokens rather than directly in components.">
       <Section title="Ramps">
         {Object.entries(tokens.primitives).map(([name, steps]) => (
           <Ramp key={name} label={name} steps={steps as { step: string; value: string }[]} />
@@ -59,7 +59,7 @@ export const Primitives: Story = {
 export const Moderation: Story = {
   name: "Semantic · Moderation",
   render: () => (
-    <Page title="Semantic · Moderation" intro="Moderation-state tokens used by Conversation Explorer message bubbles and badges. Flagged uses the amber ramp; blocked uses error/red; approved uses success.">
+    <Page eyebrow="Foundations" title="Semantic · Moderation" intro="Moderation-state tokens used by Conversation Explorer message bubbles and badges. Flagged uses the amber ramp; blocked uses error/red; approved uses success.">
       <Section title="Moderation">
         <TokenTable head={["", "Token", "Reference", "Value"]} rows={semanticRows(tokens.semantic.moderation)} />
       </Section>

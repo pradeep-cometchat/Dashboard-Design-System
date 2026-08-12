@@ -14,7 +14,7 @@ const val = { fontFamily: styles.mono, fontSize: 11, color: "#717680", width: 56
 
 export const SpacingAndRadius: Story = {
   render: () => (
-    <Page title="Spacing & Radius" intro="The spacing scale drives padding, gaps, and layout rhythm; the radius scale controls corner rounding across components.">
+    <Page eyebrow="Foundations" title="Spacing & Radius" intro="The spacing scale drives padding, gaps, and layout rhythm; the radius scale controls corner rounding across components.">
       <Section title="Spacing">
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {tokens.spacing.map((s) => (
