@@ -1,0 +1,722 @@
+{
+  "social": [
+    {
+      "label": "Facebook",
+      "file": "facebook"
+    },
+    {
+      "label": "Twitter",
+      "file": "twitter"
+    },
+    {
+      "label": "X (Twitter)",
+      "file": "x-twitter"
+    },
+    {
+      "label": "Instagram",
+      "file": "instagram"
+    },
+    {
+      "label": "LinkedIn",
+      "file": "linkedin"
+    },
+    {
+      "label": "Google",
+      "file": "google"
+    },
+    {
+      "label": "YouTube",
+      "file": "youtube"
+    },
+    {
+      "label": "WhatsApp",
+      "file": "whatsapp"
+    },
+    {
+      "label": "Apple",
+      "file": "apple"
+    },
+    {
+      "label": "Snapchat",
+      "file": "snapchat"
+    },
+    {
+      "label": "Pinterest",
+      "file": "pinterest"
+    },
+    {
+      "label": "Figma",
+      "file": "figma"
+    },
+    {
+      "label": "Framer 01",
+      "file": "framer-01"
+    },
+    {
+      "label": "Framer 02",
+      "file": "framer-02"
+    },
+    {
+      "label": "Dribbble",
+      "file": "dribbble"
+    },
+    {
+      "label": "Reddit",
+      "file": "reddit"
+    },
+    {
+      "label": "Discord 02",
+      "file": "discord-02"
+    },
+    {
+      "label": "Discord 01",
+      "file": "discord-01"
+    },
+    {
+      "label": "TikTok",
+      "file": "tiktok"
+    },
+    {
+      "label": "Tumblr",
+      "file": "tumblr"
+    },
+    {
+      "label": "Telegram",
+      "file": "telegram"
+    },
+    {
+      "label": "Clubhouse",
+      "file": "clubhouse"
+    },
+    {
+      "label": "Signal",
+      "file": "signal"
+    },
+    {
+      "label": "GitHub",
+      "file": "github"
+    },
+    {
+      "label": "AngelList",
+      "file": "angellist"
+    },
+    {
+      "label": "Layers",
+      "file": "layers"
+    },
+    {
+      "label": "Twitch",
+      "file": "twitch"
+    },
+    {
+      "label": "Slack",
+      "file": "slack"
+    },
+    {
+      "label": "Spotify",
+      "file": "spotify"
+    },
+    {
+      "label": "Stripe",
+      "file": "stripe"
+    },
+    {
+      "label": "PayPal",
+      "file": "paypal"
+    },
+    {
+      "label": "Wise",
+      "file": "wise"
+    },
+    {
+      "label": "Notion",
+      "file": "notion"
+    },
+    {
+      "label": "Webflow",
+      "file": "webflow"
+    },
+    {
+      "label": "MS Outlook",
+      "file": "ms-outlook"
+    },
+    {
+      "label": "Yahoo",
+      "file": "yahoo"
+    }
+  ],
+  "payment": [
+    {
+      "label": "JCB",
+      "file": "jcb"
+    },
+    {
+      "label": "giropay",
+      "file": "giropay"
+    },
+    {
+      "label": "Ideal",
+      "file": "ideal"
+    },
+    {
+      "label": "Bancontact",
+      "file": "bancontact"
+    },
+    {
+      "label": "UnionPay",
+      "file": "unionpay"
+    },
+    {
+      "label": "SEPA",
+      "file": "sepa"
+    },
+    {
+      "label": "Amazon",
+      "file": "amazon"
+    },
+    {
+      "label": "Sofort",
+      "file": "sofort"
+    },
+    {
+      "label": "Klarna",
+      "file": "klarna"
+    },
+    {
+      "label": "Yandex",
+      "file": "yandex"
+    },
+    {
+      "label": "Qiwi",
+      "file": "qiwi"
+    },
+    {
+      "label": "Alipay",
+      "file": "alipay"
+    },
+    {
+      "label": "WeChat",
+      "file": "wechat"
+    },
+    {
+      "label": "Etherium",
+      "file": "etherium"
+    },
+    {
+      "label": "Bitpay",
+      "file": "bitpay"
+    },
+    {
+      "label": "Bitcoin",
+      "file": "bitcoin"
+    },
+    {
+      "label": "BitcoinCash",
+      "file": "bitcoincash"
+    },
+    {
+      "label": "PayPal",
+      "file": "paypal"
+    },
+    {
+      "label": "Stripe",
+      "file": "stripe"
+    },
+    {
+      "label": "Skrill",
+      "file": "skrill"
+    },
+    {
+      "label": "GooglePay",
+      "file": "googlepay"
+    },
+    {
+      "label": "ApplePay",
+      "file": "applepay"
+    },
+    {
+      "label": "Mastercard",
+      "file": "mastercard"
+    },
+    {
+      "label": "Discover",
+      "file": "discover"
+    },
+    {
+      "label": "AMEX",
+      "file": "amex"
+    },
+    {
+      "label": "DinersClub",
+      "file": "dinersclub"
+    },
+    {
+      "label": "Visa",
+      "file": "visa"
+    },
+    {
+      "label": "Verifone",
+      "file": "verifone"
+    },
+    {
+      "label": "Payoneer",
+      "file": "payoneer"
+    },
+    {
+      "label": "Maestro",
+      "file": "maestro"
+    },
+    {
+      "label": "Webmoney",
+      "file": "webmoney"
+    },
+    {
+      "label": "Interac",
+      "file": "interac"
+    },
+    {
+      "label": "Shop Pay",
+      "file": "shop-pay"
+    },
+    {
+      "label": "Affirm",
+      "file": "affirm"
+    },
+    {
+      "label": "Paysafe",
+      "file": "paysafe"
+    },
+    {
+      "label": "Citadele",
+      "file": "citadele"
+    },
+    {
+      "label": "Forbrugsforeningen",
+      "file": "forbrugsforeningen"
+    },
+    {
+      "label": "Elo",
+      "file": "elo"
+    },
+    {
+      "label": "Lightcoin",
+      "file": "lightcoin"
+    }
+  ],
+  "file-type": [
+    {
+      "label": "Image / IMG",
+      "file": "image-img"
+    },
+    {
+      "label": "Image / JPG",
+      "file": "image-jpg"
+    },
+    {
+      "label": "Image / JPEG",
+      "file": "image-jpeg"
+    },
+    {
+      "label": "Image / PNG",
+      "file": "image-png"
+    },
+    {
+      "label": "Image / WebP",
+      "file": "image-webp"
+    },
+    {
+      "label": "Image / TIFF",
+      "file": "image-tiff"
+    },
+    {
+      "label": "Image / GIF",
+      "file": "image-gif"
+    },
+    {
+      "label": "Image / SVG",
+      "file": "image-svg"
+    },
+    {
+      "label": "Image / EPS",
+      "file": "image-eps"
+    },
+    {
+      "label": "Simple / Image",
+      "file": "simple-image"
+    },
+    {
+      "label": "Simple / Folder",
+      "file": "simple-folder"
+    },
+    {
+      "label": "Simple / Empty",
+      "file": "simple-empty"
+    },
+    {
+      "label": "Simple / Video 01",
+      "file": "simple-video-01"
+    },
+    {
+      "label": "Simple / Video 02",
+      "file": "simple-video-02"
+    },
+    {
+      "label": "Simple / Audio",
+      "file": "simple-audio"
+    },
+    {
+      "label": "Simple / PDF",
+      "file": "simple-pdf"
+    },
+    {
+      "label": "Simple / Document",
+      "file": "simple-document"
+    },
+    {
+      "label": "Simple / Spreadsheet",
+      "file": "simple-spreadsheet"
+    },
+    {
+      "label": "Simple / Code",
+      "file": "simple-code"
+    },
+    {
+      "label": "Document / PDF",
+      "file": "document-pdf"
+    },
+    {
+      "label": "Document / DOC",
+      "file": "document-doc"
+    },
+    {
+      "label": "Document / DOCX",
+      "file": "document-docx"
+    },
+    {
+      "label": "Document / TXT",
+      "file": "document-txt"
+    },
+    {
+      "label": "Document / CSV",
+      "file": "document-csv"
+    },
+    {
+      "label": "Document / XLS",
+      "file": "document-xls"
+    },
+    {
+      "label": "Document / XLSX",
+      "file": "document-xlsx"
+    },
+    {
+      "label": "Document / PPT",
+      "file": "document-ppt"
+    },
+    {
+      "label": "Document / PPTX",
+      "file": "document-pptx"
+    },
+    {
+      "label": "Design / FIG (Figma)",
+      "file": "design-fig-figma"
+    },
+    {
+      "label": "Design / AI (Illustrator)",
+      "file": "design-ai-illustrator"
+    },
+    {
+      "label": "Design / PSD (Photoshop)",
+      "file": "design-psd-photoshop"
+    },
+    {
+      "label": "Design / INDD (InDesign)",
+      "file": "design-indd-indesign"
+    },
+    {
+      "label": "Design / AEP (After Effects)",
+      "file": "design-aep-after-effects"
+    },
+    {
+      "label": "Media / MP3",
+      "file": "media-mp3"
+    },
+    {
+      "label": "Media / MP4",
+      "file": "media-mp4"
+    },
+    {
+      "label": "Media / AVI",
+      "file": "media-avi"
+    },
+    {
+      "label": "Media / WAV",
+      "file": "media-wav"
+    },
+    {
+      "label": "Media / MKV",
+      "file": "media-mkv"
+    },
+    {
+      "label": "Media / MPEG",
+      "file": "media-mpeg"
+    },
+    {
+      "label": "Archive / ZIP",
+      "file": "archive-zip"
+    },
+    {
+      "label": "Archive / RAR",
+      "file": "archive-rar"
+    },
+    {
+      "label": "Development / HTML",
+      "file": "development-html"
+    },
+    {
+      "label": "Development / CSS",
+      "file": "development-css"
+    },
+    {
+      "label": "Development / RSS",
+      "file": "development-rss"
+    },
+    {
+      "label": "Development / SQL",
+      "file": "development-sql"
+    },
+    {
+      "label": "Development / XML",
+      "file": "development-xml"
+    },
+    {
+      "label": "Development / JS",
+      "file": "development-js"
+    },
+    {
+      "label": "Development / JSON",
+      "file": "development-json"
+    },
+    {
+      "label": "Development / JAVA",
+      "file": "development-java"
+    },
+    {
+      "label": "Development / EXE",
+      "file": "development-exe"
+    },
+    {
+      "label": "Development / DMG",
+      "file": "development-dmg"
+    }
+  ],
+  "tech": [
+    {
+      "label": "Wordpress",
+      "file": "wordpress"
+    },
+    {
+      "label": "Wix",
+      "file": "wix"
+    },
+    {
+      "label": "Webflow",
+      "file": "webflow"
+    },
+    {
+      "label": "Vue",
+      "file": "vue"
+    },
+    {
+      "label": "Vercel AI",
+      "file": "vercel-ai"
+    },
+    {
+      "label": "Squarespace",
+      "file": "squarespace"
+    },
+    {
+      "label": "Shopify",
+      "file": "shopify"
+    },
+    {
+      "label": "React Router",
+      "file": "react-router"
+    },
+    {
+      "label": "React",
+      "file": "react"
+    },
+    {
+      "label": "RASA",
+      "file": "rasa"
+    },
+    {
+      "label": "PHP",
+      "file": "php"
+    },
+    {
+      "label": "Others",
+      "file": "others"
+    },
+    {
+      "label": "OpenAI",
+      "file": "openai"
+    },
+    {
+      "label": "Next JS",
+      "file": "next-js"
+    },
+    {
+      "label": "Mastra",
+      "file": "mastra"
+    },
+    {
+      "label": "LangGraph",
+      "file": "langgraph"
+    },
+    {
+      "label": "Javascript",
+      "file": "javascript"
+    },
+    {
+      "label": "iOS",
+      "file": "ios"
+    },
+    {
+      "label": "Ionic",
+      "file": "ionic"
+    },
+    {
+      "label": "Html",
+      "file": "html"
+    },
+    {
+      "label": "Flutter",
+      "file": "flutter"
+    },
+    {
+      "label": "CrewAI",
+      "file": "crewai"
+    },
+    {
+      "label": "Angular",
+      "file": "angular"
+    },
+    {
+      "label": "Android",
+      "file": "android"
+    },
+    {
+      "label": "AG-UI",
+      "file": "ag-ui"
+    },
+    {
+      "label": "AG2",
+      "file": "ag2"
+    },
+    {
+      "label": "Agno",
+      "file": "agno"
+    }
+  ],
+  "emoji": [
+    {
+      "label": "Heart red",
+      "file": "heart-red"
+    },
+    {
+      "label": "Shakas",
+      "file": "shakas"
+    },
+    {
+      "label": "Thumbs up",
+      "file": "thumbs-up"
+    },
+    {
+      "label": "Slight smile",
+      "file": "slight-smile"
+    },
+    {
+      "label": "Smile",
+      "file": "smile"
+    },
+    {
+      "label": "Okay",
+      "file": "okay"
+    },
+    {
+      "label": "Thumbs down",
+      "file": "thumbs-down"
+    },
+    {
+      "label": "Eyes",
+      "file": "eyes"
+    },
+    {
+      "label": "Heart orange",
+      "file": "heart-orange"
+    },
+    {
+      "label": "Heart yellow",
+      "file": "heart-yellow"
+    },
+    {
+      "label": "Heart green",
+      "file": "heart-green"
+    },
+    {
+      "label": "Heart blue",
+      "file": "heart-blue"
+    },
+    {
+      "label": "Heart purple",
+      "file": "heart-purple"
+    },
+    {
+      "label": "Heart brown",
+      "file": "heart-brown"
+    },
+    {
+      "label": "Heart black",
+      "file": "heart-black"
+    },
+    {
+      "label": "Heart white",
+      "file": "heart-white"
+    },
+    {
+      "label": "Sweat smile",
+      "file": "sweat-smile"
+    },
+    {
+      "label": "Wink",
+      "file": "wink"
+    }
+  ],
+  "folder": [
+    {
+      "label": "Type=Brand, Open=False",
+      "file": "type-brand-open-false"
+    },
+    {
+      "label": "Type=Gray, Open=False",
+      "file": "type-gray-open-false"
+    },
+    {
+      "label": "Type=Brand, Open=True",
+      "file": "type-brand-open-true"
+    },
+    {
+      "label": "Type=Gray, Open=True",
+      "file": "type-gray-open-true"
+    },
+    {
+      "label": "Type=Noise, Open=False",
+      "file": "type-noise-open-false"
+    },
+    {
+      "label": "Type=Noise, Open=True",
+      "file": "type-noise-open-true"
+    }
+  ]
+}

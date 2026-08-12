@@ -108,12 +108,16 @@ export const Overview: Story = {
               <span style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{namingInconsistencies.map((d) => <Code key={d}>{d}</Code>)}</span>,
             ],
             [
-              <span style={{ fontSize: 13, fontWeight: 600 }}>Missing Fill=Yes variant</span>,
-              <span style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{svgIcons.filter((i) => !i.filled).map((d) => <Code key={d.name}>{d.name}</Code>)}</span>,
+              <span style={{ fontSize: 13, fontWeight: 600 }}>Variant naming drift</span>,
+              <span style={{ fontSize: 13, color: ink.tertiary }}><Code>campaigns</Code> uses lowercase <Code>fill=n</Code>/<Code>fill=yes</Code>; <Code>keyboard-arrow-left</Code>/<Code>-right</Code> name both variants <Code>Property 1=Default</Code> instead of <Code>Fill=No</Code>/<Code>Fill=Yes</Code>.</span>,
+            ],
+            [
+              <span style={{ fontSize: 13, fontWeight: 600 }}>Flattened outline vectors</span>,
+              <span style={{ fontSize: 13, color: ink.tertiary }}><Code>collaborative-document</Code> and <Code>collaborative-whiteboard</Code> Fill=No are stroked boolean unions, which break plain SVG export — vendored here via outline-stroke instead.</span>,
             ],
             [
               <span style={{ fontSize: 13, fontWeight: 600 }}>Off-palette color</span>,
-              <span style={{ fontSize: 13, color: ink.tertiary }}><Code>campaigns</Code> is drawn in <Code>#181d27</Code> instead of <Code>#414651</Code> (not recolorable until fixed).</span>,
+              <span style={{ fontSize: 13, color: ink.tertiary }}><Code>campaigns</Code> is drawn in <Code>#181d27</Code> instead of <Code>#414651</Code> in Figma; the vendored copy is normalised to <Code>currentColor</Code>.</span>,
             ],
             [
               <span style={{ fontSize: 13, fontWeight: 600 }}>Extra variant</span>,
