@@ -14,7 +14,14 @@ export const SOURCE = {
   ],
 };
 
-export interface NewToken { name: string; value: string; maps: string | null }
+export interface NewToken {
+  name: string;
+  value: string;
+  /** Equivalent token in the CURRENT foundations, or null when the role is new. */
+  maps: string | null;
+  /** For new roles: the token name they will be given in design-tokens.scss. */
+  proposed?: string;
+}
 
 /**
  * Values below that deliberately differ from the raw Figma export.
@@ -52,6 +59,7 @@ export const CORRECTIONS: { token: string; figma: string; applied: string; reaso
 export const base2026: NewToken[] = [
   { name: "Base/white", value: "#ffffff", maps: "base-white" },
   { name: "Base/black", value: "#000000", maps: "base-black" },
+  { name: "Base/brand", value: "#6852d6", maps: "base-brand" },
 ];
 
 /** Primitive ramps. Key = May-2026 family name; `maps` = current family in tokens.primitives. */
@@ -113,11 +121,11 @@ export const semantic2026: Record<"text" | "border" | "foreground" | "background
     { name: "Text Placeholder", value: "#717680", maps: "text-placeholder" },
     { name: "Text Placeholder Subtle", value: "#a4a7ae", maps: "text-placeholder-subtle" },
     { name: "Text Brand", value: "#6852d6", maps: "text-brand-primary" },
-    { name: "Text Brand Hover", value: "#5b45bd", maps: null },
+    { name: "Text Brand Hover", value: "#5b45bd", maps: null, proposed: "text-brand-primary-hover" },
     { name: "Text Error", value: "#d92d20", maps: "text-error" },
     { name: "Text Warning", value: "#dc6803", maps: "text-warning" },
     { name: "Text Success", value: "#079455", maps: "text-success" },
-    { name: "Text Info", value: "#1570ef", maps: null },
+    { name: "Text Info", value: "#1570ef", maps: null, proposed: "text-info" },
   ],
   border: [
     { name: "Border Light", value: "#f5f5f5", maps: "border-light" },
@@ -165,8 +173,8 @@ export const semantic2026: Record<"text" | "border" | "foreground" | "background
     { name: "BG 03 Hover", value: "#e9eaeb", maps: "bg-tertiary-hover" },
     { name: "BG 04", value: "#e9eaeb", maps: "bg-quaternary" },
     { name: "BG Active", value: "#fafafa", maps: "bg-active" },
-    { name: "BG Black Solid", value: "#0a0d12", maps: null },
-    { name: "BG Black Solid Hover", value: "#252b37", maps: null },
+    { name: "BG Black Solid", value: "#0a0d12", maps: null, proposed: "bg-black-solid" },
+    { name: "BG Black Solid Hover", value: "#252b37", maps: null, proposed: "bg-black-solid-hover" },
     { name: "BG Disabled", value: "#f5f5f5", maps: "bg-disabled" },
     { name: "BG Disabled Subtle", value: "#fafafa", maps: "bg-disabled-subtle" },
     { name: "BG Overlay", value: "#0a0d12", maps: "bg-overlay" },

@@ -13,7 +13,7 @@
   // --- Progress Bar ---
   &.ant-progress-line {
     .ant-progress-bg {
-      background-color: $base-primary;
+      background-color: $base-brand;
       border-radius: $radius-md;
     }
 
@@ -39,7 +39,7 @@
       }
 
       .ant-progress-circle-path {
-        stroke: $base-primary;
+        stroke: $base-brand;
       }
     }
 

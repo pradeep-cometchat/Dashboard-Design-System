@@ -20,7 +20,7 @@ export const c = {
   borderLight: "var(--border-light)",
   borderDefault: "var(--border-default)",
   borderDark: "var(--border-dark)",
-  brand: "var(--base-primary)",
+  brand: "var(--base-brand)",
   online: "var(--success-500)",
   offline: "var(--neutral-lm-300)",
   white: "var(--base-white)",

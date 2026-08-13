@@ -61,7 +61,7 @@
 .cc-button-primary.ant-btn.ant-btn-default {
   @extend %btn-base;
   @extend %btn-size-md;
-  background-color: $base-primary;
+  background-color: $base-brand;
   border: 2px solid rgba(255, 255, 255, 0.12);
   color: $text-white;
   box-shadow: $shadow-xs-skeuomorphic;
@@ -74,7 +74,7 @@
   }
 
   &:focus {
-    background-color: $base-primary;
+    background-color: $base-brand;
     border-color: rgba(255, 255, 255, 0.12);
     color: $text-white;
     box-shadow: $focus-ring-shadow-xs-skeuomorphic;
@@ -85,8 +85,8 @@
   }
 
   &.cc-button-disabled-colored:disabled {
-    background-color: $base-primary;
-    border-color: $base-primary;
+    background-color: $base-brand;
+    border-color: $base-brand;
     color: $text-white;
     opacity: 0.6;
     box-shadow: none;

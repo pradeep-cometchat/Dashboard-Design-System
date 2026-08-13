@@ -4,7 +4,7 @@
 export const tokens = {
   "base": [
     {
-      "name": "base-primary",
+      "name": "base-brand",
       "value": "#6852d6"
     },
     {
@@ -472,7 +472,7 @@ export const tokens = {
       },
       {
         "name": "text-brand-primary",
-        "ref": "$base-primary",
+        "ref": "$base-brand",
         "value": "#6852d6"
       },
       {
@@ -482,7 +482,7 @@ export const tokens = {
       },
       {
         "name": "text-highlight",
-        "ref": "$base-primary",
+        "ref": "$base-brand",
         "value": "#6852d6"
       },
       {
@@ -646,7 +646,7 @@ export const tokens = {
       },
       {
         "name": "bg-brand-solid",
-        "ref": "$base-primary",
+        "ref": "$base-brand",
         "value": "#6852d6"
       },
       {
@@ -773,7 +773,7 @@ export const tokens = {
       },
       {
         "name": "fg-brand-primary",
-        "ref": "$base-primary",
+        "ref": "$base-brand",
         "value": "#6852d6"
       },
       {

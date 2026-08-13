@@ -193,8 +193,8 @@
   }
 
   &.cc-tag__checkbox-checked {
-    background-color: $base-primary;
-    border-color: $base-primary;
+    background-color: $base-brand;
+    border-color: $base-brand;
 
     &:hover:not(:disabled) {
       background-color: $primary-700;

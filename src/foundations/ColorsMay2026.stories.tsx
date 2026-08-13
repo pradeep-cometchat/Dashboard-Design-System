@@ -276,7 +276,21 @@ function semanticRows(items: NewToken[]) {
   return items.map((t) => [
     <Chip value={t.value} />,
     <span style={{ fontWeight: 600, fontSize: 13 }}>{t.name}</span>,
-    t.maps ? <Code>${t.maps}</Code> : <span style={{ fontSize: 12, fontWeight: 600, color: "#5925dc" }}>new token</span>,
+    t.maps ? (
+      <Code>${t.maps}</Code>
+    ) : t.proposed ? (
+      <span style={{ whiteSpace: "nowrap" }}>
+        <Code>${t.proposed}</Code>
+        <span
+          title="New role — this token does not exist in the current foundations yet"
+          style={{ marginLeft: 8, padding: "1px 7px", borderRadius: 999, fontSize: 11, fontWeight: 600, color: "#5925dc", background: "#f4f3ff", border: "1px solid #d9d6fe" }}
+        >
+          new
+        </span>
+      </span>
+    ) : (
+      <span style={{ fontSize: 12, fontWeight: 600, color: "#5925dc" }}>new token</span>
+    ),
     <Code>{t.value}</Code>,
   ]);
 }
@@ -287,23 +301,23 @@ export const Semantic: Story = {
     <Page
       eyebrow="Foundations · Proposed update"
       title="Semantic Colors (May 2026)"
-      intro="Every semantic color from the May 2026 file, with the current token it corresponds to. “New token” marks roles that don’t exist in the current foundations. Three values are corrected from the raw Figma export — see “Open Questions” for what changed and why."
+      intro="Every semantic color from the May 2026 file, with the design-tokens.scss variable it maps to. Rows marked “new” are roles the current foundations don’t have yet, shown with the token name they will be given. Three values are corrected from the raw Figma export — see “Open Questions” for what changed and why."
       meta={pageMeta}
     >
       <Section title="Base">
-        <TokenTable head={["", "Figma variable", "Maps to (current)", "Value"]} rows={semanticRows(base2026)} />
+        <TokenTable head={["", "Figma variable", "Token name", "Value"]} rows={semanticRows(base2026)} />
       </Section>
       <Section title="Text">
-        <TokenTable head={["", "Figma variable", "Maps to (current)", "Value"]} rows={semanticRows(semantic2026.text)} />
+        <TokenTable head={["", "Figma variable", "Token name", "Value"]} rows={semanticRows(semantic2026.text)} />
       </Section>
       <Section title="Border">
-        <TokenTable head={["", "Figma variable", "Maps to (current)", "Value"]} rows={semanticRows(semantic2026.border)} />
+        <TokenTable head={["", "Figma variable", "Token name", "Value"]} rows={semanticRows(semantic2026.border)} />
       </Section>
       <Section title="Foreground (Icons)">
-        <TokenTable head={["", "Figma variable", "Maps to (current)", "Value"]} rows={semanticRows(semantic2026.foreground)} />
+        <TokenTable head={["", "Figma variable", "Token name", "Value"]} rows={semanticRows(semantic2026.foreground)} />
       </Section>
       <Section title="Background">
-        <TokenTable head={["", "Figma variable", "Maps to (current)", "Value"]} rows={semanticRows(semantic2026.background)} />
+        <TokenTable head={["", "Figma variable", "Token name", "Value"]} rows={semanticRows(semantic2026.background)} />
       </Section>
     </Page>
   ),

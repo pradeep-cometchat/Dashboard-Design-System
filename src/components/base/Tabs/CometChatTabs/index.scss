@@ -78,7 +78,7 @@
     }
 
     &.ant-tabs-tab-active {
-      border-bottom-color: $base-primary;
+      border-bottom-color: $base-brand;
 
       .ant-tabs-tab-btn {
         color: $text-brand-secondary;
@@ -246,7 +246,7 @@
     }
 
     &.ant-tabs-tab-active {
-      border-left-color: $base-primary;
+      border-left-color: $base-brand;
 
       .ant-tabs-tab-btn {
         color: $text-brand-secondary;

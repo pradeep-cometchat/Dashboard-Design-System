@@ -8,7 +8,7 @@
 // ============================================================
 // BASE COLORS
 // ============================================================
-$base-primary: #6852d6;
+$base-brand: #6852d6;
 $base-white: #ffffff;
 $base-black: #0a0d12;
 
@@ -155,9 +155,9 @@ $text-white: $base-white;
 $text-disabled: $neutral-lm-500;
 $text-placeholder: $neutral-lm-500;
 $text-placeholder-subtle: $neutral-lm-400;
-$text-brand-primary: $base-primary;
+$text-brand-primary: $base-brand;
 $text-brand-secondary: $primary-700;
-$text-highlight: $base-primary;
+$text-highlight: $base-brand;
 $text-highlight-hover: $primary-700;
 $text-error: $error-600;
 $text-error-hover: $error-700;
@@ -193,7 +193,7 @@ $bg-overlay: $neutral-lm-950;
 $bg-brand-primary: $primary-50;
 $bg-brand-primary-alt: $primary-100;
 $bg-brand-secondary: $primary-100;
-$bg-brand-solid: $base-primary;
+$bg-brand-solid: $base-brand;
 $bg-brand-solid-hover: $primary-700;
 $bg-error-primary: $error-50;
 $bg-error-secondary: $error-100;
@@ -220,7 +220,7 @@ $fg-quaternary-hover: $neutral-lm-500;
 $fg-white: $base-white;
 $fg-disabled: $neutral-lm-400;
 $fg-disabled-subtle: $neutral-lm-300;
-$fg-brand-primary: $base-primary;
+$fg-brand-primary: $base-brand;
 $fg-brand-primary-alt: $primary-700;
 $fg-brand-secondary: $primary-500;
 $fg-brand-secondary-alt: $primary-600;

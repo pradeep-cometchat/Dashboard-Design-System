@@ -30,8 +30,8 @@
     }
 
     &.ant-checkbox-checked .ant-checkbox-inner {
-      background-color: $base-primary;
-      border-color: $base-primary;
+      background-color: $base-brand;
+      border-color: $base-brand;
     }
 
     &.ant-checkbox-indeterminate .ant-checkbox-inner::after {
@@ -48,8 +48,8 @@
 
     &.ant-checkbox-checked .ant-checkbox-inner,
     &.ant-checkbox-indeterminate .ant-checkbox-inner {
-      background-color: $base-primary;
-      border-color: $base-primary;
+      background-color: $base-brand;
+      border-color: $base-brand;
     }
 
     // Focus state

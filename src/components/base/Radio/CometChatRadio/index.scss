@@ -50,8 +50,8 @@
 
   // Checked: solid purple fill + white dot
   .ant-radio-checked .ant-radio-inner {
-    background-color: $base-primary;
-    border-color: $base-primary;
+    background-color: $base-brand;
+    border-color: $base-brand;
   }
 
   .ant-radio-checked .ant-radio-inner::after {
@@ -61,7 +61,7 @@
 
   // Hover on wrapper
   .ant-radio-wrapper:hover .ant-radio:not(.ant-radio-disabled) .ant-radio-inner {
-    border-color: $base-primary;
+    border-color: $base-brand;
   }
 
   // Focus
