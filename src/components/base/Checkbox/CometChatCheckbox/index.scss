@@ -110,8 +110,7 @@
 .cc-checkbox__text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding-top: 0;
+  gap: $spacing-xxs;  padding-top: 0;
 }
 
 .cc-checkbox__label {

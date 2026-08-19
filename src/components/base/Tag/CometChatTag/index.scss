@@ -87,8 +87,7 @@
       padding: $spacing-xxs;
 
       .anticon {
-        font-size: 12px;
-      }
+        font-size: $font-size-text-xs;      }
     }
 
     .cc-tag__count {
@@ -122,15 +121,13 @@
       padding: 3px;
 
       .anticon {
-        font-size: 14px;
-      }
+        font-size: $font-size-text-sm;      }
     }
 
     .cc-tag__count {
       font-size: $font-size-text-sm;
       line-height: $line-height-text-sm;
-      padding: 0 6px;
-    }
+      padding: 0 $spacing-sm;    }
   }
 
   // ----------------------------------------------------------

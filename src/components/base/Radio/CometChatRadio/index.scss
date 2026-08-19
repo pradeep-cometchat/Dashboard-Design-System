@@ -45,8 +45,7 @@
 
   .ant-radio .ant-radio-inner::after {
     background-color: $bg-primary;
-    border-radius: 9999px;
-  }
+    border-radius: $radius-full;  }
 
   // Checked: solid purple fill + white dot
   .ant-radio-checked .ant-radio-inner {
@@ -136,8 +135,7 @@
 .cc-radio__text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-}
+  gap: $spacing-xxs;}
 
 .cc-radio__label {
   font-family: $font-family-base;

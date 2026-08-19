@@ -324,8 +324,7 @@
 @media (max-width: 480px) {
   .cc-modal .ant-modal {
     max-width: calc(100vw - 32px);
-    margin: 16px;
-  }
+    margin: $spacing-xl;  }
 
   .cc-modal__header {
     padding: $spacing-xl $spacing-xl 0 $spacing-xl;

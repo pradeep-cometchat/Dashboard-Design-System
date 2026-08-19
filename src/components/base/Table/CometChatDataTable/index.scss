@@ -286,8 +286,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px 32px 48px;
-}
+  padding: $spacing-5xl $spacing-4xl $spacing-6xl;}
 
 // ============================================================
 // PAGINATION FOOTER
@@ -312,6 +311,5 @@
 }
 
 .cc-data-table .ant-spin-dot {
-  font-size: 24px;
-  color: $base-brand;
+  font-size: $font-size-display-xs;  color: $base-brand;
 }

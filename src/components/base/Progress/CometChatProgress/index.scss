@@ -81,8 +81,7 @@
 
 .cc-progress__percent {
   font-family: $font-family-base;
-  font-size: 32px;
-  font-weight: $font-weight-semibold;
+  font-size: $font-size-display-sm;  font-weight: $font-weight-semibold;
   line-height: 1.1875em;
   color: $text-primary;
 }
