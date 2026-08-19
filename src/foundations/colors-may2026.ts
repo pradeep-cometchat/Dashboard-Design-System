@@ -183,6 +183,7 @@ export const semantic2026: Record<"text" | "border" | "foreground" | "background
     { name: "BG Brand Secondary", value: "#e3e6fc", maps: "bg-brand-secondary" },
     { name: "BG Brand Solid", value: "#6852d6", maps: "bg-brand-solid" },
     { name: "BG Brand Solid Hover", value: "#5b45bd", maps: "bg-brand-solid-hover" },
+    { name: "BG Brand Disabled", value: "#adb1f4", maps: null, proposed: "bg-brand-disabled" },
     { name: "BG Error Primary", value: "#fef3f2", maps: "bg-error-primary" },
     { name: "BG Error Secondary", value: "#fee4e2", maps: "bg-error-secondary" },
     { name: "BG Error Solid", value: "#d92d20", maps: "bg-error-solid" },
