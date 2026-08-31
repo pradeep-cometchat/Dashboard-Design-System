@@ -1,0 +1,30 @@
+// Pin picker modal overrides — 24px geometry per design feedback.
+// Scoped to .cc-pin-modal so the base CometChatModal keeps its own defaults.
+// Every value is a foundation token: $radius-4xl = 24px, $spacing-3xl = 24px.
+@import '../../assets/design-tokens.scss';
+
+// antd v5 renders .ant-modal-content; v6 renders .ant-modal-container — cover both.
+.cc-pin-modal .ant-modal-content,
+.cc-pin-modal .ant-modal-container {
+  border-radius: $radius-4xl;
+}
+
+.cc-pin-modal .cc-modal__header {
+  padding: $spacing-3xl $spacing-3xl 0 $spacing-3xl;
+}
+
+.cc-pin-modal .cc-modal__body {
+  padding: $spacing-xl $spacing-3xl $spacing-3xl; // tighter above the tabs
+}
+
+// Tabs sit inline beside the search field — drop antd's default nav margin.
+.cc-pin-modal .cc-tabs .ant-tabs-nav {
+  margin: 0;
+}
+
+// Search input stretches to match the segmented tab bar's height (flex row, no fixed px).
+// The base input pins its own height, so match its selector weight and stretch instead.
+.cc-pin-modal .cc-input-field .ant-input-affix-wrapper {
+  height: 100%;
+  align-self: stretch;
+}
