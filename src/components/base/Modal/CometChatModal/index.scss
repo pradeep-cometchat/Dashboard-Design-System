@@ -12,7 +12,9 @@
 //   - Optional: featured icon, close, header/footer divider, tertiary action, checkbox
 // ============================================================
 
-.cc-modal .ant-modal-content {
+// antd v5 renders .ant-modal-content; v6 renders .ant-modal-container — cover both.
+.cc-modal .ant-modal-content,
+.cc-modal .ant-modal-container {
   padding: 0;
   border-radius: $radius-xl;
   font-family: $font-family-base;

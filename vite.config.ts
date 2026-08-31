@@ -15,6 +15,8 @@ export default defineConfig({
   resolve: {
     alias: {
       // Mirror the customer-dashboard aliases (tsconfig baseUrl: "src", @assets/*)
+      // Webpack-style tilde imports used by the mirrored component SCSS (mask-image urls).
+      '~@assets': path.resolve(dirname, 'src/assets'),
       '@assets': path.resolve(dirname, 'src/assets'),
       components: path.resolve(dirname, 'src/components'),
     },

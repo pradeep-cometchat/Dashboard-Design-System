@@ -110,6 +110,7 @@
   }
 
   .ant-tabs-tab {
+    margin: 0; // antd's default inter-tab margin doubles up with the gap above
     padding: $spacing-md $spacing-lg;
     border-radius: $radius-sm;
     color: $text-tertiary;
@@ -138,6 +139,7 @@
   }
 
   .ant-tabs-tab {
+    margin: 0; // antd's default inter-tab margin doubles up with the gap above
     padding: $spacing-md $spacing-lg;
     border-radius: $radius-sm;
     color: $text-tertiary;
