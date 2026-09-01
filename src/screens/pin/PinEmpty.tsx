@@ -12,7 +12,7 @@ import CometChatButton from "components/base/Button/CometChatButton";
 import CometChatAvatar from "components/base/Avatar/CometChatAvatar";
 import { c, r, s, font, shadow } from "../theme";
 import { Icon, dim } from "./ui";
-import PinConversationModal, { PinPickerSelect, CONVERSATIONS, PIN_LIMIT, type Conversation } from "./PinConversationModal";
+import PinConversationModal, { CONVERSATIONS, PIN_LIMIT, type Conversation } from "./PinConversationModal";
 
 const w = {
   medium: "var(--font-weight-medium)",
@@ -68,7 +68,14 @@ type DragHandlers = {
   onDragStart: (e: React.DragEvent) => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent) => void;
+  onDragEnd: (e: React.DragEvent) => void;
 };
+
+// 1×1 transparent GIF for setDragImage. The native drag snapshot is rendered
+// by the OS with forced translucency and an opaque white backing behind the
+// rounded corners; V2 suppresses it and floats its own opaque card instead.
+const EMPTY_DRAG_IMAGE = typeof Image !== "undefined" ? new Image() : null;
+if (EMPTY_DRAG_IMAGE) EMPTY_DRAG_IMAGE.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 /* ---------------- Default variant pieces ---------------- */
 
@@ -165,7 +172,7 @@ function SlotNumber({ n }: { n: number }) {
   );
 }
 
-function EmptySlot({ n, onClick }: { n: number; onClick: (e: React.MouseEvent<HTMLButtonElement>) => void }) {
+function EmptySlot({ n, onClick }: { n: number; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -193,21 +200,19 @@ function EmptySlot({ n, onClick }: { n: number; onClick: (e: React.MouseEvent<HT
   );
 }
 
-function PinnedSlot({ n, conv, onRemove, dragging, handlers }: { n: number; conv: Conversation; onRemove: () => void; dragging: boolean; handlers: DragHandlers }) {
+/** The slot card visuals — shared by the in-list row and the floating drag preview. */
+function SlotCard({ n, conv, onRemove }: { n: number; conv: Conversation; onRemove: () => void }) {
   return (
     <div
-      draggable
-      {...handlers}
       style={{
         display: "flex",
         alignItems: "center",
         gap: s.xl,
         boxSizing: "border-box",
         padding: `${s.lg} ${s["3xl"]}`,
-        background: dragging ? c.bgSecondary : c.bgPrimary,
+        background: c.bgPrimary,
         border: `1px solid ${c.borderDefault}`,
         borderRadius: r.xl,
-        cursor: "grab",
       }}
     >
       <SlotNumber n={n} />
@@ -218,6 +223,37 @@ function PinnedSlot({ n, conv, onRemove, dragging, handlers }: { n: number; conv
         <span style={{ ...font.body, color: c.textQuaternary }}>{conv.uid}</span>
       </span>
       <RemoveButton name={conv.name} onRemove={onRemove} />
+    </div>
+  );
+}
+
+function PinnedSlot({ n, conv, onRemove, dragging, handlers }: { n: number; conv: Conversation; onRemove: () => void; dragging: boolean; handlers: DragHandlers }) {
+  return (
+    <div draggable {...handlers} style={{ cursor: "grab", background: "transparent" }}>
+      {dragging ? (
+        // While the floating preview carries the card, the source slot reads as
+        // an empty drop target: dashed outline, same height and layout as an
+        // empty slot, with a hint instead of blank space.
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: s.xl,
+            boxSizing: "border-box",
+            padding: `${s.lg} ${s["3xl"]}`,
+            border: `1px dashed ${c.borderDark}`,
+            borderRadius: r.xl,
+            background: c.bgSecondary,
+          }}
+        >
+          <SlotNumber n={n} />
+          <span style={{ ...font.body, color: c.textQuaternary, display: "flex", alignItems: "center", minHeight: dim.avatar }}>
+            Drop here to place at position {n}
+          </span>
+        </div>
+      ) : (
+        <SlotCard n={n} conv={conv} onRemove={onRemove} />
+      )}
     </div>
   );
 }
@@ -239,30 +275,6 @@ export default function PinEmpty({
   saveTick?: number;
 }) {
   const [pickerOpen, setPickerOpen] = React.useState(false);
-  // V2: which slot's picker dropdown is open (null = none), and whether it
-  // opens above the slot (when the viewport has more room there than below —
-  // keeps the last slots from spilling scroll space under the section).
-  const [openSlot, setOpenSlot] = React.useState<number | null>(null);
-  const [dropUp, setDropUp] = React.useState(false);
-  // Approximate rendered dropdown height (list viewport + search/footer chrome);
-  // only steers the above/below choice, nothing is sized with it.
-  const PICKER_HEIGHT_ESTIMATE = 400;
-  const slotsRef = React.useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
-    if (openSlot === null) return;
-    const onPointerDown = (e: PointerEvent) => {
-      if (slotsRef.current && !slotsRef.current.contains(e.target as Node)) setOpenSlot(null);
-    };
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpenSlot(null);
-    };
-    document.addEventListener("pointerdown", onPointerDown);
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("pointerdown", onPointerDown);
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [openSlot]);
   const [pinnedIds, setPinnedIds] = React.useState<string[]>([]);
   const baseline = React.useRef("[]");
   React.useEffect(() => {
@@ -276,6 +288,24 @@ export default function PinEmpty({
 
   const dragFrom = React.useRef<number | null>(null);
   const [dragIndex, setDragIndex] = React.useState<number | null>(null);
+
+  // V2 floating drag preview: an opaque copy of the card that follows the
+  // cursor (position driven directly on the DOM node — no re-render per move).
+  const previewRef = React.useRef<HTMLDivElement>(null);
+  const dragMeta = React.useRef<{ w: number; x: number; y: number; ox: number; oy: number } | null>(null);
+  const movePreview = React.useCallback((ev: DragEvent) => {
+    const el = previewRef.current;
+    const meta = dragMeta.current;
+    if (!el || !meta || (ev.clientX === 0 && ev.clientY === 0)) return;
+    el.style.transform = `translate(${ev.clientX - meta.ox}px, ${ev.clientY - meta.oy}px)`;
+  }, []);
+  const endPreview = React.useCallback(() => {
+    document.removeEventListener("dragover", movePreview);
+    dragMeta.current = null;
+    dragFrom.current = null;
+    setDragIndex(null);
+  }, [movePreview]);
+  React.useEffect(() => () => document.removeEventListener("dragover", movePreview), [movePreview]);
 
   const pinnedSet = React.useMemo(() => new Set(pinnedIds), [pinnedIds]);
   const pinnedConvs = pinnedIds
@@ -304,6 +334,14 @@ export default function PinEmpty({
       dragFrom.current = i;
       setDragIndex(i);
       e.dataTransfer.effectAllowed = "move";
+      if (labelOutside && EMPTY_DRAG_IMAGE) {
+        // Replace the OS ghost (translucent, white-backed corners) with our
+        // own opaque floating card, anchored where the row was grabbed.
+        e.dataTransfer.setDragImage(EMPTY_DRAG_IMAGE, 0, 0);
+        const rect = e.currentTarget.getBoundingClientRect();
+        dragMeta.current = { w: rect.width, x: rect.left, y: rect.top, ox: e.clientX - rect.left, oy: e.clientY - rect.top };
+        document.addEventListener("dragover", movePreview);
+      }
     },
     onDragOver: (e) => {
       e.preventDefault();
@@ -316,9 +354,10 @@ export default function PinEmpty({
     },
     onDrop: (e) => {
       e.preventDefault();
-      dragFrom.current = null;
-      setDragIndex(null);
+      endPreview();
     },
+    // Fires on the source even when dropped outside the list — always clean up.
+    onDragEnd: () => endPreview(),
   });
 
   const counter = (
@@ -330,65 +369,54 @@ export default function PinEmpty({
     </>
   );
 
-  const modal = <PinConversationModal open={pickerOpen} onClose={() => setPickerOpen(false)} pinned={pinnedSet} onToggle={toggle} />;
+  const modal = (
+    <PinConversationModal
+      open={pickerOpen}
+      onClose={() => setPickerOpen(false)}
+      pinned={pinnedSet}
+      onConfirm={(ids) => {
+        pinMany(ids);
+        setPickerOpen(false);
+      }}
+    />
+  );
 
   if (labelOutside) {
-    // V2: label row + PIN_LIMIT slot cards.
+    // V2: label row + PIN_LIMIT slot cards; empty slots open the picker pop-up.
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: s.lg }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: s.md }}>
           <span style={{ ...font.bodyMd, color: c.textPrimary }}>{title}</span>
           {counter}
         </div>
-        <div ref={slotsRef} style={{ display: "flex", flexDirection: "column", gap: s.lg }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: s.lg }}>
           {Array.from({ length: PIN_LIMIT }, (_, i) => {
             const conv = pinnedConvs[i];
-            if (!conv)
-              return (
-                // Relative anchor so the picker dropdown overlays the slots below instead of pushing them.
-                <div key={`empty-${i}`} style={{ position: "relative" }}>
-                  <EmptySlot
-                    n={i + 1}
-                    onClick={(e) => {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const spaceBelow = window.innerHeight - rect.bottom;
-                      setDropUp(spaceBelow < PICKER_HEIGHT_ESTIMATE && rect.top > spaceBelow);
-                      setOpenSlot((open) => (open === i ? null : i));
-                    }}
-                  />
-                  {openSlot === i && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        ...(dropUp ? { bottom: `calc(100% + ${s.md})` } : { top: `calc(100% + ${s.md})` }),
-                        left: 0,
-                        right: 0,
-                        zIndex: 30,
-                        background: c.bgPrimary,
-                        border: `1px solid ${c.borderDefault}`,
-                        borderRadius: r.xl,
-                        boxShadow: shadow.lg,
-                        boxSizing: "border-box",
-                        overflow: "hidden",
-                      }}
-                    >
-                      <PinPickerSelect
-                        pinned={pinnedSet}
-                        onCancel={() => setOpenSlot(null)}
-                        onConfirm={(ids) => {
-                          pinMany(ids);
-                          setOpenSlot(null);
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-              );
+            if (!conv) return <EmptySlot key={`empty-${i}`} n={i + 1} onClick={() => setPickerOpen(true)} />;
             return (
               <PinnedSlot key={conv.id} n={i + 1} conv={conv} dragging={dragIndex === i} onRemove={() => toggle(conv.id)} handlers={dragHandlers(i)} />
             );
           })}
         </div>
+        {dragIndex !== null && pinnedConvs[dragIndex] && dragMeta.current && (
+          <div
+            ref={previewRef}
+            style={{
+              position: "fixed",
+              left: 0,
+              top: 0,
+              width: dragMeta.current.w,
+              transform: `translate(${dragMeta.current.x}px, ${dragMeta.current.y}px)`,
+              zIndex: 50,
+              pointerEvents: "none",
+              boxShadow: shadow.lg,
+              borderRadius: r.xl,
+            }}
+          >
+            <SlotCard n={dragIndex + 1} conv={pinnedConvs[dragIndex]} onRemove={() => {}} />
+          </div>
+        )}
+        {modal}
       </div>
     );
   }

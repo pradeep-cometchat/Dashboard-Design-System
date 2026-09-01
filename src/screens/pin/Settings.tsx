@@ -225,7 +225,7 @@ export default function SettingsScreen({ pinEnableToggle = true, pinLabelOutside
 
           {/* Copy below is a placeholder pending design — the section shape mirrors Threads. */}
           <Section
-            title="Pin"
+            title="Pin Conversations"
             desc="Keep up to 5 important conversations at the top of the list for everyone in your app. Only admins can pin, reorder, or remove them."
           >
             <div style={{ display: "flex", flexDirection: "column", gap: s["3xl"] }}>

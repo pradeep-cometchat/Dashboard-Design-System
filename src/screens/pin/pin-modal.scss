@@ -10,11 +10,24 @@
 }
 
 .cc-pin-modal .cc-modal__header {
-  padding: $spacing-3xl $spacing-3xl 0 $spacing-3xl;
+  padding: $spacing-3xl $spacing-3xl $spacing-xl;
+  border-bottom: 1px solid $border-light; // separator below the description, edge to edge
 }
 
+// The picker manages its own padding so its separators run edge to edge.
 .cc-pin-modal .cc-modal__body {
-  padding: $spacing-xl $spacing-3xl $spacing-3xl; // tighter above the tabs
+  padding: 0;
+}
+
+// Header close: same glyph and tone as the slot remove button
+// (foundation close icon at fg-tertiary, not the modal's default x-close).
+.cc-pin-modal .cc-modal__close {
+  color: $fg-tertiary;
+}
+
+.cc-pin-modal .cc-modal__close-icon {
+  mask-image: url('../../foundations/icons-2026/svg/close.svg');
+  -webkit-mask-image: url('../../foundations/icons-2026/svg/close.svg');
 }
 
 // Tabs sit inline beside the search field — drop antd's default nav margin.
@@ -73,6 +86,12 @@
 // border so toggling between 0 and n selected never shifts the button's width.
 .cc-pin-picker .cc-button-primary.ant-btn.ant-btn-default:disabled {
   border-width: 2px;
+}
+
+// Picker rows: the checkbox wrapper reserves a 12px label-gap slot even with
+// no label — drop it so the row's own spacing controls the visible gap.
+.cc-pin-picker .cc-checkbox .ant-checkbox-wrapper {
+  gap: 0;
 }
 
 // Picker rows: check state snaps instantly — no tick/box transition, no click wave.
