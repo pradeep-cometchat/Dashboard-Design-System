@@ -52,9 +52,11 @@
       border-color: $base-brand;
     }
 
-    // Focus state
-    &.ant-checkbox-checked::after,
-    &::after {
+    // Focus state — v5 only: there ::after is the focus ring. In antd v6 the
+    // same ::after IS the check mark (no .ant-checkbox-inner exists), so the
+    // reset must not apply — the :has() guard keys it to the v5 structure.
+    &:has(.ant-checkbox-inner).ant-checkbox-checked::after,
+    &:has(.ant-checkbox-inner)::after {
       border: none;
     }
 
@@ -75,6 +77,59 @@
   }
 }
 
+// ============================================================
+// antd v6 drift: .ant-checkbox-inner no longer exists — the .ant-checkbox
+// span is the drawn box and its ::after is the check mark. Recolor through
+// antd's CSS variables so its native tick/indeterminate drawing is kept.
+// ============================================================
+.cc-checkbox .ant-checkbox-wrapper {
+  --ant-color-primary: #{$base-brand};
+  --ant-color-primary-hover: #{$base-brand};
+  --ant-color-border: #{$border-dark};
+}
+
+// v6 box sizes (the .ant-checkbox-inner size rules below are inert in v6).
+.cc-checkbox-md .ant-checkbox:not(:has(.ant-checkbox-inner)) {
+  width: 20px;
+  height: 20px;
+  border-radius: $radius-sm;
+}
+
+.cc-checkbox-sm .ant-checkbox:not(:has(.ant-checkbox-inner)) {
+  width: 16px;
+  height: 16px;
+  border-radius: $radius-xs;
+}
+
+// v6 check mark: the box's own ::after, drawn as a rotated two-edge border.
+// Re-anchor it to the true centre of our resized box (antd positions it for
+// its default box size) and pin the stroke to the foundation white.
+.cc-checkbox .ant-checkbox:not(:has(.ant-checkbox-inner)) {
+  position: relative;
+
+  &.ant-checkbox-checked::after {
+    position: absolute;
+    top: 50%;
+    inset-inline-start: 50%;
+    margin: 0;
+    border: 2px solid $base-white;
+    border-top: 0;
+    border-inline-start: 0;
+    transform: translate(-50%, -58%) rotate(45deg);
+  }
+}
+
+.cc-checkbox-md .ant-checkbox:not(:has(.ant-checkbox-inner)).ant-checkbox-checked::after {
+  width: 6px;
+  height: 10px;
+}
+
+.cc-checkbox-sm .ant-checkbox:not(:has(.ant-checkbox-inner)).ant-checkbox-checked::after {
+  width: 5px;
+  height: 8px;
+}
+
+// ============================================================
 // --- MD size (default): 20×20, 6px radius ---
 .cc-checkbox-md .ant-checkbox .ant-checkbox-inner {
   width: 20px;
