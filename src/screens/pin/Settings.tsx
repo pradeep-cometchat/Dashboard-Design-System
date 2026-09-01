@@ -166,7 +166,9 @@ function MessageTypeTable() {
 // (and copy-paste accidents) can never mistake it for a live credential.
 const OPENAI_KEY_SAMPLE = "sk-••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••4tQF";
 
-export default function SettingsScreen() {
+export default function SettingsScreen({ pinEnableToggle = true, pinLabelOutside = false }: { pinEnableToggle?: boolean; pinLabelOutside?: boolean }) {
+  const [pinDirty, setPinDirty] = React.useState(false);
+  const [pinSaveTick, setPinSaveTick] = React.useState(0);
   return (
     <DashboardFrame active="Settings">
       <div style={{ display: "flex", flexDirection: "column", gap: s.xl }}>
@@ -227,14 +229,18 @@ export default function SettingsScreen() {
             desc="Keep up to 5 important conversations at the top of the list for everyone in your app. Only admins can pin, reorder, or remove them."
           >
             <div style={{ display: "flex", flexDirection: "column", gap: s["3xl"] }}>
-              <ToggleRow
-                on
-                label="Enable conversation pinning"
-                desc="Show pinned conversations at the top of the conversation list for all members."
-              />
-              <PinEmpty />
+              {pinEnableToggle && (
+                <ToggleRow
+                  on
+                  label="Enable conversation pinning"
+                  desc="Show pinned conversations at the top of the conversation list for all members."
+                />
+              )}
+              <PinEmpty labelOutside={pinLabelOutside} onDirtyChange={setPinDirty} saveTick={pinSaveTick} />
               <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <CometChatButton hierarchy="primary">Save</CometChatButton>
+                <CometChatButton hierarchy="primary" disabled={!pinDirty} onClick={() => setPinSaveTick((t) => t + 1)}>
+                  Update
+                </CometChatButton>
               </div>
             </div>
           </Section>

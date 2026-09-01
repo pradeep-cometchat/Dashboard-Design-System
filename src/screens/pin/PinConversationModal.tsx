@@ -9,6 +9,7 @@ import CometChatModal from "components/base/Modal/CometChatModal";
 import CometChatInput from "components/base/Input/CometChatInput";
 import CometChatButton from "components/base/Button/CometChatButton";
 import CometChatAvatar from "components/base/Avatar/CometChatAvatar";
+import CometChatCheckbox from "components/base/Checkbox/CometChatCheckbox";
 import CometChatTabs from "components/base/Tabs/CometChatTabs";
 import { c, r, s, font } from "../theme";
 import { Icon, dim } from "./ui";
@@ -51,10 +52,17 @@ export const CONVERSATIONS: Conversation[] = [
   })),
 ].sort((a, b) => a.name.localeCompare(b.name));
 
+// Labels carry a hidden semibold ghost (see pin-modal.scss) so each tab keeps
+// its active-state width and the bar doesn't resize as the selection moves.
+const tabLabel = (text: string) => (
+  <span className="cc-pin-modal__tab-label" data-label={text}>
+    {text}
+  </span>
+);
 const TAB_ITEMS = [
-  { key: "all", label: "All" },
-  { key: "user", label: "Users" },
-  { key: "group", label: "Groups" },
+  { key: "all", label: tabLabel("All") },
+  { key: "user", label: tabLabel("Users") },
+  { key: "group", label: tabLabel("Groups") },
 ];
 
 const PAGE = 8;
@@ -65,17 +73,23 @@ export const PIN_LIMIT = 5;
 // (needs a $control/$panel size family); fixed so the card doesn't resize
 // when a tab filters down to fewer rows.
 const LIST_HEIGHT = 360;
+// Dropdown list viewport — shorter than the modal's so the picker fits below
+// (or above) a slot card; max-height so short result sets leave no blank space.
+const DROPDOWN_LIST_HEIGHT = 240;
 
-export default function PinConversationModal({
-  open,
-  onClose,
+/**
+ * The picker body — search, All/Users/Groups tabs, infinite-scroll list.
+ * Hosted by the modal (Default variant) or the slot dropdown (V2).
+ */
+export function PinPicker({
   pinned,
   onToggle,
+  onPicked,
 }: {
-  open: boolean;
-  onClose: () => void;
   pinned: Set<string>;
   onToggle: (id: string) => void;
+  /** Called after a conversation is pinned (not unpinned) — lets the dropdown close on pick. */
+  onPicked?: () => void;
 }) {
   const [query, setQuery] = React.useState("");
   const [tab, setTab] = React.useState("all");
@@ -93,22 +107,7 @@ export default function PinConversationModal({
   };
 
   return (
-    <CometChatModal
-      open={open}
-      onCancel={onClose}
-      title="Pin a conversation"
-      description={
-        atLimit
-          ? `All ${PIN_LIMIT} pin slots are used. Unpin a conversation to make room for another.`
-          : `Pinned conversations appear at the top of the list for everyone. You can pin up to ${PIN_LIMIT}.`
-      }
-      showClose
-      hideOk
-      hideCancel
-      size="3xl"
-      className="cc-pin-modal"
-    >
-      <div style={{ display: "flex", flexDirection: "column", gap: s.xl }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: s.xl }}>
         <div style={{ display: "flex", alignItems: "stretch", gap: s.lg }}>
           <div style={{ flex: 1, minWidth: 0, display: "flex" }}>
             <CometChatInput
@@ -170,7 +169,14 @@ export default function PinConversationModal({
                       Pinned
                     </CometChatButton>
                   ) : (
-                    <CometChatButton hierarchy="secondary" disabled={atLimit} onClick={() => onToggle(conv.id)}>
+                    <CometChatButton
+                      hierarchy="secondary"
+                      disabled={atLimit}
+                      onClick={() => {
+                        onToggle(conv.id);
+                        onPicked?.();
+                      }}
+                    >
                       Pin
                     </CometChatButton>
                   )}
@@ -185,6 +191,156 @@ export default function PinConversationModal({
           </div>
         </div>
       </div>
+  );
+}
+
+/**
+ * V2 dropdown picker — checkbox multi-select rows with a Cancel / "Pin selected (n)"
+ * footer. Already-pinned conversations are excluded; selection stops at the free slots.
+ */
+export function PinPickerSelect({
+  pinned,
+  onCancel,
+  onConfirm,
+}: {
+  pinned: Set<string>;
+  onCancel: () => void;
+  onConfirm: (ids: string[]) => void;
+}) {
+  const [query, setQuery] = React.useState("");
+  const [tab, setTab] = React.useState("all");
+  const [visible, setVisible] = React.useState(PAGE);
+  const [selected, setSelected] = React.useState<string[]>([]);
+  const free = PIN_LIMIT - pinned.size - selected.length;
+  const matches = CONVERSATIONS.filter(
+    (conv) => !pinned.has(conv.id) && (tab === "all" || conv.type === tab) && conv.name.toLowerCase().includes(query.trim().toLowerCase())
+  );
+  const shown = matches.slice(0, visible);
+  const onListScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 48) {
+      setVisible((v) => (v < matches.length ? v + PAGE : v));
+    }
+  };
+  const toggleSelect = (id: string) =>
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : free > 0 ? [...prev, id] : prev));
+
+  return (
+    <div className="cc-pin-picker" style={{ display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", alignItems: "stretch", gap: s.lg, padding: s.xl, borderBottom: `1px solid ${c.borderLight}` }}>
+        <div style={{ flex: 1, minWidth: 0, display: "flex" }}>
+          <CometChatInput
+            placeholder="Search people or groups"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setVisible(PAGE);
+            }}
+            prefix={<Icon name="search" size={dim.iconSm} color={c.textQuaternary} />}
+            allowClear
+          />
+        </div>
+        <CometChatTabs
+          type="button-border"
+          size="sm"
+          items={TAB_ITEMS}
+          activeKey={tab}
+          onChange={(key) => {
+            setTab(key);
+            setVisible(PAGE);
+          }}
+        />
+      </div>
+
+      <div style={{ maxHeight: DROPDOWN_LIST_HEIGHT, overflowY: "auto" }} onScroll={onListScroll}>
+        {shown.length === 0 ? (
+          <div style={{ padding: `${s["3xl"]} ${s.xl}`, textAlign: "center" }}>
+            <span style={{ ...font.body, color: c.textTertiary }}>No conversations match “{query.trim()}”</span>
+          </div>
+        ) : (
+          shown.map((conv) => {
+            const checked = selected.includes(conv.id);
+            const disabled = !checked && free <= 0;
+            return (
+              <div
+                key={conv.id}
+                onClick={() => !disabled && toggleSelect(conv.id)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: s.lg,
+                  padding: `${s.md} ${s.xl}`,
+                  borderBottom: `1px solid ${c.borderLight}`,
+                  cursor: disabled ? "not-allowed" : "pointer",
+                  opacity: disabled ? 0.5 : 1,
+                }}
+              >
+                {/* stopPropagation: without it a checkbox click also fires the row's onClick and the two toggles cancel out. */}
+                <span onClick={(e) => e.stopPropagation()} style={{ display: "inline-flex" }}>
+                  <CometChatCheckbox checked={checked} disabled={disabled} ariaLabel={`Select ${conv.name}`} onChange={() => !disabled && toggleSelect(conv.id)} />
+                </span>
+                {conv.type === "user" ? (
+                  <CometChatAvatar src={conv.avatar} size={dim.avatar} alt={conv.name} />
+                ) : (
+                  <CometChatAvatar size={dim.avatar} alt={conv.name} icon={<Icon name="group" size={dim.iconSm} color={c.textSecondary} />} />
+                )}
+                <span style={{ display: "flex", flexDirection: "column", flex: 1, minWidth: 0 }}>
+                  <span style={{ ...font.bodyMd, color: c.textPrimary }}>{conv.name}</span>
+                  <span style={{ ...font.body, color: c.textQuaternary }}>{conv.uid}</span>
+                </span>
+              </div>
+            );
+          })
+        )}
+        {shown.length > 0 && shown.length < matches.length && (
+          <div style={{ padding: `${s.md} ${s.xl}`, textAlign: "center" }}>
+            <span style={{ ...font.caption, color: c.textQuaternary }}>Scroll for more</span>
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: s.lg, padding: s.xl, borderTop: `1px solid ${c.borderLight}` }}>
+        <CometChatButton hierarchy="secondary" onClick={onCancel}>
+          Cancel
+        </CometChatButton>
+        <CometChatButton hierarchy="primary" disabled={selected.length === 0} onClick={() => onConfirm(selected)}>
+          {/* tabular-nums: every digit takes the same advance width, so the count changing can't resize the button */}
+          <span style={{ fontVariantNumeric: "tabular-nums" }}>Pin selected ({selected.length})</span>
+        </CometChatButton>
+      </div>
+    </div>
+  );
+}
+
+export default function PinConversationModal({
+  open,
+  onClose,
+  pinned,
+  onToggle,
+}: {
+  open: boolean;
+  onClose: () => void;
+  pinned: Set<string>;
+  onToggle: (id: string) => void;
+}) {
+  const atLimit = pinned.size >= PIN_LIMIT;
+  return (
+    <CometChatModal
+      open={open}
+      onCancel={onClose}
+      title="Pin a conversation"
+      description={
+        atLimit
+          ? `All ${PIN_LIMIT} pin slots are used. Unpin a conversation to make room for another.`
+          : `Pinned conversations appear at the top of the list for everyone. You can pin up to ${PIN_LIMIT}.`
+      }
+      showClose
+      hideOk
+      hideCancel
+      size="3xl"
+      className="cc-pin-modal"
+    >
+      <PinPicker pinned={pinned} onToggle={onToggle} />
     </CometChatModal>
   );
 }

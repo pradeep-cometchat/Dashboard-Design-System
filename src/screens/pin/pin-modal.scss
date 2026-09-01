@@ -22,9 +22,67 @@
   margin: 0;
 }
 
+// Each tab label stacks a zero-height semibold ghost of itself underneath, so
+// the tab is always as wide as its active (semibold) state and the bar's width
+// stays fixed while toggling All / Users / Groups.
+.cc-pin-modal__tab-label {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+
+  &::after {
+    content: attr(data-label);
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
+    user-select: none;
+    font-weight: $font-weight-semibold;
+  }
+}
+
 // Search input stretches to match the segmented tab bar's height (flex row, no fixed px).
 // The base input pins its own height, so match its selector weight and stretch instead.
 .cc-pin-modal .cc-input-field .ant-input-affix-wrapper {
   height: 100%;
   align-self: stretch;
+}
+
+// Dropdown picker: the tab bar matches the search field's height. Tighter tab
+// padding (md → xs) drops the bar's intrinsic height below the input's 40px,
+// so the input drives the row and the 100% chain stretches the bar to it.
+.cc-pin-picker .cc-tabs .ant-tabs-nav {
+  margin: 0;
+  height: 100%;
+}
+
+.cc-pin-picker .cc-tabs .ant-tabs-nav-wrap {
+  height: 100%;
+}
+
+.cc-pin-picker .cc-tabs.cc-tabs-horizontal.cc-tabs-type-button-border .ant-tabs-nav-list {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.cc-pin-picker .cc-tabs.cc-tabs-horizontal.cc-tabs-type-button-border .ant-tabs-tab {
+  padding-block: $spacing-xs;
+}
+
+// Footer "Pin selected (n)": disabled primary keeps the enabled state's 2px
+// border so toggling between 0 and n selected never shifts the button's width.
+.cc-pin-picker .cc-button-primary.ant-btn.ant-btn-default:disabled {
+  border-width: 2px;
+}
+
+// Picker rows: check state snaps instantly — no tick/box transition, no click wave.
+.cc-pin-picker .cc-checkbox .ant-checkbox,
+.cc-pin-picker .cc-checkbox .ant-checkbox::after,
+.cc-pin-picker .cc-checkbox .ant-checkbox .ant-checkbox-input {
+  transition: none !important;
+  animation: none !important;
+}
+
+.cc-pin-picker .cc-checkbox .ant-wave {
+  display: none;
 }

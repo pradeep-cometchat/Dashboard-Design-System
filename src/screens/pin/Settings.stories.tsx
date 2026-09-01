@@ -11,3 +11,6 @@ export default meta;
 type Story = StoryObj<typeof SettingsScreen>;
 
 export const Default: Story = {};
+
+/** Next iteration of the screen: the Pin section drops the enable-toggle header. */
+export const V2: Story = { name: "V2", args: { pinEnableToggle: false, pinLabelOutside: true } };
