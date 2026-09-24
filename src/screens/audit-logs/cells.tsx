@@ -89,7 +89,7 @@ export function OutcomeBadge({ outcome }: { outcome: Outcome }) {
   const ok = outcome === "success";
   return (
     <CometChatBadge type="pill" size="sm" color={ok ? "success" : "error"}>
-      {ok ? "Success" : "Failure"}
+      {ok ? "Success" : "Failed"}
     </CometChatBadge>
   );
 }
