@@ -38,10 +38,21 @@
   height: 40px;
 }
 
+// Disabled, per Figma (Buttons → State=Disabled, 3287:427327 / 3287:427351):
+// filled hierarchies (primary, black, dark, danger) grey out to a gray fill;
+// secondary stays white. Both use the subtle disabled border and fg-disabled text/icons.
 %btn-disabled {
   background-color: $bg-disabled;
-  border: 1px solid $border-default;
-  color: $text-disabled;
+  border: 1px solid $border-disabled-subtle;
+  color: $fg-disabled;
+  box-shadow: $shadow-xs;
+  cursor: not-allowed;
+}
+
+%btn-disabled-outline {
+  background-color: $bg-primary;
+  border: 1px solid $border-disabled-subtle;
+  color: $fg-disabled;
   box-shadow: $shadow-xs;
   cursor: not-allowed;
 }
@@ -125,7 +136,7 @@
   }
 
   &:disabled {
-    @extend %btn-disabled;
+    @extend %btn-disabled-outline;
   }
 }
 
@@ -416,7 +427,7 @@
   }
 
   &:disabled {
-    @extend %btn-disabled;
+    @extend %btn-disabled-outline;
   }
 }
 
