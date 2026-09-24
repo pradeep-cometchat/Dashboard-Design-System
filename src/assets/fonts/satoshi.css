@@ -1,0 +1,32 @@
+/* Satoshi — the design system's type family (design-tokens.scss: $font-family-base).
+ * Variable font, weight axis 300–900, so semibold (600) is a true instance rather
+ * than a synthesized bold. Source: Fontshare (Indian Type Foundry), ITF Free Font
+ * License — free for web embedding. Self-hosted so Storybook and the Pages deploy
+ * never depend on an external font host.
+ *
+ * 'SatoshiRegular' / 'SatoshiMedium' are the legacy aliases the tokens still expose
+ * ($font-family-regular / $font-family-primary); they resolve to the same file so
+ * any base component using them renders Satoshi too. */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('./satoshi/Satoshi-Variable.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SatoshiRegular';
+  src: url('./satoshi/Satoshi-Variable.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SatoshiMedium';
+  src: url('./satoshi/Satoshi-Variable.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}

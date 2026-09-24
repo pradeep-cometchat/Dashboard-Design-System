@@ -1,6 +1,7 @@
 import type { Preview } from '@storybook/react-vite'
 import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import '../src/assets/fonts/satoshi.css'
 import '../src/foundations/tokens.css'
 
 const preview: Preview = {
