@@ -11,6 +11,7 @@ import { CometChatDataTable } from "components/base/Table";
 import CometChatButton from "components/base/Button/CometChatButton";
 import CometChatDropdown from "components/base/Dropdown/CometChatDropdown";
 import CometChatTooltip from "components/base/Tooltip/CometChatTooltip";
+import CometChatEmpty from "components/base/Empty/CometChatEmpty";
 import { c, s, r, font, shadow } from "../theme";
 import { DashboardFrame, Icon, dim } from "../pin/ui";
 // Filter glyph shared with Conversation Explorer (Untitled UI "filter-lines", May 2026 library).
@@ -41,7 +42,7 @@ type Row = AuditEvent & Record<string, unknown>;
 function Head({ label, help }: { label: string; help: string }) {
   return (
     <CometChatTooltip title={help} placement="top">
-      <span style={{ display: "inline-flex", alignItems: "center", gap: s.xs, cursor: "help" }}>
+      <span style={{ display: "inline-flex", alignItems: "center", gap: s.xs }}>
         {label}
         <Icon name="info" size={dim.iconXs} color={c.textQuaternary} />
       </span>
@@ -128,24 +129,49 @@ function AuditTable({
   selectedId,
   onSelect,
   noResults,
+  hidePagination = false,
+  fill = false,
 }: {
   entries: AuditEvent[];
   selectedId: string | null;
   onSelect: (entry: AuditEvent) => void;
   noResults: React.ReactNode;
+  /** The gated preview shows sample rows only. */
+  hidePagination?: boolean;
+  /**
+   * Stretch the card to the bottom of the page, so its height doesn't change from page to page.
+   * With rows: rows keep their height at the top and the Previous / Next footer is pinned to the
+   * card's bottom. Without rows: the empty row takes the space and its message centres.
+   */
+  fill?: boolean;
 }) {
   const [page, setPage] = React.useState(0);
   // Filters change the result set; always land back on the first page.
   React.useEffect(() => setPage(0), [entries]);
   const columns = React.useMemo(() => buildColumns(), []);
   const rows: Row[] = entries.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map((row) => ({ ...row, key: row.externalId }));
+  // A full page can be taller than the viewport; remember its height so a short last page
+  // keeps the same card height (and the Previous / Next footer stays put) on small screens too.
+  const cardRef = React.useRef<HTMLDivElement>(null);
+  const [fullPageHeight, setFullPageHeight] = React.useState(0);
+  React.useLayoutEffect(() => {
+    if (fill && rows.length === PAGE_SIZE && cardRef.current) {
+      const h = cardRef.current.offsetHeight;
+      setFullPageHeight((prev) => Math.max(prev, h));
+    }
+  }, [fill, rows.length, page, entries]);
   return (
-    <div className="cc-audit-table" style={{ background: c.bgPrimary, border: `1px solid ${c.borderDefault}`, borderRadius: r.xl, boxShadow: shadow.xs, overflow: "hidden" }}>
+    <div
+      ref={cardRef}
+      className={!fill ? "cc-audit-table" : rows.length > 0 ? "cc-audit-table cc-audit-table--pinned" : "cc-audit-table cc-audit-table--fill"}
+      style={{ background: c.bgPrimary, border: `1px solid ${c.borderDefault}`, borderRadius: r.xl, boxShadow: shadow.xs, overflow: "hidden", minHeight: fill && fullPageHeight ? fullPageHeight : undefined, boxSizing: "border-box" }}
+    >
       <CometChatDataTable<Row>
         appItemList={false}
         pagination={false}
         primaryColumnIndex={null}
-        highlightRow
+        // Pointer cursor only when there are rows to open — not on the empty-state row.
+        highlightRow={rows.length > 0}
         tableLayout="fixed"
         columns={columns}
         dataSource={rows}
@@ -153,7 +179,7 @@ function AuditTable({
         rowClassName={(row) => (row.externalId === selectedId ? "cc-audit-table__row-selected" : "")}
         emptyState={noResults}
       />
-      {entries.length > 0 && (
+      {entries.length > 0 && !hidePagination && (
         <CursorPagination
           hasPrev={page > 0}
           hasNext={(page + 1) * PAGE_SIZE < entries.length}
@@ -255,6 +281,7 @@ function EnterpriseView() {
       {(filtersOpen || count > 0) && <FilterBar filters={filters} onChange={setFilters} />}
       <AuditTable
         entries={filtered}
+        fill
         selectedId={selected?.externalId ?? null}
         onSelect={setSelected}
         noResults={
@@ -272,12 +299,121 @@ function EnterpriseView() {
   );
 }
 
+/* ---------------- gated ---------------- */
+
+/** Who is looking: Plans & Billing is owner-only, so only an owner gets the upgrade button. */
+export type ViewerRole = "owner" | "admin";
+
+/** Featured icon: 48px brand-tinted circle with the shield glyph (fills the Empty state's 48px icon slot). */
+function ShieldFeaturedIcon() {
+  return (
+    <span
+      aria-hidden
+      style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", borderRadius: r.full, background: "var(--primary-100)", color: c.brand }}
+    >
+      <Icon name="shield" size={dim.iconMd} />
+    </span>
+  );
+}
+
+/**
+ * Gated (the app's `dashboard.audit.logs.enabled` parameter is off): the real table fed sample
+ * rows, blurred and inert, under an upgrade card. Copy per the dashboard team's UI spec, without
+ * features the backend doesn't have yet (the prototype's "webhook delivery").
+ */
+function GatedView({ viewerRole }: { viewerRole: ViewerRole }) {
+  const sample = React.useMemo(() => buildEvents().slice(0, 8), []);
+  const inert = { inert: "" } as React.HTMLAttributes<HTMLDivElement>; // @types/react 18 has no `inert`
+  return (
+    <div style={{ position: "relative" }}>
+      <div aria-hidden {...inert} className="cc-audit-gated__preview">
+        <AuditTable entries={sample} selectedId={null} onSelect={() => undefined} noResults={null} hidePagination />
+      </div>
+      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", padding: s["3xl"] }}>
+        <div
+          role="region"
+          aria-label="Upgrade to access Audit Logs"
+          className="cc-audit-gated__card"
+          style={{ background: c.bgPrimary, border: `1px solid ${c.borderDefault}`, borderRadius: r["2xl"], boxShadow: shadow.lg, padding: s["4xl"] }}
+        >
+          <CometChatEmpty
+            size="sm"
+            icon={<ShieldFeaturedIcon />}
+            showBackgroundPattern={false}
+            title="Audit Logs"
+            description="Track every action performed on your Dashboard — who changed what, when, and why. Includes before/after diffs and export."
+            actions={
+              viewerRole === "owner" ? (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: s.lg }}>
+                  <CometChatButton hierarchy="black">Upgrade to Enterprise</CometChatButton>
+                  <span style={{ ...font.captionReg, color: c.textQuaternary }}>Available on the Enterprise plan</span>
+                </div>
+              ) : (
+                <span style={{ ...font.body, color: c.textTertiary, textAlign: "center" }}>Ask your app owner to upgrade to Enterprise.</span>
+              )
+            }
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- empty ---------------- */
+
+/**
+ * Empty (enabled, no events yet). Copy per the dashboard team's spec: it lists only what the API
+ * records (the Feature Narrative's "login/logout" and "user management" aren't captured), and says
+ * history starts when logging was switched on — there's nothing from before launch.
+ */
+function EmptyView() {
+  return (
+    <AuditTable
+      entries={[]}
+      selectedId={null}
+      onSelect={() => undefined}
+      fill
+      noResults={
+        <CometChatEmpty
+          size="md"
+          showBackgroundPattern={false}
+          icon={
+            // The dashboard's empty-state featured icon ("modern"): white rounded square, border-dark
+            // border, skeuomorphic xs shadow, dark line icon — fills the Empty state's 48px icon slot.
+            <span
+              aria-hidden
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                height: "100%",
+                boxSizing: "border-box",
+                borderRadius: r.lg,
+                background: c.bgPrimary,
+                border: `1px solid ${c.borderDark}`,
+                boxShadow: "var(--shadow-xs-skeuomorphic)",
+                color: c.textSecondary,
+              }}
+            >
+              <Icon name="description" size={dim.iconMd} />
+            </span>
+          }
+          title="No activity recorded yet"
+          description="Audit logs will appear here as configuration changes are made to this app — settings, team, roles, API keys, moderation rules, AI agents, push and extensions. History starts from when audit logging was enabled."
+        />
+      }
+    />
+  );
+}
+
 /* ---------------- page ---------------- */
 
-export default function AuditLogsScreen({ variant = "empty" }: { variant?: AuditLogsVariant }) {
+export default function AuditLogsScreen({ variant = "empty", viewerRole = "owner" }: { variant?: AuditLogsVariant; viewerRole?: ViewerRole }) {
   return (
     <DashboardFrame active="Audit Logs" expanded="application">
-      <div data-variant={variant} style={{ display: "flex", flexDirection: "column", gap: s["2xl"] }}>
+      {/* Full height so the Empty state can centre in the space under the header. */}
+      <div data-variant={variant} style={{ display: "flex", flexDirection: "column", gap: s["2xl"], minHeight: "100%" }}>
         {variant === "enterprise" ? (
           <EnterpriseView />
         ) : (
@@ -290,7 +426,8 @@ export default function AuditLogsScreen({ variant = "empty" }: { variant?: Audit
             }
           />
         )}
-        {/* Empty and Gated content — to be specified. */}
+        {variant === "gated" && <GatedView viewerRole={viewerRole} />}
+        {variant === "empty" && <EmptyView />}
       </div>
     </DashboardFrame>
   );

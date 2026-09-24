@@ -114,7 +114,7 @@ function Section({ title, help, children }: { title: string; help: string; child
       <div style={{ display: "flex", alignItems: "center", gap: s.md }}>
         <h3 style={{ ...h4, fontWeight: w.semibold as unknown as number, color: c.textPrimary, margin: 0 }}>{title}</h3>
         <CometChatTooltip title={help} placement="top">
-          <span style={{ display: "inline-flex", cursor: "help" }} aria-label={help} role="img">
+          <span style={{ display: "inline-flex" }} aria-label={help} role="img">
             <Icon name="info" size={dim.iconXs} color="var(--fg-quaternary)" />
           </span>
         </CometChatTooltip>

@@ -81,3 +81,98 @@
 .cc-audit-table .cc-avatar.ant-avatar {
   line-height: $line-height-text-xs;
 }
+
+// Gated preview: the real table with sample rows, blurred ($backdrop-blur-sm, the
+// smallest blur token) and non-interactive. `inert` is set too; this covers browsers
+// without it.
+.cc-audit-gated__preview {
+  filter: blur($backdrop-blur-sm);
+  pointer-events: none;
+  user-select: none;
+}
+
+// Upgrade card width — the same 400px as the dashboard's RestrictedState card
+// (no size token exists).
+.cc-audit-gated__card {
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
+// The base Empty state is 512px wide; inside the card it takes the card's width.
+.cc-audit-gated__card .cc-empty {
+  width: 100%;
+}
+
+// Empty state inside the table: the card stretches to the bottom of the page and
+// the table's empty row takes the space under the header row, so the Empty state
+// centres in the body (the dashboard's in-table empty pattern).
+.cc-audit-table--fill {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cc-audit-table--fill > .cc-data-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+// Percentage heights don't resolve here (the page column only has a min-height),
+// so every antd wrapper down to the table is a growing flex column instead.
+// (antd v6 wraps the table in .ant-spin; v5 in .ant-spin-nested-loading.)
+.cc-audit-table--fill .ant-table-wrapper,
+.cc-audit-table--fill .ant-table-wrapper > .ant-spin,
+.cc-audit-table--fill .ant-spin-nested-loading,
+.cc-audit-table--fill .ant-spin-container,
+.cc-audit-table--fill .ant-table,
+.cc-audit-table--fill .ant-table-container,
+.cc-audit-table--fill .ant-table-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+// The table grows too; the header row keeps its 40px (base rule), so the extra
+// height lands on the empty row.
+.cc-audit-table--fill table {
+  flex: 1;
+}
+
+// The empty row is not a data row: no hover fill.
+.cc-audit-table--fill .ant-table-tbody > tr.ant-table-placeholder:hover > td {
+  background: $bg-primary;
+}
+
+// Rows present: the card still stretches to the page bottom (so its height is the
+// same on every page, including a short last page), but the table keeps its natural
+// row heights at the top and the Previous / Next footer is pinned to the bottom.
+.cc-audit-table--pinned {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cc-audit-table--pinned > .cc-data-table {
+  flex: 1;
+}
+
+// The card clips its own rounded corners, so rows inside never need rounding. (The
+// base table rounds the last row's bottom corners when it has no built-in pager —
+// ours is a custom footer — and that rounding showed on hover mid-card.)
+.cc-audit-table .cc-data-table .ant-table-tbody > tr:last-child > td {
+  border-radius: 0;
+}
+
+// Pinned footer: the last row can sit above empty space, so it keeps its separator
+// (the base table drops it). The footer overlaps by 1px so, when a full page does
+// reach the footer, the row line and the footer's top border collapse into one.
+.cc-audit-table--pinned .cc-data-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: 1px solid $border-default;
+}
+
+.cc-audit-table--pinned > .cc-data-table__pagination-footer {
+  position: relative;
+  margin-top: -1px;
+}
