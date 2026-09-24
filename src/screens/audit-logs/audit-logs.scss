@@ -1,0 +1,75 @@
+// Audit Logs table — May 2026 Tables spec (Figma OIMLZzuzLmG7mdPKYJyglX,
+// node 1227:110480). The base CometChatDataTable pads cells at 24px
+// ($spacing-3xl); the May 2026 table cell pads at 16px ($spacing-xl) and keeps
+// a 56px row pitch even for two-line cells (20 + 20 line-heights + 8px each side).
+// Scoped to .cc-audit-table so the base component keeps its own defaults.
+@import '../../assets/design-tokens.scss';
+
+.cc-audit-table .cc-data-table .ant-table-thead > tr > th {
+  padding: $spacing-md $spacing-xl;
+  white-space: nowrap;
+}
+
+.cc-audit-table .cc-data-table .ant-table-tbody > tr > td {
+  padding: $spacing-md $spacing-xl;
+}
+
+// Selected row (its entry is open in the side panel).
+.cc-audit-table .cc-data-table .ant-table-tbody > tr.cc-audit-table__row-selected > td {
+  background: $bg-secondary;
+}
+
+// Side panel: 400px per the Feature Narrative; the base drawer hides nothing
+// else — the panel renders its own hero instead of the drawer header.
+.cc-audit-panel .ant-drawer-body {
+  overflow: auto;
+}
+
+// Selected row (its entry is open in the side panel).
+.cc-audit-table .cc-data-table .ant-table-tbody > tr.cc-audit-table__row-selected > td {
+  background: $bg-secondary;
+}
+
+// Side panel body scrolls; the panel draws its own hero in place of the drawer header.
+.cc-audit-panel .ant-drawer-body {
+  overflow: auto;
+}
+
+// Filter dropdowns: compact option rows (the dashboard's dropdown pitch).
+// Radio options are spaced by the group gap; checkbox rows by their own padding.
+.cc-audit-filter .cc-radio.cc-radio-vertical .ant-radio-group {
+  gap: $spacing-md;
+}
+
+// Control → label: antd v6 adds 8px inline padding to the label on top of the
+// base 12px wrapper gap (≈28px total). The dashboard dropdown sits it at
+// $spacing-md, with the control centred on the label line instead of top-aligned.
+.cc-audit-filter .cc-radio .ant-radio-wrapper,
+.cc-audit-filter .cc-checkbox .ant-checkbox-wrapper {
+  align-items: center;
+  gap: $spacing-md;
+  line-height: $line-height-text-sm; // antd's 22px line box → the label's own 20px
+}
+
+.cc-audit-filter .cc-radio .ant-radio-wrapper .ant-radio-label,
+.cc-audit-filter .cc-checkbox .ant-checkbox-wrapper .ant-checkbox-label {
+  padding-inline: 0;
+}
+
+.cc-audit-filter .ant-radio,
+.cc-audit-filter .ant-checkbox {
+  align-self: center;
+  top: 0;
+}
+
+// Placeholder tone for the borderless search field.
+.cc-audit-filter input::placeholder {
+  color: $text-placeholder;
+}
+
+// Actor avatar (40px): 12px initials — the size itself is set inline in
+// AuditLogs.tsx (antd's numeric size writes an inline font-size); the matching
+// line-height lives here.
+.cc-audit-table .cc-avatar.ant-avatar {
+  line-height: $line-height-text-xs;
+}

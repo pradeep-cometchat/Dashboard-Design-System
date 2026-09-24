@@ -1,0 +1,297 @@
+// Audit Logs screen — Account → Application → Audit Logs, built to the Linear
+// Feature Narrative ("Dashboard Audit Logs", P-ENG-362): Stripe-style table,
+// Filter button with purple active-count badge toggling filter chips, Export
+// (CSV / JSON), 400px side panel, plan-gated
+// and empty states. Shares the dashboard shell with Screens/Pin. Table visual
+// follows the May 2026 Tables spec (Figma OIMLZzuzLmG7mdPKYJyglX, 1227:110480)
+// on the base CometChatDataTable. Foundation tokens + base components only.
+import React from "react";
+import type { ColumnsType } from "antd/es/table";
+import { CometChatDataTable } from "components/base/Table";
+import CometChatAvatar from "components/base/Avatar/CometChatAvatar";
+import CometChatButton from "components/base/Button/CometChatButton";
+import CometChatDropdown from "components/base/Dropdown/CometChatDropdown";
+import CometChatTooltip from "components/base/Tooltip/CometChatTooltip";
+import { c, s, r, font, shadow } from "../theme";
+import { DashboardFrame, Icon, dim } from "../pin/ui";
+// Filter glyph shared with Conversation Explorer (Untitled UI "filter-lines", May 2026 library).
+import { FilterLines } from "../conversation-explorer/icons";
+import { buildEntries, lookupAction, type AuditEntry } from "./data";
+import { CellText, ActionBadge, OutcomeBadge, RoleBadge, SourceBadge, initials, formatDate, formatTime, viewerTimeZone } from "./cells";
+import { FilterBar, EMPTY_FILTERS, activeFilterCount, applyFilters, type Filters } from "./filters";
+import AuditDetailPanel from "./AuditDetailPanel";
+import { downloadExport, type ExportFormat } from "./export";
+import "./audit-logs.scss";
+
+export type AuditLogsVariant = "empty" | "gated" | "enterprise";
+
+const w = {
+  regular: "var(--font-weight-regular)",
+  medium: "var(--font-weight-medium)",
+  semibold: "var(--font-weight-semibold)",
+} as const;
+
+const PAGE_SIZE = 10;
+const APP_ID = "240998CGSF2026";
+
+/* ---------------- table ---------------- */
+
+type Row = AuditEntry & Record<string, unknown>;
+
+/** Column header with a help tooltip (Feature Narrative: tooltips explaining each column). */
+function Head({ label, help }: { label: string; help: string }) {
+  return (
+    <CometChatTooltip title={help} placement="top">
+      <span style={{ display: "inline-flex", alignItems: "center", gap: s.xs, cursor: "help" }}>
+        {label}
+        <Icon name="info" size={dim.iconXs} color={c.textQuaternary} />
+      </span>
+    </CometChatTooltip>
+  );
+}
+
+function buildColumns(): ColumnsType<Row> {
+  return [
+    {
+      title: <Head label="Actor" help="The team member who performed the action." />,
+      key: "actor",
+      width: "24.2%",
+      render: (_, row) => (
+        <div style={{ display: "flex", alignItems: "center", gap: s.md, minWidth: 0 }}>
+          {/* 40px — the shared dashboard avatar size (dim.avatar). A numeric size makes antd
+              write an inline 18px font-size, so the 12px initials go inline too. */}
+          <CometChatAvatar size={dim.avatar} style={{ flexShrink: 0, fontSize: "var(--font-size-text-xs)" }}>
+            {initials(row.actor.name)}
+          </CometChatAvatar>
+          <CellText lead={row.actor.name} supporting={row.actor.email} />
+        </div>
+      ),
+    },
+    {
+      // Neutral chip — same gray pill as the "Dashboard" source chip.
+      title: <Head label="Role" help="The team member's role on this app when the action happened." />,
+      key: "role",
+      width: "9.9%",
+      render: (_, row) => <RoleBadge role={row.actor.role} />,
+    },
+    {
+      title: <Head label="Action" help="What was done — updated, created, deleted, enabled, disabled, logged in." />,
+      key: "action",
+      width: "9.6%",
+      render: (_, row) => <ActionBadge type={lookupAction(row.actionId).action.type}>{row.verb}</ActionBadge>,
+    },
+    {
+      title: <Head label="Resource" help="What was affected: the dashboard section and the item that changed." />,
+      key: "resource",
+      render: (_, row) => <CellText lead={row.resource} supporting={lookupAction(row.actionId).action.label} />,
+    },
+    {
+      title: <Head label="Source" help="How the action was performed: the Dashboard UI or the Management API." />,
+      key: "source",
+      width: "10%",
+      render: (_, row) => <SourceBadge source={row.source} />,
+    },
+    {
+      title: <Head label={`Timestamp (${viewerTimeZone()})`} help="When the action happened, shown in your local timezone. Stored in UTC." />,
+      key: "timestamp",
+      width: "18%",
+      render: (_, row) => <CellText lead={formatDate(row.timestamp)} supporting={formatTime(row.timestamp)} />,
+    },
+    {
+      title: <Head label="Outcome" help="Whether the action succeeded or failed." />,
+      key: "outcome",
+      width: "9.5%",
+      render: (_, row) => <OutcomeBadge outcome={row.outcome} />,
+    },
+  ];
+}
+
+/**
+ * Previous / Next paging (ENG-39587: the API returns no total count). sm buttons take 16px icons.
+ * Grouped right, $spacing-xl (16px) apart.
+ */
+function CursorPagination({ hasPrev, hasNext, onPrev, onNext }: { hasPrev: boolean; hasNext: boolean; onPrev: () => void; onNext: () => void }) {
+  return (
+    <div className="cc-data-table__pagination-footer" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: s.xl }}>
+      <CometChatButton hierarchy="secondary" size="sm" disabled={!hasPrev} onClick={onPrev} iconLeading={<Icon name="arrow-back" size={dim.iconXs} />}>
+        Previous
+      </CometChatButton>
+      <CometChatButton hierarchy="secondary" size="sm" disabled={!hasNext} onClick={onNext} iconTrailing={<Icon name="arrow-forward" size={dim.iconXs} />}>
+        Next
+      </CometChatButton>
+    </div>
+  );
+}
+
+function AuditTable({
+  entries,
+  selectedId,
+  onSelect,
+  noResults,
+}: {
+  entries: AuditEntry[];
+  selectedId: string | null;
+  onSelect: (entry: AuditEntry) => void;
+  noResults: React.ReactNode;
+}) {
+  const [page, setPage] = React.useState(0);
+  // Filters change the result set; always land back on the first page.
+  React.useEffect(() => setPage(0), [entries]);
+  const columns = React.useMemo(() => buildColumns(), []);
+  const rows: Row[] = entries.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map((row) => ({ ...row, key: row.id }));
+  return (
+    <div className="cc-audit-table" style={{ background: c.bgPrimary, border: `1px solid ${c.borderDefault}`, borderRadius: r.xl, boxShadow: shadow.xs, overflow: "hidden" }}>
+      <CometChatDataTable<Row>
+        appItemList={false}
+        pagination={false}
+        primaryColumnIndex={null}
+        highlightRow
+        tableLayout="fixed"
+        columns={columns}
+        dataSource={rows}
+        onRowClick={(row) => onSelect(row)}
+        rowClassName={(row) => (row.id === selectedId ? "cc-audit-table__row-selected" : "")}
+        emptyState={noResults}
+      />
+      {entries.length > 0 && (
+        <CursorPagination
+          hasPrev={page > 0}
+          hasNext={(page + 1) * PAGE_SIZE < entries.length}
+          onPrev={() => setPage((p) => Math.max(0, p - 1))}
+          onNext={() => setPage((p) => p + 1)}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ---------------- header ---------------- */
+
+/** Filter button with the purple active-count badge. */
+function FilterButton({ count, open, disabled, onClick }: { count: number; open: boolean; disabled: boolean; onClick: () => void }) {
+  return (
+    <CometChatButton hierarchy="secondary" disabled={disabled} onClick={onClick} iconLeading={<FilterLines size={dim.iconSm} />} aria-expanded={open}>
+      <span style={{ display: "inline-flex", alignItems: "center", gap: s.md }}>
+        Filter
+        {count > 0 && (
+          <span
+            style={{
+              ...font.caption,
+              fontWeight: w.semibold as unknown as number,
+              color: c.white,
+              background: c.brand,
+              borderRadius: r.full,
+              minWidth: dim.iconSm,
+              height: dim.iconSm,
+              padding: `0 ${s.sm}`,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxSizing: "border-box",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {count}
+          </span>
+        )}
+      </span>
+    </CometChatButton>
+  );
+}
+
+/** Export — the header's primary (black) action, right-most. */
+function ExportButton({ disabled, onExport }: { disabled: boolean; onExport: (format: ExportFormat) => void }) {
+  return (
+    <CometChatDropdown
+      trigger={["click"]}
+      disabled={disabled}
+      placement="bottomRight"
+      items={[
+        { key: "csv", label: "Download CSV" },
+        { key: "json", label: "Download JSON" },
+      ]}
+      onClick={({ key }) => onExport(key as ExportFormat)}
+    >
+      <CometChatButton hierarchy="black" disabled={disabled} iconLeading={<Icon name="download" size={dim.iconSm} />} iconTrailing={<Icon name="keyboard-arrow-down" size={dim.iconSm} />}>
+        Export
+      </CometChatButton>
+    </CometChatDropdown>
+  );
+}
+
+function PageHeader({ actions }: { actions: React.ReactNode }) {
+  return (
+    <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: s.xl, minHeight: dim.avatar }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: s.xxs }}>
+        <h1 style={{ ...font.pageTitle, fontWeight: w.semibold as unknown as number, color: c.textPrimary, margin: 0 }}>Audit Logs</h1>
+        <p style={{ ...font.body, color: c.textTertiary, margin: 0 }}>Track all actions performed on this app</p>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: s.lg }}>{actions}</div>
+    </header>
+  );
+}
+
+/* ---------------- enterprise ---------------- */
+
+function EnterpriseView() {
+  const entries = React.useMemo(() => buildEntries(), []);
+  const [filters, setFilters] = React.useState<Filters>(EMPTY_FILTERS);
+  const [filtersOpen, setFiltersOpen] = React.useState(false);
+  const [selected, setSelected] = React.useState<AuditEntry | null>(null);
+
+  const filtered = React.useMemo(() => applyFilters(entries, filters), [entries, filters]);
+  const count = activeFilterCount(filters);
+
+  return (
+    <>
+      <PageHeader
+        actions={
+          <>
+            <FilterButton count={count} open={filtersOpen} disabled={false} onClick={() => setFiltersOpen((o) => !o)} />
+            <ExportButton disabled={filtered.length === 0} onExport={(format) => downloadExport(filtered, format, APP_ID)} />
+          </>
+        }
+      />
+      {(filtersOpen || count > 0) && <FilterBar filters={filters} onChange={setFilters} />}
+      <AuditTable
+        entries={filtered}
+        selectedId={selected?.id ?? null}
+        onSelect={setSelected}
+        noResults={
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: s.md, textAlign: "center" }}>
+            <span style={{ ...font.h4, color: c.textPrimary }}>No entries match these filters</span>
+            <span style={{ ...font.body, color: c.textTertiary }}>Try a wider date range or clear a filter.</span>
+            <CometChatButton hierarchy="secondary" size="sm" onClick={() => setFilters(EMPTY_FILTERS)}>
+              Clear filters
+            </CometChatButton>
+          </div>
+        }
+      />
+      <AuditDetailPanel entry={selected} onClose={() => setSelected(null)} />
+    </>
+  );
+}
+
+/* ---------------- page ---------------- */
+
+export default function AuditLogsScreen({ variant = "empty" }: { variant?: AuditLogsVariant }) {
+  return (
+    <DashboardFrame active="Audit Logs" expanded="application">
+      <div data-variant={variant} style={{ display: "flex", flexDirection: "column", gap: s["2xl"] }}>
+        {variant === "enterprise" ? (
+          <EnterpriseView />
+        ) : (
+          <PageHeader
+            actions={
+              <>
+                <FilterButton count={0} open={false} disabled onClick={() => undefined} />
+                <ExportButton disabled onExport={() => undefined} />
+              </>
+            }
+          />
+        )}
+        {/* Empty and Gated content — to be specified. */}
+      </div>
+    </DashboardFrame>
+  );
+}

@@ -136,7 +136,12 @@ function AccountCard() {
   );
 }
 
-export function Sidebar({ active }: { active: string }) {
+/** Sub-pages under Account → Application (May 2026 nav). */
+const APPLICATION_PAGES = ["Credentials", "Webhooks", "Team Members", "Audit Logs", "Plans & Billing", "Settings"];
+
+export function Sidebar({ active, expanded = "chats" }: { active: string; expanded?: "chats" | "application" }) {
+  const chatsOpen = expanded === "chats";
+  const appOpen = expanded === "application";
   const item = (icon: string | undefined, label: string, chevron?: "down" | "up" | "right", sub = false) => (
     <NavItem key={label + (sub ? "-sub" : "")} icon={icon} label={label} chevron={chevron} sub={sub} active={label === active} />
   );
@@ -150,15 +155,15 @@ export function Sidebar({ active }: { active: string }) {
         {item("space-dashboard", "Overview")}
         {item("group", "User & Groups", "down")}
         <SectionLabel>PRODUCTS</SectionLabel>
-        {item("chat", "Chats", "up")}
-        {item(undefined, "Get Started", undefined, true)}
-        {item(undefined, "Logs", undefined, true)}
-        {item(undefined, "Conversation Explorer", undefined, true)}
-        {item(undefined, "Features", undefined, true)}
-        {item(undefined, "Moderation", undefined, true)}
-        {item(undefined, "Insights", undefined, true)}
-        {item(undefined, "Settings", undefined, true)}
-        {item(undefined, "Widgets", undefined, true)}
+        {item("chat", "Chats", chatsOpen ? "up" : "down")}
+        {chatsOpen && item(undefined, "Get Started", undefined, true)}
+        {chatsOpen && item(undefined, "Logs", undefined, true)}
+        {chatsOpen && item(undefined, "Conversation Explorer", undefined, true)}
+        {chatsOpen && item(undefined, "Features", undefined, true)}
+        {chatsOpen && item(undefined, "Moderation", undefined, true)}
+        {chatsOpen && item(undefined, "Insights", undefined, true)}
+        {chatsOpen && item(undefined, "Settings", undefined, true)}
+        {chatsOpen && item(undefined, "Widgets", undefined, true)}
         {item("call", "Voice & Video", "down")}
         {item("stars-s", "AI Agents", "down")}
         {item("graph-2", "BYO Agents", "down")}
@@ -167,7 +172,8 @@ export function Sidebar({ active }: { active: string }) {
         {item("notifications", "Notifications", "down")}
         {item("insert-chart", "Insights")}
         <SectionLabel>ACCOUNT</SectionLabel>
-        {item("grid-view", "Application", "down")}
+        {item("grid-view", "Application", appOpen ? "up" : "down")}
+        {appOpen && APPLICATION_PAGES.map((label) => item(undefined, label, undefined, true))}
         {item("account-circle", "Profile", "right")}
         {item("import-contacts", "Resources", "right")}
       </nav>
@@ -181,10 +187,10 @@ export function Sidebar({ active }: { active: string }) {
 /* ---------------- page shell ---------------- */
 
 /** The full dashboard frame: gray canvas, sidebar left, white page container. */
-export function DashboardFrame({ active, children }: { active: string; children: React.ReactNode }) {
+export function DashboardFrame({ active, expanded, children }: { active: string; expanded?: "chats" | "application"; children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", height: "100vh", minHeight: 720, background: c.bgTertiary, fontFamily: "var(--font-family-base)", overflow: "hidden" }}>
-      <Sidebar active={active} />
+      <Sidebar active={active} expanded={expanded} />
       <main
         style={{
           flex: 1,
