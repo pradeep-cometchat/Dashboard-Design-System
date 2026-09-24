@@ -39,9 +39,12 @@ const preview: Preview = {
 
   decorators: [
     // Base components use react-router <Link> and expect a router context.
-    (Story) => (
+    // Stories that render a full-height (100vh) dashboard frame opt out of the canvas
+    // padding with `parameters: { fullBleed: true }` — otherwise a 24px white band
+    // surrounds the frame and its bottom is pushed off-screen. Everything else keeps it.
+    (Story, context) => (
       <MemoryRouter>
-        <div style={{ padding: 24, fontFamily: "'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
+        <div style={{ padding: context.parameters.fullBleed ? 0 : 24, fontFamily: "'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
           <Story />
         </div>
       </MemoryRouter>

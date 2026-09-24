@@ -14,6 +14,7 @@ const meta: Meta<typeof Explorer> = {
   tags: ["autodocs"],
   parameters: {
     layout: "fullscreen",
+    fullBleed: true,
     docs: {
       description: {
         component:
