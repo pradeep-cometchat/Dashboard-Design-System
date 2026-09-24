@@ -1,43 +1,40 @@
-// Export — Feature Narrative: download the filtered results as CSV or JSON,
-// timestamps in UTC ISO 8601 for machine readability.
-import { lookupAction, type AuditEntry } from "./data";
+// Export — mirrors the server's /audit-logs/export (captured on staging):
+// JSON = a bare array of events; CSV = 12 fixed columns with `change` as a JSON
+// string. Timestamps are epoch seconds, as the API sends them (the Feature
+// Narrative asks for ISO 8601 — see the backend discrepancy list).
+import type { AuditEvent } from "./data";
 
 export type ExportFormat = "csv" | "json";
 
-const flatten = (e: AuditEntry) => {
-  const { action, section } = lookupAction(e.actionId);
-  return {
-    id: e.id,
-    timestamp: e.timestamp,
-    actor_email: e.actor.email,
-    actor_id: e.actor.userId,
-    actor_role: e.actor.role,
-    action: action.id,
-    action_label: action.label,
-    section: section.label,
-    resource: e.resource,
-    outcome: e.outcome,
-    source: e.source,
-    source_ip: e.sourceIp,
-    change: e.change,
-  };
-};
+const CSV_COLUMNS = ["timestamp", "action", "section", "actorEmail", "actorRole", "resourceType", "resourceId", "outcome", "sourceIp", "externalId", "correlationId", "change"] as const;
+
+const csvRow = (e: AuditEvent): Record<(typeof CSV_COLUMNS)[number], unknown> => ({
+  timestamp: e.timestamp,
+  action: e.action,
+  section: e.section,
+  actorEmail: e.actor.email,
+  actorRole: e.actor.role,
+  resourceType: e.resource.type,
+  resourceId: e.resource.id ?? "",
+  outcome: e.outcome,
+  sourceIp: e.sourceIp ?? "",
+  externalId: e.externalId,
+  correlationId: e.correlationId ?? "",
+  change: e.change,
+});
 
 const csvCell = (v: unknown) => {
-  const str = typeof v === "string" ? v : JSON.stringify(v);
+  const str = typeof v === "string" ? v : typeof v === "number" ? String(v) : JSON.stringify(v);
   return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
 };
 
-export function serialize(entries: AuditEntry[], format: ExportFormat): string {
-  const rows = entries.map(flatten);
-  if (format === "json") return JSON.stringify(rows, null, 2);
-  const headers = Object.keys(rows[0] ?? flatten(entries[0]));
-  return [headers.join(","), ...rows.map((row) => headers.map((h) => csvCell((row as Record<string, unknown>)[h])).join(","))].join("\n");
+export function serialize(events: AuditEvent[], format: ExportFormat): string {
+  if (format === "json") return JSON.stringify(events, null, 2);
+  return [CSV_COLUMNS.join(","), ...events.map((e) => CSV_COLUMNS.map((col) => csvCell(csvRow(e)[col])).join(","))].join("\n");
 }
 
-export function downloadExport(entries: AuditEntry[], format: ExportFormat, appId: string) {
-  const body = serialize(entries, format);
-  const blob = new Blob([body], { type: format === "json" ? "application/json" : "text/csv" });
+export function downloadExport(events: AuditEvent[], format: ExportFormat, appId: string) {
+  const blob = new Blob([serialize(events, format)], { type: format === "json" ? "application/json" : "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

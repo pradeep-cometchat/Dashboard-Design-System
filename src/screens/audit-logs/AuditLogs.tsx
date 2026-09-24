@@ -8,7 +8,6 @@
 import React from "react";
 import type { ColumnsType } from "antd/es/table";
 import { CometChatDataTable } from "components/base/Table";
-import CometChatAvatar from "components/base/Avatar/CometChatAvatar";
 import CometChatButton from "components/base/Button/CometChatButton";
 import CometChatDropdown from "components/base/Dropdown/CometChatDropdown";
 import CometChatTooltip from "components/base/Tooltip/CometChatTooltip";
@@ -16,8 +15,8 @@ import { c, s, r, font, shadow } from "../theme";
 import { DashboardFrame, Icon, dim } from "../pin/ui";
 // Filter glyph shared with Conversation Explorer (Untitled UI "filter-lines", May 2026 library).
 import { FilterLines } from "../conversation-explorer/icons";
-import { buildEntries, lookupAction, type AuditEntry } from "./data";
-import { CellText, ActionBadge, OutcomeBadge, RoleBadge, SourceBadge, initials, formatDate, formatTime, viewerTimeZone } from "./cells";
+import { buildEvents, actionLabel, memberFor, resourceLabel, type AuditEvent } from "./data";
+import { CellText, ActionBadge, ActorAvatar, OutcomeBadge, RoleBadge, SourceBadge, formatDate, formatTime, viewerTimeZone } from "./cells";
 import { FilterBar, EMPTY_FILTERS, activeFilterCount, applyFilters, type Filters } from "./filters";
 import AuditDetailPanel from "./AuditDetailPanel";
 import { downloadExport, type ExportFormat } from "./export";
@@ -36,7 +35,7 @@ const APP_ID = "240998CGSF2026";
 
 /* ---------------- table ---------------- */
 
-type Row = AuditEntry & Record<string, unknown>;
+type Row = AuditEvent & Record<string, unknown>;
 
 /** Column header with a help tooltip (Feature Narrative: tooltips explaining each column). */
 function Head({ label, help }: { label: string; help: string }) {
@@ -58,12 +57,13 @@ function buildColumns(): ColumnsType<Row> {
       width: "24.2%",
       render: (_, row) => (
         <div style={{ display: "flex", alignItems: "center", gap: s.md, minWidth: 0 }}>
-          {/* 40px — the shared dashboard avatar size (dim.avatar). A numeric size makes antd
-              write an inline 18px font-size, so the 12px initials go inline too. */}
-          <CometChatAvatar size={dim.avatar} style={{ flexShrink: 0, fontSize: "var(--font-size-text-xs)" }}>
-            {initials(row.actor.name)}
-          </CometChatAvatar>
-          <CellText lead={row.actor.name} supporting={row.actor.email} />
+          {/* 40px (dim.avatar). Photo and name come from the team list — the API only sends the email. */}
+          <ActorAvatar email={row.actor.email} size={dim.avatar} />
+          {memberFor(row.actor.email) ? (
+            <CellText lead={memberFor(row.actor.email)!.name} supporting={row.actor.email} />
+          ) : (
+            <CellText lead={row.actor.email} supporting="No longer on this team" />
+          )}
         </div>
       ),
     },
@@ -78,12 +78,12 @@ function buildColumns(): ColumnsType<Row> {
       title: <Head label="Action" help="What was done — updated, created, deleted, enabled, disabled, logged in." />,
       key: "action",
       width: "9.6%",
-      render: (_, row) => <ActionBadge type={lookupAction(row.actionId).action.type}>{row.verb}</ActionBadge>,
+      render: (_, row) => <ActionBadge event={row} />,
     },
     {
       title: <Head label="Resource" help="What was affected: the dashboard section and the item that changed." />,
       key: "resource",
-      render: (_, row) => <CellText lead={row.resource} supporting={lookupAction(row.actionId).action.label} />,
+      render: (_, row) => <CellText lead={resourceLabel(row)} supporting={actionLabel(row.action)} />,
     },
     {
       title: <Head label="Source" help="How the action was performed: the Dashboard UI or the Management API." />,
@@ -129,16 +129,16 @@ function AuditTable({
   onSelect,
   noResults,
 }: {
-  entries: AuditEntry[];
+  entries: AuditEvent[];
   selectedId: string | null;
-  onSelect: (entry: AuditEntry) => void;
+  onSelect: (entry: AuditEvent) => void;
   noResults: React.ReactNode;
 }) {
   const [page, setPage] = React.useState(0);
   // Filters change the result set; always land back on the first page.
   React.useEffect(() => setPage(0), [entries]);
   const columns = React.useMemo(() => buildColumns(), []);
-  const rows: Row[] = entries.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map((row) => ({ ...row, key: row.id }));
+  const rows: Row[] = entries.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map((row) => ({ ...row, key: row.externalId }));
   return (
     <div className="cc-audit-table" style={{ background: c.bgPrimary, border: `1px solid ${c.borderDefault}`, borderRadius: r.xl, boxShadow: shadow.xs, overflow: "hidden" }}>
       <CometChatDataTable<Row>
@@ -150,7 +150,7 @@ function AuditTable({
         columns={columns}
         dataSource={rows}
         onRowClick={(row) => onSelect(row)}
-        rowClassName={(row) => (row.id === selectedId ? "cc-audit-table__row-selected" : "")}
+        rowClassName={(row) => (row.externalId === selectedId ? "cc-audit-table__row-selected" : "")}
         emptyState={noResults}
       />
       {entries.length > 0 && (
@@ -234,10 +234,10 @@ function PageHeader({ actions }: { actions: React.ReactNode }) {
 /* ---------------- enterprise ---------------- */
 
 function EnterpriseView() {
-  const entries = React.useMemo(() => buildEntries(), []);
+  const entries = React.useMemo(() => buildEvents(), []);
   const [filters, setFilters] = React.useState<Filters>(EMPTY_FILTERS);
   const [filtersOpen, setFiltersOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState<AuditEntry | null>(null);
+  const [selected, setSelected] = React.useState<AuditEvent | null>(null);
 
   const filtered = React.useMemo(() => applyFilters(entries, filters), [entries, filters]);
   const count = activeFilterCount(filters);
@@ -255,7 +255,7 @@ function EnterpriseView() {
       {(filtersOpen || count > 0) && <FilterBar filters={filters} onChange={setFilters} />}
       <AuditTable
         entries={filtered}
-        selectedId={selected?.id ?? null}
+        selectedId={selected?.externalId ?? null}
         onSelect={setSelected}
         noResults={
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: s.md, textAlign: "center" }}>

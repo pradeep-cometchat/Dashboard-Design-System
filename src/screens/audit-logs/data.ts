@@ -1,311 +1,336 @@
-// Audit Logs sample data, modelled on the Linear Feature Narrative
-// ("Dashboard Audit Logs", project P-ENG-362): the Auditable Actions Catalog
-// (12 categories), log entry fields (timestamp UTC, actor email / ID / role,
-// action, resource, outcome, source Dashboard | API, source IP) and the
-// per-type detail payloads (before/after for updates, entity details for
-// create/delete, context for auth events).
+// Audit Logs sample data — shaped exactly like the staging audit-log API
+// (GET /apps/{appId}/audit-logs, captured 2026-09-23/24; Linear "Audit Log —
+// Wire Contract v1" + the dashboard team's WIRE-CONTRACT.md / Api-response/):
+//
+//   { externalId, appId, correlationId, timestamp (epoch SECONDS),
+//     actor { type, userId, email, role },      ← no display name, no avatar
+//     action "section.resource.verb", section,
+//     resource { type, id | null },            ← raw ids (parameter keys, microservice ids, key hashes)
+//     source "dashboard" | "api", sourceIp, outcome "success" | "failure",
+//     change: create{entity} | update{before|null, after} | toggle{after{enabled}}
+//             | delete{entity} | auth{context} }
+//
+// Everything readable (action / section / resource labels, the actor's name and
+// photo) is a Dashboard-side lookup: label maps below, plus a join of
+// actor.email against the app's team members.
 
-export type ActionType = "Auth" | "Update" | "Create" | "Delete" | "Config";
 export type Role = "owner" | "admin" | "developer" | "moderator";
 export type Source = "dashboard" | "api";
 export type Outcome = "success" | "failure";
 
-/** Detail payload. Update/Config → before/after; Create/Delete → entity; Auth → context. */
+type Obj = Record<string, unknown>;
+
 export type Change =
-  | { kind: "update"; rows: { field: string; before: string; after: string }[] }
-  | { kind: "create"; entity: Record<string, string> }
-  | { kind: "delete"; entity: Record<string, string> }
-  | { kind: "auth"; context: Record<string, string> };
+  | { type: "create"; entity: Obj }
+  | { type: "update"; before: Obj | null; after: Obj }
+  | { type: "toggle"; after: { enabled: boolean } }
+  | { type: "delete"; entity: Obj }
+  | { type: "auth"; context: Obj };
 
-/** Secrets are never stored — the backend sends this marker and the UI shows "Redacted". */
-export const REDACTED = "[redacted]";
-
-/* ---------------- Auditable Actions Catalog ---------------- */
-
-export interface CatalogAction {
-  id: string;
-  label: string;
-  type: ActionType;
-}
-
-export interface CatalogSection {
-  id: string;
-  label: string;
-  actions: CatalogAction[];
-}
-
-const a = (id: string, label: string, type: ActionType): CatalogAction => ({ id, label, type });
-
-export const CATALOG: CatalogSection[] = [
-  {
-    id: "auth",
-    label: "Authentication & Account",
-    actions: [
-      a("auth.login", "Login", "Auth"),
-      a("auth.login_otp", "Login with OTP", "Auth"),
-      a("auth.signup", "Signup", "Auth"),
-      a("auth.logout", "Logout", "Auth"),
-      a("auth.password_reset", "Password reset", "Auth"),
-      a("auth.profile.update", "Update user profile", "Update"),
-      a("auth.invite.accept", "Accept collaborator invite", "Auth"),
-      a("auth.2fa.toggle", "2FA enable/disable", "Config"),
-    ],
-  },
-  {
-    id: "team",
-    label: "Team Management",
-    actions: [
-      a("team.collaborator.add", "Add collaborator", "Create"),
-      a("team.collaborator.remove", "Remove collaborator", "Delete"),
-      a("team.collaborator.update_role", "Update collaborator role", "Update"),
-    ],
-  },
-  {
-    id: "app",
-    label: "App Management",
-    actions: [
-      a("app.create", "Create app", "Create"),
-      a("app.update", "Update app", "Update"),
-      a("app.delete", "Delete app", "Delete"),
-      a("app.settings.update", "Update app settings", "Config"),
-      a("app.conversation_settings.update", "Update thread/conversation settings", "Config"),
-      a("app.legacy_settings.update", "Update legacy settings", "Config"),
-    ],
-  },
-  {
-    id: "users",
-    label: "Users",
-    actions: [
-      a("users.user.create", "Create user", "Create"),
-      a("users.user.update", "Update user", "Update"),
-      a("users.user.delete", "Delete user (permanent)", "Delete"),
-      a("users.user.deactivate", "Deactivate user", "Update"),
-      a("users.user.activate", "Activate user", "Update"),
-      a("users.auth_token.create", "Create auth token", "Create"),
-      a("users.auth_token.delete", "Delete auth token", "Delete"),
-      a("users.friend.add", "Add friend", "Update"),
-      a("users.friend.remove", "Remove friend", "Update"),
-      a("users.group.add", "Add user to group", "Update"),
-      a("users.group.kick", "Kick user from group", "Delete"),
-      a("users.group.ban", "Ban user from group", "Update"),
-      a("users.group.scope", "Update user scope in group", "Update"),
-    ],
-  },
-  {
-    id: "groups",
-    label: "Groups",
-    actions: [
-      a("groups.group.create", "Create group", "Create"),
-      a("groups.group.update", "Update group", "Update"),
-      a("groups.group.delete", "Delete group", "Delete"),
-      a("groups.members.add", "Add members", "Update"),
-      a("groups.member.kick", "Kick member", "Delete"),
-      a("groups.member.ban", "Ban member", "Update"),
-      a("groups.member.unban", "Unban member", "Update"),
-      a("groups.scope.update", "Update scope permissions", "Config"),
-      a("groups.scope.reset", "Reset scope permission", "Config"),
-    ],
-  },
-  {
-    id: "roles",
-    label: "Roles & Permissions",
-    actions: [
-      a("roles.role.create", "Create role", "Create"),
-      a("roles.role.update", "Update role", "Update"),
-      a("roles.role.delete", "Delete role", "Delete"),
-      a("roles.restrictions.add", "Add permission restrictions", "Config"),
-      a("roles.restrictions.remove", "Remove permission restrictions", "Config"),
-      a("roles.permissions.update", "Update role permissions", "Config"),
-      a("roles.permissions.reset", "Reset role permission", "Config"),
-    ],
-  },
-  {
-    id: "moderation",
-    label: "Messages & Moderation",
-    actions: [
-      a("messages.message.delete", "Delete message", "Delete"),
-      a("moderation.message.approve", "Approve moderation message", "Update"),
-      a("moderation.message.reject", "Reject moderation message", "Update"),
-      a("moderation.flag.accept", "Accept flagged message", "Update"),
-      a("moderation.flag.approve", "Approve flagged message", "Update"),
-      a("moderation.flag.review", "Review flagged message", "Update"),
-      a("moderation.flag.block", "Block flagged message", "Update"),
-      a("moderation.flag.ban_sender", "Ban sender of flagged message", "Update"),
-      a("moderation.blocked.update", "Update blocked message status", "Update"),
-      a("moderation.rule.create", "Create moderation rule", "Create"),
-      a("moderation.rule.update", "Update moderation rule", "Update"),
-      a("moderation.rule.delete", "Delete moderation rule", "Delete"),
-      a("moderation.keyword.create", "Create keyword", "Create"),
-      a("moderation.keyword.update", "Update keyword", "Update"),
-      a("moderation.keyword.delete", "Delete keyword", "Delete"),
-      a("moderation.settings.update", "Update global moderation settings", "Config"),
-      a("moderation.category.create", "Add custom category", "Create"),
-      a("moderation.category.update", "Update custom category", "Update"),
-      a("moderation.category.delete", "Delete custom category", "Delete"),
-    ],
-  },
-  {
-    id: "webhooks",
-    label: "Webhooks",
-    actions: [
-      a("webhooks.webhook.create", "Create webhook", "Create"),
-      a("webhooks.webhook.update", "Update webhook", "Update"),
-      a("webhooks.webhook.delete", "Delete webhook", "Delete"),
-      a("webhooks.webhook.enable", "Enable webhook", "Config"),
-      a("webhooks.webhook.disable", "Disable webhook", "Config"),
-      a("webhooks.triggers.add", "Add webhook triggers", "Update"),
-      a("webhooks.triggers.remove", "Remove webhook triggers", "Update"),
-    ],
-  },
-  {
-    id: "apikeys",
-    label: "API Keys & Credentials",
-    actions: [a("apikeys.key.create", "Create API key", "Create"), a("apikeys.key.delete", "Delete API key", "Delete")],
-  },
-  {
-    id: "ai",
-    label: "AI Agents & Bots",
-    actions: [
-      a("ai.agent.update", "Update AI agent", "Update"),
-      a("ai.agent.delete", "Delete AI agent", "Delete"),
-      a("ai.agent.add_tool", "Add tool to agent", "Update"),
-      a("ai.agent.remove_tool", "Remove tool from agent", "Update"),
-      a("ai.tool.update", "Update AI tool", "Update"),
-      a("ai.knowledge.add", "Add knowledge base files", "Create"),
-      a("ai.knowledge.remove", "Remove knowledge base files", "Delete"),
-      a("ai.bot.create", "Create bot", "Create"),
-      a("ai.bot.update", "Update bot", "Update"),
-      a("ai.bot.delete", "Delete bot", "Delete"),
-    ],
-  },
-  {
-    id: "push",
-    label: "Push Notifications",
-    actions: [
-      a("push.settings.update", "Update push settings", "Config"),
-      a("push.apns.configure", "Configure APNs", "Config"),
-      a("push.sendgrid.configure", "Configure SendGrid email", "Config"),
-      a("push.twilio.configure", "Configure Twilio SMS", "Config"),
-    ],
-  },
-  {
-    id: "billing",
-    label: "Billing & Subscriptions",
-    actions: [a("billing.subscribe", "Subscribe to plan", "Create"), a("billing.cancel", "Unsubscribe/cancel", "Delete")],
-  },
-  {
-    id: "extensions",
-    label: "Extensions & Widgets",
-    actions: [
-      a("extensions.extension.toggle", "Enable/disable extension", "Config"),
-      a("extensions.widget.create", "Create chat widget", "Create"),
-      a("extensions.widget.update", "Update chat widget", "Update"),
-    ],
-  },
-];
-
-const ACTION_INDEX = new Map<string, { action: CatalogAction; section: CatalogSection }>();
-CATALOG.forEach((section) => section.actions.forEach((action) => ACTION_INDEX.set(action.id, { action, section })));
-export const lookupAction = (id: string) => ACTION_INDEX.get(id)!;
-
-/* ---------------- Team members (actor filter source) ---------------- */
-
-export interface Actor {
-  userId: string;
-  name: string;
-  email: string;
-  role: Role;
-}
-
-export const TEAM: Actor[] = [
-  { userId: "usr_01", name: "Sarah Chen", email: "sarah.chen@acmecorp.com", role: "owner" },
-  { userId: "usr_02", name: "James Wilson", email: "james.wilson@acmecorp.com", role: "admin" },
-  { userId: "usr_03", name: "Priya Sharma", email: "priya.sharma@acmecorp.com", role: "admin" },
-  { userId: "usr_04", name: "Alex Kim", email: "alex.kim@acmecorp.com", role: "developer" },
-  { userId: "usr_05", name: "Maria Garcia", email: "maria.garcia@acmecorp.com", role: "moderator" },
-];
-const [SARAH, JAMES, PRIYA, ALEX, MARIA] = TEAM;
-
-/* ---------------- Log entries ---------------- */
-
-export interface AuditEntry {
-  id: string;
-  timestamp: string; // ISO 8601 UTC
-  actor: Actor;
-  actionId: string;
-  /** What was done, as shown in the Action column ("Updated", "Created", "Logged in", …). */
-  verb: string;
-  /** Section label → affected resource, e.g. "Chat & Messaging → Message Translation". */
-  resource: string;
-  outcome: Outcome;
+export interface AuditEvent {
+  externalId: string;
+  appId: string;
+  correlationId: string | null;
+  /** Epoch seconds (UTC). */
+  timestamp: number;
+  actor: { type: "user"; userId: number; email: string; role: Role };
+  action: string;
+  section: string;
+  resource: { type: string; id: string | null };
   source: Source;
-  sourceIp: string;
+  sourceIp: string | null;
+  outcome: Outcome;
   change: Change;
 }
 
-const MIN = 60_000;
+/** Secrets are never stored — the backend keeps the key and sends this marker as the value. */
+export const REDACTED = "[redacted]";
+
+/* ---------------- label maps (Dashboard-side) ---------------- */
+
+/** Backend sections (the `/catalog` ids) → readable names. */
+export const SECTION_LABEL: Record<string, string> = {
+  team: "Team Management",
+  app_management: "App Management",
+  roles: "Roles & Permissions",
+  moderation: "Moderation",
+  messages: "Messages",
+  apikeys: "API Keys",
+  ai: "AI Agents & Bots",
+  push: "Push Notifications",
+  notifications: "Notifications",
+  billing: "Billing & Subscriptions",
+  extensions: "Extensions",
+  vcb: "Voice & Video",
+};
+
+/** Backend action catalog (wire contract §4) → readable labels. The Section / Action filters are built from this, as `/catalog` would. */
+export const ACTION_LABEL: Record<string, string> = {
+  "team.collaborator.create": "Add collaborator",
+  "team.collaborator.delete": "Remove collaborator",
+  "team.collaborator.update_role": "Change collaborator role",
+  "app_management.app.update": "Update app",
+  "app_management.app.delete": "Delete app",
+  "app_management.settings.update": "Update app setting",
+  "app_management.settings.delete": "Reset app settings",
+  "messages.settings.update": "Update messaging setting",
+  "roles.role.create": "Create role",
+  "roles.role.update": "Update role",
+  "roles.role.delete": "Delete role",
+  "moderation.rule.create": "Create moderation rule",
+  "moderation.rule.update": "Update moderation rule",
+  "moderation.rule.delete": "Delete moderation rule",
+  "moderation.keyword.create": "Create keyword list",
+  "moderation.keyword.update": "Update keyword list",
+  "moderation.keyword.delete": "Delete keyword list",
+  "moderation.settings.update": "Update moderation settings",
+  "apikeys.key.create": "Create API key",
+  "apikeys.key.update": "Update API key",
+  "apikeys.key.delete": "Delete API key",
+  "ai.settings.update": "Update AI setting",
+  "ai.agent.create": "Create AI agent",
+  "ai.agent.update": "Update AI agent",
+  "ai.agent.delete": "Delete AI agent",
+  "ai.bot.create": "Create bot",
+  "ai.bot.update": "Update bot",
+  "ai.bot.delete": "Delete bot",
+  "push.settings.update": "Update push settings",
+  "push.apns.configure": "Configure APNs",
+  "push.fcm.configure": "Configure FCM",
+  "push.templates.delete": "Reset push templates",
+  "push.preferences.delete": "Reset push preferences",
+  "push.custom.delete": "Remove custom push provider",
+  "notifications.settings.update": "Update notification setting",
+  "billing.subscription.create": "Subscribe to plan",
+  "billing.subscription.cancel": "Cancel subscription",
+  "extensions.extension.enable": "Enable extension",
+  "extensions.extension.disable": "Disable extension",
+  "vcb.builder.create": "Create call builder",
+  "vcb.builder.update": "Update call builder",
+};
+
+/** `resource.type` → readable noun. */
+const RESOURCE_TYPE_LABEL: Record<string, string> = {
+  collaborator: "Collaborator",
+  app: "App",
+  settings: "Setting",
+  role: "Role",
+  rule: "Moderation rule",
+  keyword: "Keyword list",
+  apikey: "API key",
+  agent: "AI agent",
+  bot: "Bot",
+  provider: "Push provider",
+  templates: "Push templates",
+  preferences: "Push preferences",
+  subscription: "Subscription",
+  extension: "Extension",
+  builder: "Call builder",
+};
+
+/** Settings `resource.id` / `parameterId` → readable name (raw key is the fallback). */
+export const PARAMETER_LABEL: Record<string, string> = {
+  "core.notifications.push.enabled": "Push notifications",
+  "core.notifications.logs.enabledAtMS": "Notification logs enabled at",
+  "features.ai.enabled": "AI features",
+  "core.chat.messages.retentionDays": "Message retention (days)",
+  "core.conversations.updateOnCustomMessage": "Update conversation on custom message",
+  "features.moderation.enabled": "Moderation",
+};
+
+/** Extension `microserviceId` → product name (raw id is the fallback). */
+const EXTENSION_LABEL: Record<string, string> = {
+  "message-translation": "Message Translation",
+  "stickers-stipop": "Stickers (Stipop)",
+  "pin-message": "Pin Message",
+  "url-shortener-bitly": "URL Shortener (Bitly)",
+  "voice-transcription": "Voice Transcription",
+  "disappearing-messages": "Disappearing Messages",
+};
+
+const PROVIDER_LABEL: Record<string, string> = { apns: "APNs", fcm: "FCM", custom: "Custom provider" };
+
+export const actionLabel = (id: string) => ACTION_LABEL[id] ?? id;
+export const sectionLabel = (id: string) => SECTION_LABEL[id] ?? id;
+export const parameterLabel = (key: string) => PARAMETER_LABEL[key] ?? key;
+
+/** Long opaque ids (API key hashes) are shortened for display: first 4 · last 4. */
+export const shortId = (id: string) => (id.length > 16 ? `${id.slice(0, 4)}…${id.slice(-4)}` : id);
+
+const str = (v: unknown) => (typeof v === "string" ? v : undefined);
+
+/** Readable resource: "<type> → <name>", from `resource` plus whatever the change body names. */
+export function resourceLabel(ev: AuditEvent): string {
+  const { type, id } = ev.resource;
+  const body: Obj = ev.change.type === "create" || ev.change.type === "delete" ? ev.change.entity : ev.change.type === "update" ? ev.change.after : {};
+  let name: string;
+  switch (type) {
+    case "settings":
+      name = id ? parameterLabel(id) : "Multiple settings";
+      break;
+    case "extension":
+      name = id ? EXTENSION_LABEL[id] ?? id : "—";
+      break;
+    case "provider":
+      name = id ? PROVIDER_LABEL[id] ?? id : "—";
+      break;
+    case "templates":
+    case "preferences":
+      return RESOURCE_TYPE_LABEL[type];
+    case "apikey":
+      name = str(body.name) ?? (id ? shortId(id) : "—");
+      break;
+    case "subscription":
+      name = str(body.plan) ?? id ?? "—";
+      break;
+    default:
+      // Creates often have resource.id null (the id only exists after the call) — fall back to the entity's name.
+      name = str(body.name) ?? str(body.keyword) ?? id ?? "—";
+  }
+  return `${RESOURCE_TYPE_LABEL[type] ?? type} → ${name}`;
+}
+
+/** What was done, for the Action badge. */
+export function verbOf(ev: AuditEvent): string {
+  if (ev.change.type === "toggle") return ev.change.after.enabled ? "Enabled" : "Disabled";
+  if (ev.action.endsWith(".enable")) return "Enabled"; // extension first-enable arrives as `create`
+  if (ev.action.endsWith(".disable")) return "Disabled";
+  if (ev.action.endsWith(".cancel")) return "Cancelled";
+  if (ev.action.endsWith(".configure")) return "Configured";
+  switch (ev.change.type) {
+    case "create":
+      return "Created";
+    case "update":
+      return "Updated";
+    case "delete":
+      return ev.action.endsWith("settings.delete") || ev.action.endsWith("templates.delete") || ev.action.endsWith("preferences.delete") ? "Reset" : "Deleted";
+    case "auth":
+      return "Signed in";
+  }
+}
+
+/** `/catalog`-style list for the Section → Action filters, built from the label map. */
+export const CATALOG: { id: string; label: string; actions: { id: string; label: string }[] }[] = Object.keys(SECTION_LABEL)
+  .map((section) => ({
+    id: section,
+    label: SECTION_LABEL[section],
+    actions: Object.keys(ACTION_LABEL)
+      .filter((a) => a.startsWith(`${section}.`))
+      .map((a) => ({ id: a, label: ACTION_LABEL[a] })),
+  }))
+  .filter((sec) => sec.actions.length > 0);
+
+/* ---------------- team members (Dashboard's collaborators list) ---------------- */
+
+/** The API has no actor name or photo; the Dashboard joins actor.email against the app's team members. */
+export interface Member {
+  userId: number;
+  name: string;
+  email: string;
+  avatar: string;
+}
+
+export const TEAM: Member[] = [
+  { userId: 965, name: "Sarah Chen", email: "sarah.chen@acmecorp.com", avatar: "https://i.pravatar.cc/96?img=47" },
+  { userId: 972, name: "James Wilson", email: "james.wilson@acmecorp.com", avatar: "https://i.pravatar.cc/96?img=12" },
+  { userId: 981, name: "Priya Sharma", email: "priya.sharma@acmecorp.com", avatar: "https://i.pravatar.cc/96?img=45" },
+  { userId: 990, name: "Alex Kim", email: "alex.kim@acmecorp.com", avatar: "https://i.pravatar.cc/96?img=15" },
+  { userId: 994, name: "Maria Garcia", email: "maria.garcia@acmecorp.com", avatar: "https://i.pravatar.cc/96?img=5" },
+];
+
+export const memberFor = (email: string) => TEAM.find((m) => m.email === email);
+
+/* ---------------- events ---------------- */
+
+const MIN = 60;
 const HOUR = 60 * MIN;
 const DAY = 24 * HOUR;
 
-type Seed = [offsetMs: number, actor: Actor, actionId: string, verb: string, resource: string, source: Source, ip: string, change: Change, outcome?: Outcome];
+type ActorSeed = { userId: number; email: string; role: Role };
+const SARAH: ActorSeed = { userId: 965, email: "sarah.chen@acmecorp.com", role: "owner" };
+const JAMES: ActorSeed = { userId: 972, email: "james.wilson@acmecorp.com", role: "admin" };
+const PRIYA: ActorSeed = { userId: 981, email: "priya.sharma@acmecorp.com", role: "admin" };
+const ALEX: ActorSeed = { userId: 990, email: "alex.kim@acmecorp.com", role: "developer" };
+const MARIA: ActorSeed = { userId: 994, email: "maria.garcia@acmecorp.com", role: "moderator" };
+/** Removed from the team since — no longer in the members list, so the UI can only show the email. */
+const FORMER: ActorSeed = { userId: 941, email: "tom.baker@acmecorp.com", role: "admin" };
 
-const upd = (...rows: [string, string, string][]): Change => ({ kind: "update", rows: rows.map(([field, before, after]) => ({ field, before, after })) });
-const created = (entity: Record<string, string>): Change => ({ kind: "create", entity });
-const removed = (entity: Record<string, string>): Change => ({ kind: "delete", entity });
-const ctx = (context: Record<string, string>): Change => ({ kind: "auth", context });
+const IP_1 = "10.4.13.7";
+const IP_2 = "10.4.6.140";
+const KEY_HASH_1 = "be82468ea05aab3f4f40150cefa6bce5c686bd1a";
+const KEY_HASH_2 = "4c1f09d2e77ab5613c0b8e9a2f4d6c8e1b3a5f70";
 
-const IP_1 = "203.0.113.42";
-const IP_2 = "198.51.100.17";
-const IP_3 = "192.0.2.88";
-const IP_4 = "203.0.113.109";
+type Seed = {
+  ago: number;
+  actor: ActorSeed;
+  action: string;
+  resource: [type: string, id: string | null];
+  change: Change;
+  source?: Source;
+  outcome?: Outcome;
+  ip?: string | null;
+};
+
+const setting = (key: string, before: unknown, after: unknown): Change => ({
+  type: "update",
+  before: { parameterId: key, value: before },
+  after: { parameterId: key, value: after },
+});
 
 const SEEDS: Seed[] = [
-  [5 * MIN, SARAH, "apikeys.key.delete", "Deleted", "Application → API Key ••••3f2a", "dashboard", IP_1, removed({ Name: "Staging Key", "Key ID": "••••3f2a", Scope: "fullAccess" })],
-  [12 * MIN, JAMES, "users.user.create", "Created", "Users → michael@acmecorp.com", "api", IP_2, created({ UID: "michael-001", Name: "Michael Scott", Role: "default" })],
-  [38 * MIN, SARAH, "apikeys.key.create", "Created", "Application → API Key ••••9b1c", "dashboard", IP_1, created({ Name: "Production Key", "Key ID": "••••9b1c", Scope: "authOnly", Secret: REDACTED })],
-  [55 * MIN, PRIYA, "moderation.rule.update", "Updated", "Moderation → Profanity Filter", "dashboard", IP_3, upd(["Status", "Disabled", "Enabled"], ["Action", "Flag", "Block"])],
-  [80 * MIN, JAMES, "users.user.delete", "Deleted", "Users → temp-user@test.com", "dashboard", IP_2, removed({ UID: "temp-user", Name: "Temp User", Role: "default" })],
-  [3 * HOUR, SARAH, "app.settings.update", "Updated", "Chat & Messaging → Message Retention", "dashboard", IP_1, upd(["Message Retention", "30 days", "90 days"])],
-  [4 * HOUR, PRIYA, "push.apns.configure", "Updated", "Push Notifications → APNs", "dashboard", IP_3, upd(["Provider", "FCM", "APNs"], ["Team ID", "—", "8XK2Q7M4LP"], ["Auth Key (.p8)", REDACTED, REDACTED])],
-  [6 * HOUR, JAMES, "auth.login", "Logged in", "Account → Dashboard Login", "dashboard", IP_2, ctx({ Method: "Email + Password", Browser: "Chrome 124", OS: "macOS 15", Location: "Mumbai, IN" })],
-  [9 * HOUR, ALEX, "webhooks.webhook.create", "Created", "Webhooks → https://api.acmecorp.com/hooks", "api", IP_4, created({ URL: "https://api.acmecorp.com/hooks", Description: "Order events", Active: "Yes", Secret: REDACTED })],
-  [14 * HOUR, MARIA, "moderation.flag.block", "Updated", "Moderation → Flagged message msg-889271", "dashboard", IP_4, upd(["Status", "Flagged", "Blocked"])],
-  [22 * HOUR, SARAH, "roles.permissions.update", "Updated", "Roles & Permissions → Admin → Permissions", "dashboard", IP_1, upd(["Delete messages", "Deny", "Allow"], ["Ban users", "Deny", "Allow"])],
-  [1 * DAY + 2 * HOUR, PRIYA, "ai.agent.update", "Updated", "AI Agents → Support Agent", "api", IP_3, upd(["Status", "Enabled", "Disabled"])],
-  [1 * DAY + 6 * HOUR, SARAH, "ai.bot.create", "Created", "BYO Agents → OrderTracker", "dashboard", IP_1, created({ "Bot UID": "order-tracker", Name: "OrderTracker", Webhook: "https://bots.acmecorp.com/order" })],
-  [1 * DAY + 11 * HOUR, JAMES, "webhooks.webhook.update", "Updated", "Webhooks → https://api.acmecorp.com/hooks", "api", IP_2, upd(["Triggers", "message_sent", "message_sent, message_edited"])],
-  [2 * DAY, SARAH, "billing.subscribe", "Created", "Plans & Billing → Enterprise", "dashboard", IP_1, created({ Plan: "Enterprise", Billing: "Annual", "Previous plan": "Growth" })],
-  [2 * DAY + 4 * HOUR, PRIYA, "users.group.ban", "Updated", "Groups → Hiking Group → spammer42", "dashboard", IP_3, upd(["Membership", "Participant", "Banned"])],
-  [2 * DAY + 9 * HOUR, SARAH, "team.collaborator.add", "Created", "Team Members → david@acmecorp.com", "dashboard", IP_1, created({ Email: "david@acmecorp.com", Role: "Developer" })],
-  [3 * DAY, JAMES, "extensions.extension.toggle", "Enabled", "Extensions → Message Translation", "api", IP_2, upd(["Message Translation", "Disabled", "Enabled"])],
-  [3 * DAY + 5 * HOUR, PRIYA, "groups.group.create", "Created", "Groups → Engineering Team", "dashboard", IP_3, created({ GUID: "engineering", Name: "Engineering Team", Type: "Private" })],
-  [4 * DAY, ALEX, "moderation.keyword.delete", "Deleted", "Moderation → Keyword list", "api", IP_4, removed({ Keyword: "crypto-giveaway", List: "Spam" }), "failure"],
-  [5 * DAY, SARAH, "team.collaborator.update_role", "Updated", "Team Members → priya.sharma@acmecorp.com", "dashboard", IP_1, upd(["Role", "Developer", "Admin"])],
-  [6 * DAY, JAMES, "auth.logout", "Logged out", "Account → Dashboard Logout", "dashboard", IP_2, ctx({ Method: "User initiated", Browser: "Chrome 124", OS: "macOS 15" })],
-  [8 * DAY, PRIYA, "push.settings.update", "Updated", "Push Notifications → Settings", "dashboard", IP_3, upd(["Include message body", "Off", "On"])],
-  [10 * DAY, SARAH, "auth.2fa.toggle", "Enabled", "Account → Two-factor authentication", "dashboard", IP_1, upd(["Two-factor authentication", "Disabled", "Enabled"])],
-  [12 * DAY, MARIA, "moderation.rule.create", "Created", "Moderation → Link Spam", "dashboard", IP_4, created({ Name: "Link Spam", Condition: "Contains URL", Action: "Flag" })],
-  [15 * DAY, JAMES, "users.auth_token.create", "Created", "Users → michael-001 → Auth token", "api", IP_2, created({ UID: "michael-001", Token: REDACTED })],
-  [18 * DAY, SARAH, "app.update", "Updated", "Application → Acme Support", "dashboard", IP_1, upd(["App name", "Acme Chat", "Acme Support"])],
-  [21 * DAY, PRIYA, "roles.role.delete", "Deleted", "Roles & Permissions → Guest", "dashboard", IP_3, removed({ "Role ID": "guest", Name: "Guest" })],
-  [26 * DAY, ALEX, "ai.knowledge.add", "Created", "AI Agents → Support Agent → Knowledge base", "api", IP_4, created({ Files: "returns-policy.pdf, shipping-faq.pdf", Count: "2" })],
-  [33 * DAY, SARAH, "auth.login", "Logged in", "Account → Dashboard Login", "dashboard", IP_1, ctx({ Method: "Email + OTP", Browser: "Safari 18", OS: "iOS 19", Location: "Bengaluru, IN" }), "failure"],
-  [41 * DAY, JAMES, "webhooks.webhook.disable", "Disabled", "Webhooks → https://legacy.acmecorp.com/hook", "dashboard", IP_2, upd(["Active", "Yes", "No"])],
-  [52 * DAY, SARAH, "app.conversation_settings.update", "Updated", "Chat & Messaging → Threads", "dashboard", IP_1, upd(["Threaded replies", "Off", "On"])],
+  { ago: 4 * MIN, actor: SARAH, action: "apikeys.key.delete", resource: ["apikey", KEY_HASH_1], change: { type: "delete", entity: { id: KEY_HASH_1 } } },
+  { ago: 11 * MIN, actor: JAMES, action: "team.collaborator.create", resource: ["collaborator", "david@acmecorp.com"], change: { type: "create", entity: { email: "david@acmecorp.com", role: "developer" } } },
+  { ago: 37 * MIN, actor: SARAH, action: "apikeys.key.create", resource: ["apikey", null], change: { type: "create", entity: { name: "Production key", scope: "authOnly" } } },
+  { ago: 54 * MIN, actor: PRIYA, action: "moderation.rule.update", resource: ["rule", "profanity-filter"], change: { type: "update", before: null, after: { name: "Profanity Filter", action: "block", enabled: true } }, outcome: "failure" },
+  { ago: 79 * MIN, actor: SARAH, action: "notifications.settings.update", resource: ["settings", "core.notifications.push.enabled"], change: setting("core.notifications.push.enabled", false, true) },
+  { ago: 3 * HOUR, actor: SARAH, action: "messages.settings.update", resource: ["settings", "core.chat.messages.retentionDays"], change: setting("core.chat.messages.retentionDays", 30, 90) },
+  { ago: 4 * HOUR, actor: PRIYA, action: "push.apns.configure", resource: ["provider", "apns"], change: { type: "update", before: null, after: { teamId: "8XK2Q7M4LP", keyId: "ZB39Q2K7HD", p8Key: REDACTED, production: true } }, outcome: "failure" },
+  { ago: 6 * HOUR, actor: JAMES, action: "extensions.extension.enable", resource: ["extension", "message-translation"], change: { type: "create", entity: { microserviceId: "message-translation", enabled: true } } },
+  { ago: 9 * HOUR, actor: ALEX, action: "ai.agent.create", resource: ["agent", "support-agent"], change: { type: "create", entity: { name: "Support Agent", model: "claude-sonnet-5", temperature: 0.2 } }, source: "api" },
+  { ago: 14 * HOUR, actor: MARIA, action: "moderation.keyword.create", resource: ["keyword", "spam-words"], change: { type: "create", entity: { keyword: "spam-words", listName: "Spam", keywords: ["crypto-giveaway", "free-followers", "dm-for-promo"], action: "flag", enabled: true } } },
+  { ago: 22 * HOUR, actor: SARAH, action: "team.collaborator.update_role", resource: ["collaborator", "priya.sharma@acmecorp.com"], change: { type: "update", before: { role: "developer" }, after: { role: "admin" } } },
+  { ago: DAY + 2 * HOUR, actor: PRIYA, action: "ai.settings.update", resource: ["settings", "features.ai.enabled"], change: setting("features.ai.enabled", true, false) },
+  { ago: DAY + 6 * HOUR, actor: SARAH, action: "roles.role.create", resource: ["role", null], change: { type: "create", entity: { name: "Support Lead", description: "Can moderate and read logs", permissions: ["messages.read", "moderation.review"] } } },
+  { ago: DAY + 11 * HOUR, actor: JAMES, action: "extensions.extension.disable", resource: ["extension", "url-shortener-bitly"], change: { type: "toggle", after: { enabled: false } } },
+  { ago: 2 * DAY, actor: SARAH, action: "billing.subscription.create", resource: ["subscription", "enterprise-2026"], change: { type: "create", entity: { plan: "enterprise-2026", isAnnual: true } } },
+  { ago: 2 * DAY + 4 * HOUR, actor: FORMER, action: "roles.role.update", resource: ["role", "support_lead"], change: { type: "update", before: null, after: { name: "Support Lead", permissions: ["messages.read", "moderation.review", "users.read"] } } },
+  { ago: 2 * DAY + 9 * HOUR, actor: SARAH, action: "app_management.app.update", resource: ["app", "240998CGSF2026"], change: { type: "update", before: { name: "Acme Chat" }, after: { name: "Acme Support" } } },
+  { ago: 3 * DAY, actor: JAMES, action: "extensions.extension.enable", resource: ["extension", "pin-message"], change: { type: "toggle", after: { enabled: true } } },
+  { ago: 3 * DAY + 5 * HOUR, actor: PRIYA, action: "apikeys.key.update", resource: ["apikey", KEY_HASH_2], change: { type: "update", before: null, after: { name: "Staging key", scope: "fullAccess" } } },
+  { ago: 4 * DAY, actor: ALEX, action: "moderation.rule.delete", resource: ["rule", "link-spam"], change: { type: "delete", entity: { id: "link-spam" } }, outcome: "failure" },
+  { ago: 5 * DAY, actor: SARAH, action: "team.collaborator.delete", resource: ["collaborator", "tom.baker@acmecorp.com"], change: { type: "delete", entity: { email: "tom.baker@acmecorp.com", role: "admin" } } },
+  { ago: 6 * DAY, actor: JAMES, action: "push.templates.delete", resource: ["templates", "templates"], change: { type: "delete", entity: { id: "templates" } } },
+  { ago: 8 * DAY, actor: PRIYA, action: "notifications.settings.update", resource: ["settings", "core.notifications.logs.enabledAtMS"], change: setting("core.notifications.logs.enabledAtMS", 1787138905596, 1790229015028) },
+  { ago: 10 * DAY, actor: SARAH, action: "app_management.settings.delete", resource: ["settings", null], change: { type: "delete", entity: { parameterIds: ["core.conversations.updateOnCustomMessage", "features.moderation.enabled"] } } },
+  { ago: 12 * DAY, actor: MARIA, action: "moderation.rule.create", resource: ["rule", "link-spam"], change: { type: "create", entity: { name: "Link Spam", description: "Flags messages with 3+ links", action: "flag", enabled: true } } },
+  { ago: 15 * DAY, actor: JAMES, action: "roles.role.delete", resource: ["role", "guest"], change: { type: "delete", entity: { id: "guest" } } },
+  { ago: 18 * DAY, actor: SARAH, action: "apikeys.key.create", resource: ["apikey", null], change: { type: "create", entity: { name: "Staging key", scope: "fullAccess" } } },
+  { ago: 21 * DAY, actor: PRIYA, action: "vcb.builder.create", resource: ["builder", "support-calls"], change: { type: "create", entity: { name: "Support Calls", type: "video", settings: { recording: true, maxParticipants: 8 } } } },
+  { ago: 26 * DAY, actor: ALEX, action: "ai.bot.update", resource: ["bot", "order-tracker"], change: { type: "update", before: null, after: { name: "OrderTracker", webhookUrl: "https://bots.acmecorp.com/order", secret: REDACTED } } },
+  { ago: 33 * DAY, actor: JAMES, action: "extensions.extension.enable", resource: ["extension", "voice-transcription"], change: { type: "toggle", after: { enabled: true } } },
+  { ago: 41 * DAY, actor: SARAH, action: "billing.subscription.cancel", resource: ["subscription", "growth-2025"], change: { type: "delete", entity: { plan: "growth-2025", cancelsAt: 1787200000 } } },
+  { ago: 52 * DAY, actor: SARAH, action: "messages.settings.update", resource: ["settings", "core.conversations.updateOnCustomMessage"], change: setting("core.conversations.updateOnCustomMessage", true, false) },
 ];
 
-/** Entries newest first; timestamps are relative to `now` so the date presets always have data. */
-export function buildEntries(now = Date.now()): AuditEntry[] {
-  return SEEDS.map(([offset, actor, actionId, verb, resource, source, sourceIp, change, outcome = "success"], i) => ({
-    id: `evt_${(0x3a9f10 + i * 7919).toString(16)}`,
-    timestamp: new Date(now - offset).toISOString(),
-    actor,
-    actionId,
-    verb,
-    resource,
-    outcome,
-    source,
-    sourceIp,
-    change,
+const uuid = (n: number) => {
+  const h = (x: number) => ((x * 2654435761) >>> 0).toString(16).padStart(8, "0");
+  return `${h(n)}-${h(n + 7).slice(0, 4)}-4${h(n + 13).slice(0, 3)}-a${h(n + 19).slice(0, 3)}-${h(n + 23)}${h(n + 29).slice(0, 4)}`;
+};
+
+/** Events newest first; timestamps are relative to `now` (epoch seconds) so the date presets always have data. */
+export function buildEvents(nowSeconds = Math.floor(Date.now() / 1000)): AuditEvent[] {
+  return SEEDS.map((sd, i) => ({
+    externalId: uuid(i + 1),
+    appId: "240998CGSF2026",
+    correlationId: uuid(i + 101),
+    timestamp: nowSeconds - sd.ago,
+    actor: { type: "user", ...sd.actor },
+    action: sd.action,
+    section: sd.action.split(".")[0],
+    resource: { type: sd.resource[0], id: sd.resource[1] },
+    source: sd.source ?? "dashboard",
+    sourceIp: sd.ip === undefined ? (i % 3 === 0 ? IP_1 : IP_2) : sd.ip,
+    outcome: sd.outcome ?? "success",
+    change: sd.change,
   }));
 }

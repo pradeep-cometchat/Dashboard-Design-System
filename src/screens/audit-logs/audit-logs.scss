@@ -30,9 +30,17 @@
   background: $bg-secondary;
 }
 
-// Side panel body scrolls; the panel draws its own hero in place of the drawer header.
+// Detail panel: the panel draws its own header bar (Figma slide-out header) and
+// scrolls its body section itself, so the drawer body is a plain flex column.
 .cc-audit-panel .ant-drawer-body {
-  overflow: auto;
+  overflow: hidden;
+}
+
+// Figma's slide-out close X is a 24px icon in a 40px button; the base close
+// variant sizes its icon slot at 20px, so widen the slot for this button.
+.cc-audit-panel__close .cc-button__icon {
+  width: $spacing-3xl;
+  height: $spacing-3xl;
 }
 
 // Filter dropdowns: compact option rows (the dashboard's dropdown pitch).

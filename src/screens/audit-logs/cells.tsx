@@ -1,9 +1,10 @@
-// Shared badge / text helpers for the Audit Logs table and detail panel.
+// Shared badge / text / avatar helpers for the Audit Logs table and detail panel.
 import React from "react";
 import CometChatBadge from "components/base/Badge/CometChatBadge";
 import type { BadgeColor } from "components/base/Badge/CometChatBadge";
+import CometChatAvatar from "components/base/Avatar/CometChatAvatar";
 import { c, font } from "../theme";
-import type { ActionType, Outcome, Source } from "./data";
+import { memberFor, verbOf, type AuditEvent, type Change, type Outcome, type Source } from "./data";
 
 const w = {
   regular: "var(--font-weight-regular)",
@@ -27,9 +28,11 @@ export function CellText({ lead, supporting }: { lead: React.ReactNode; supporti
   );
 }
 
-export const initials = (name: string) =>
-  name
-    .split(/\s+/)
+/** Initials from a name ("Sarah Chen" → SC) or, when only an email is known, its local part (tom.baker@… → TB). */
+export const initials = (nameOrEmail: string) =>
+  nameOrEmail
+    .split("@")[0]
+    .split(/[\s._-]+/)
     .filter(Boolean)
     .slice(0, 2)
     .map((p) => p[0].toUpperCase())
@@ -37,19 +40,46 @@ export const initials = (name: string) =>
 
 export const roleLabel = (role: string) => role[0].toUpperCase() + role.slice(1);
 
-/** Action badge color keyed on the catalog action type. */
-const ACTION_COLOR: Record<ActionType, BadgeColor> = {
-  Create: "success",
-  Update: "brand",
-  Config: "brand",
-  Delete: "error",
-  Auth: "gray",
+/**
+ * Actor avatar: the member's photo from the team list (the API sends no photo), falling back to
+ * initials for someone no longer on the team. `size` in px (antd numeric size); initials stay 12px.
+ */
+export function ActorAvatar({ email, size }: { email: string; size?: number }) {
+  const member = memberFor(email);
+  return (
+    <CometChatAvatar
+      src={member?.avatar}
+      alt={member?.name ?? email}
+      size={size}
+      style={{ flexShrink: 0, fontSize: "var(--font-size-text-xs)" }}
+    >
+      {initials(member?.name ?? email)}
+    </CometChatAvatar>
+  );
+}
+
+/** Action badge colour keyed on the API's change.type (toggles follow their direction). */
+const colorFor = (change: Change): BadgeColor => {
+  switch (change.type) {
+    case "create":
+      return "success";
+    case "update":
+      return "brand";
+    case "delete":
+      return "error";
+    case "toggle":
+      return change.after.enabled ? "success" : "gray";
+    case "auth":
+      return "gray";
+  }
 };
 
-export function ActionBadge({ type, children }: { type: ActionType; children: React.ReactNode }) {
+export function ActionBadge({ event }: { event: AuditEvent }) {
+  // Extension first-enable arrives as `create`; colour it like any other enable.
+  const color = event.action.endsWith(".enable") ? "success" : event.action.endsWith(".disable") ? "gray" : colorFor(event.change);
   return (
-    <CometChatBadge type="pill" size="sm" color={ACTION_COLOR[type]}>
-      {children}
+    <CometChatBadge type="pill" size="sm" color={color}>
+      {verbOf(event)}
     </CometChatBadge>
   );
 }
@@ -81,10 +111,10 @@ export function SourceBadge({ source }: { source: Source }) {
   );
 }
 
-/* ---------------- time formatting (stored UTC, displayed in the viewer's zone) ---------------- */
+/* ---------------- time formatting (API: epoch seconds UTC; shown in the viewer's zone) ---------------- */
 
 export const viewerTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-export const formatDate = (iso: string) => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+export const formatDate = (epochSeconds: number) => new Date(epochSeconds * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
-export const formatTime = (iso: string) => new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+export const formatTime = (epochSeconds: number) => new Date(epochSeconds * 1000).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });

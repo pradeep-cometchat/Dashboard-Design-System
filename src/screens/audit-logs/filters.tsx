@@ -14,7 +14,7 @@ import CometChatButton from "components/base/Button/CometChatButton";
 import { c, s, r, font } from "../theme";
 import { Icon, dim } from "../pin/ui";
 import { SearchLg } from "../conversation-explorer/icons";
-import { CATALOG, TEAM, lookupAction, type AuditEntry, type Source } from "./data";
+import { CATALOG, TEAM, actionLabel as labelOfAction, sectionLabel as labelOfSection, type AuditEvent, type Source } from "./data";
 
 /* ---------------- model ---------------- */
 
@@ -29,7 +29,7 @@ export interface DateFilter {
 
 export interface Filters {
   date: DateFilter | null;
-  actors: string[]; // userId
+  actors: string[]; // actor email — the API's `actor` filter matches email, not userId
   sections: string[]; // section id
   actions: string[]; // action id
   sources: Source[];
@@ -59,18 +59,18 @@ const TIME_PRESETS = Object.keys(PRESET_LABEL) as TimePreset[];
 
 export const SOURCE_LABEL: Record<Source, string> = { dashboard: "Dashboard", api: "API" };
 
-export function applyFilters(entries: AuditEntry[], f: Filters, now = Date.now()): AuditEntry[] {
+export function applyFilters(entries: AuditEvent[], f: Filters, now = Date.now()): AuditEvent[] {
   return entries.filter((e) => {
-    const t = Date.parse(e.timestamp);
+    const t = e.timestamp * 1000; // API timestamps are epoch seconds
     if (f.date) {
       if (f.date.preset === "custom") {
         if (f.date.from && t < dayjs(f.date.from).startOf("day").valueOf()) return false;
         if (f.date.to && t > dayjs(f.date.to).endOf("day").valueOf()) return false;
       } else if (t < now - PRESET_MS[f.date.preset]) return false;
     }
-    if (f.actors.length && !f.actors.includes(e.actor.userId)) return false;
-    if (f.sections.length && !f.sections.includes(lookupAction(e.actionId).section.id)) return false;
-    if (f.actions.length && !f.actions.includes(e.actionId)) return false;
+    if (f.actors.length && !f.actors.includes(e.actor.email)) return false;
+    if (f.sections.length && !f.sections.includes(e.section)) return false;
+    if (f.actions.length && !f.actions.includes(e.action)) return false;
     if (f.sources.length && !f.sources.includes(e.source)) return false;
     return true;
   });
@@ -304,9 +304,9 @@ export function FilterBar({ filters, onChange }: { filters: Filters; onChange: (
     setOpenChip(null);
   };
 
-  const sectionLabel = (id: string) => CATALOG.find((sec) => sec.id === id)?.label ?? id;
-  const actorName = (id: string) => TEAM.find((m) => m.userId === id)?.name ?? id;
-  const actionLabel = (id: string) => lookupAction(id).action.label;
+  const sectionLabel = labelOfSection;
+  const actorName = (email: string) => TEAM.find((m) => m.email === email)?.name ?? email;
+  const actionLabel = labelOfAction;
 
   // Time range and Custom dates share the one date filter; applying either replaces the other.
   const timePreset = filters.date && filters.date.preset !== "custom" ? filters.date.preset : null;
@@ -359,7 +359,7 @@ export function FilterBar({ filters, onChange }: { filters: Filters; onChange: (
         values={filters.actors.map(actorName)}
         open={openChip === "actor"}
         onOpenChange={setOpen("actor")}
-        panel={<CheckboxPanel options={TEAM.map((m) => ({ value: m.userId, label: m.name, keywords: m.email }))} selected={filters.actors} onApply={(actors) => apply({ actors })} />}
+        panel={<CheckboxPanel options={TEAM.map((m) => ({ value: m.email, label: m.name, keywords: m.email }))} selected={filters.actors} onApply={(actors) => apply({ actors })} />}
       />
       <FilterChip
         label="Source"
