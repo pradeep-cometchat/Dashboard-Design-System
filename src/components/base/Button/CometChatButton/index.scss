@@ -8,6 +8,11 @@
 //
 // Specificity strategy: .cc-button-<name>.ant-btn.ant-btn-default
 // This beats antd's default hover/focus styles without !important
+// Focus rings use :focus-visible (keyboard focus only), like the other base
+// components — a mouse click must not leave a ring on the button. They also skip
+// `.ant-dropdown-open`: while a button's menu is open, focus is effectively in the
+// menu, and any key press there (arrows, Escape) would otherwise flip the browser
+// into keyboard mode and ring the trigger.
 // ============================================================
 
 // ============================================================
@@ -73,7 +78,7 @@
     box-shadow: $shadow-xs-skeuomorphic;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: $base-brand;
     border-color: rgba(255, 255, 255, 0.12);
     color: $text-white;
@@ -112,7 +117,7 @@
     box-shadow: $shadow-xs-skeuomorphic;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: $bg-primary;
     border-color: $border-dark;
     color: $text-primary;
@@ -143,7 +148,7 @@
     box-shadow: none;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: transparent;
     border-color: transparent;
     color: $text-tertiary;
@@ -181,7 +186,7 @@
     text-decoration: underline;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: transparent;
     border: none;
     color: $primary-700;
@@ -217,7 +222,7 @@
     box-shadow: $shadow-xs-skeuomorphic;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: $base-black;
     border-color: rgba(255, 255, 255, 0.12);
     color: $text-white;
@@ -249,7 +254,7 @@
     box-shadow: $shadow-xs-skeuomorphic;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: $base-black;
     border-color: rgba(255, 255, 255, 0.12);
     color: $text-white;
@@ -277,7 +282,7 @@
     box-shadow: none;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: transparent;
     border-color: transparent;
     color: $text-tertiary;
@@ -309,7 +314,7 @@
     box-shadow: $shadow-xs-skeuomorphic;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: $error-500;
     border-color: rgba(255, 255, 255, 0.12);
     color: $text-white;
@@ -343,7 +348,7 @@
     box-shadow: $shadow-xs-skeuomorphic;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: $bg-primary;
     border-color: $border-dark;
     color: $fg-primary;
@@ -377,7 +382,7 @@
     box-shadow: $shadow-xs-skeuomorphic;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: $error-500;
     border-color: rgba(255, 255, 255, 0.12);
     color: $text-white;
@@ -403,7 +408,7 @@
     box-shadow: $shadow-xs-skeuomorphic;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: $bg-primary;
     border-color: $error-300;
     color: $error-600;
@@ -429,7 +434,7 @@
     box-shadow: none;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: transparent;
     border-color: transparent;
     color: $error-600;
@@ -460,7 +465,7 @@
     text-decoration: underline;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: transparent;
     border: none;
     color: $error-600;
@@ -474,6 +479,28 @@
     cursor: not-allowed;
     box-shadow: none;
     text-decoration: none;
+  }
+}
+
+
+// antd v6 draws its own 3px blue `outline` on :focus-visible, on top of the DS
+// focus ring (the box-shadow set per hierarchy above). Drop it. Buttons carry
+// `cc-button-<hierarchy>` / `cc-button-<size>` classes but no bare `cc-button`.
+.ant-btn[class*='cc-button-']:not(:disabled):focus-visible {
+  outline: none;
+}
+
+// antd v6 drift: `.ant-btn:not(:disabled):not(.ant-btn-disabled):hover` and
+// `:active` (specificity 0,4,0) re-apply antd's `border` shorthand at its 1px
+// token, so every 2px-border hierarchy shrank by 2px and shifted on hover. The
+// per-hierarchy hover rules above only set border-color; pin the width here.
+.cc-button-primary.ant-btn.ant-btn-default,
+.cc-button-black.ant-btn.ant-btn-default,
+.cc-button-dark.ant-btn.ant-btn-default,
+.cc-button-danger.ant-btn.ant-btn-default {
+  &:not(:disabled):hover,
+  &:not(:disabled):active {
+    border-width: 2px;
   }
 }
 
@@ -531,7 +558,7 @@
     box-shadow: $shadow-xs-skeuomorphic;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: $bg-primary;
     border-color: $border-dark;
     color: $text-primary;
@@ -565,7 +592,7 @@
     box-shadow: none;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: transparent;
     border-color: transparent;
     color: $text-tertiary;
@@ -623,7 +650,7 @@
     box-shadow: none;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: transparent;
     border-color: transparent;
     color: $fg-tertiary;
@@ -677,7 +704,7 @@
     box-shadow: none;
   }
 
-  &:focus {
+  &:focus-visible:not(.ant-dropdown-open) {
     background-color: transparent;
     border-color: transparent;
     color: $fg-white;

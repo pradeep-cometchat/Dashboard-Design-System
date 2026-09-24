@@ -84,6 +84,71 @@
   }
 }
 
+// ============================================================
+// antd v6 drift: v6 dropped `.ant-radio-inner` — the `.ant-radio` span IS the
+// circle and its `::after` is the dot, painted from antd's own CSS variables
+// (default #1677ff blue). Every `.ant-radio-inner` rule above is inert in v6,
+// so point antd's variables at the foundation tokens and size the v6 circle.
+// The `:has(.ant-radio-inner)` guard keeps v5 (upstream) on the rules above.
+// ============================================================
+// antd resolves its radio tokens on the group (`.css-var-root`), so overriding
+// only the global `--ant-color-*` on a child isn't enough everywhere — set the
+// radio component tokens themselves on the wrapper too.
+.cc-radio .ant-radio-wrapper {
+  --ant-color-primary: #{$base-brand};
+  --ant-color-primary-hover: #{$base-brand};
+  --ant-color-primary-active: #{$base-brand};
+  --ant-color-border: #{$border-dark};
+  --ant-color-bg-container: #{$bg-primary};
+  --ant-radio-radio-bg-color: #{$base-brand};
+  --ant-radio-radio-color: #{$base-white};
+}
+
+.cc-radio .ant-radio:not(:has(.ant-radio-inner)) {
+  box-sizing: border-box;
+  border-radius: $radius-full;
+}
+
+.cc-radio.cc-radio-md .ant-radio:not(:has(.ant-radio-inner)) {
+  width: 20px;
+  height: 20px;
+
+  &::after {
+    width: 8px;
+    height: 8px;
+    margin: 0;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  &.ant-radio-checked::after {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.cc-radio.cc-radio-sm .ant-radio:not(:has(.ant-radio-inner)) {
+  width: 16px;
+  height: 16px;
+
+  &::after {
+    width: 6px;
+    height: 6px;
+    margin: 0;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  &.ant-radio-checked::after {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.cc-radio .ant-radio:not(:has(.ant-radio-inner)).ant-radio-checked::after {
+  background-color: $base-white;
+}
+
 // --- MD size (default): 20×20, dot 8×8 ---
 .cc-radio.cc-radio-md {
   .ant-radio .ant-radio-inner {

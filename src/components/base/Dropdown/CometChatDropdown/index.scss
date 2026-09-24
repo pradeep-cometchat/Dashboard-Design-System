@@ -1,17 +1,59 @@
 @import '../../../../assets/design-tokens.scss';
 
+// ============================================================
+// CometChatDropdown — menu panel per the May 2026 design system
+// (Figma OIMLZzuzLmG7mdPKYJyglX, Select → Size=sm, State=Open, node 7953:158048):
+// 14/20 items in 38px rows, matching the 14px text of the sm/md buttons that open it.
+//
+// Selectors carry `.cc-dropdown.ant-dropdown` + `.ant-dropdown-menu`: antd v6's
+// own menu rules are `.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item`
+// (0,3,0), which silently beat the previous 2-class rules, so items were
+// rendering antd's defaults (14/22, rgba black, 5px 12px).
+// ============================================================
 
-.cc-dropdown .ant-dropdown-menu {
+// --- Panel ---
+.cc-dropdown.ant-dropdown .ant-dropdown-menu {
   font-family: $font-family-base;
+  background-color: $bg-primary;
+  border: 1px solid $border-default-hover;
   border-radius: $radius-md;
-  padding: $spacing-xs;  box-shadow: $shadow-lg;
+  padding: $spacing-xs 0;
+  box-shadow: $shadow-lg;
 }
 
-.cc-dropdown .ant-dropdown-menu-item {
+// --- Item ---
+// Figma nests the row as a 6px-inset wrapper (1px apart) around a rounded content
+// box padded 8px all round. antd renders one <li>, so the inset is its margin and
+// the content padding its padding. The 1px row gap is the design's literal value —
+// no spacing token exists for it (flagged).
+.cc-dropdown.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
+  margin: 1px $spacing-sm;
+  padding: $spacing-md;
   border-radius: $radius-sm;
+  font-family: $font-family-base;
   font-size: $font-size-text-sm;
-  padding: $spacing-md $spacing-lg;}
+  line-height: $line-height-text-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  transition: background-color 0.15s ease;
+}
 
-.cc-dropdown .ant-dropdown-menu-item-danger {
+// Hover and keyboard-active rows share the design's active fill.
+.cc-dropdown.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item:not(.ant-dropdown-menu-item-disabled):hover,
+.cc-dropdown.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item.ant-dropdown-menu-item-active:not(.ant-dropdown-menu-item-disabled) {
+  background-color: $bg-active;
+}
+
+.cc-dropdown.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item-disabled {
+  color: $text-disabled;
+}
+
+.cc-dropdown.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item-danger {
   color: $fg-error-secondary;
+}
+
+// Divider: full-bleed (the panel has no side padding), foundation border colour.
+.cc-dropdown.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item-divider {
+  margin: $spacing-xs 0;
+  background-color: $border-light;
 }
