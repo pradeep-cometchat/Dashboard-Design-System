@@ -43,6 +43,32 @@
   height: $spacing-3xl;
 }
 
+// Detail panel: the Section value as a link — the dashboard's inline link
+// ("View Moderation Logs ↗"), underlined, one brand step darker on hover (the
+// base link button's hover step), focus ring for keyboard. The arrow isn't
+// underlined: text-decoration doesn't reach the SVG.
+.cc-audit-section-link {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  border-radius: $radius-xs;
+  color: $text-brand-primary;
+  text-decoration: underline;
+  // Satoshi's default underline runs through descenders (the "p" / "y" in
+  // "API Keys") and skip-ink breaks it around them; drop it below them.
+  text-underline-offset: $spacing-xs;
+
+  &:hover {
+    color: $text-brand-secondary;
+  }
+
+  &:focus-visible {
+    box-shadow: $focus-ring;
+  }
+}
+
 // Filter dropdowns: compact option rows (the dashboard's dropdown pitch).
 // Radio options are spaced by the group gap; checkbox rows by their own padding.
 .cc-audit-filter .cc-radio.cc-radio-vertical .ant-radio-group {

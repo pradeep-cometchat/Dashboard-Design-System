@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import AuditLogsScreen from "./AuditLogs";
 
 const meta: Meta<typeof AuditLogsScreen> = {
-  title: "Screens/Audit Logs/Main",
+  title: "Screens/Audit Logs/App Audit",
   component: AuditLogsScreen,
   parameters: { layout: "fullscreen", fullBleed: true, options: { showPanel: false } },
 };

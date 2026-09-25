@@ -31,7 +31,7 @@ const preview: Preview = {
           ['Overview', 'Colors (May 2026)', ['Overview', 'Primitive Ramps', 'Semantic Colors', 'Changes vs Current', 'Open Questions'], 'Typography (May 2026)', ['Overview', 'Type Styles', 'Changes vs Current'], 'Spacing & Radius (May 2026)', ['Overview', 'Scales', 'Changes vs Current'], 'Icons (May 2026)', ['Overview', 'Icon Library'], 'Misc Icons (May 2026)', ['Overview', 'Icon Library'], 'Elevation & Effects'],
           'Base Components',
           'Screens',
-          ['Conversation Explorer', ['Overview', '1:1 Chat', 'Group Chat'], 'Pin', ['Overview', 'Settings'], 'Audit Logs', ['Main']],
+          ['Conversation Explorer', ['Overview', '1:1 Chat', 'Group Chat'], 'Pin', ['Overview', 'Settings'], 'Audit Logs', ['App Audit', 'User Audit']],
         ],
       },
     },

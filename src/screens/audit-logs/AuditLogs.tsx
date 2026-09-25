@@ -16,8 +16,8 @@ import { c, s, r, font, shadow } from "../theme";
 import { DashboardFrame, Icon, dim } from "../pin/ui";
 // Filter glyph shared with Conversation Explorer (Untitled UI "filter-lines", May 2026 library).
 import { FilterLines } from "../conversation-explorer/icons";
-import { buildEvents, actionLabel, memberFor, resourceLabel, type AuditEvent } from "./data";
-import { CellText, ActionBadge, ActorAvatar, OutcomeBadge, RoleBadge, SourceBadge, formatDate, formatTime, viewerTimeZone } from "./cells";
+import { buildEvents, actionLabel, memberFor, resourceLabel, sectionLabel, type AuditEvent } from "./data";
+import { CellText, CellPlain, collapseFlow, ActionBadge, ActorAvatar, OutcomeBadge, RoleBadge, SourceBadge, formatDate, formatTime, viewerTimeZone } from "./cells";
 import { FilterBar, EMPTY_FILTERS, activeFilterCount, applyFilters, type Filters } from "./filters";
 import AuditDetailPanel from "./AuditDetailPanel";
 import { downloadExport, type ExportFormat } from "./export";
@@ -36,10 +36,24 @@ const APP_ID = "240998CGSF2026";
 
 /* ---------------- table ---------------- */
 
+/**
+ * Column widths. Chip and timestamp columns are sized to their content (chips don't truncate), so
+ * they keep their width on any screen; Actor and Section scale; Resource takes the rest, so it gets
+ * the extra room on wide screens. No size-token family for table columns (flagged to design).
+ */
+export const COL_W = {
+  actor: "17%",
+  /** Widest chip ("Configured", "Moderator", "Dashboard") + 2 × $spacing-xl cell padding. */
+  chip: 112,
+  section: "10.5%",
+  /** "Timestamp (Asia/Calcutta) ⓘ" header. */
+  timestamp: 200,
+} as const;
+
 type Row = AuditEvent & Record<string, unknown>;
 
 /** Column header with a help tooltip (Feature Narrative: tooltips explaining each column). */
-function Head({ label, help }: { label: string; help: string }) {
+export function Head({ label, help }: { label: string; help: string }) {
   return (
     <CometChatTooltip title={help} placement="top">
       <span style={{ display: "inline-flex", alignItems: "center", gap: s.xs }}>
@@ -55,7 +69,7 @@ function buildColumns(): ColumnsType<Row> {
     {
       title: <Head label="Actor" help="The team member who performed the action." />,
       key: "actor",
-      width: "24.2%",
+      width: COL_W.actor,
       render: (_, row) => (
         <div style={{ display: "flex", alignItems: "center", gap: s.md, minWidth: 0 }}>
           {/* 40px (dim.avatar). Photo and name come from the team list — the API only sends the email. */}
@@ -72,36 +86,43 @@ function buildColumns(): ColumnsType<Row> {
       // Neutral chip — same gray pill as the "Dashboard" source chip.
       title: <Head label="Role" help="The team member's role on this app when the action happened." />,
       key: "role",
-      width: "9.9%",
+      width: COL_W.chip,
       render: (_, row) => <RoleBadge role={row.actor.role} />,
     },
     {
       title: <Head label="Action" help="What was done — updated, created, deleted, enabled, disabled, logged in." />,
       key: "action",
-      width: "9.6%",
+      width: COL_W.chip,
       render: (_, row) => <ActionBadge event={row} />,
     },
     {
-      title: <Head label="Resource" help="What was affected: the dashboard section and the item that changed." />,
+      // Description first, then the flow (item type → the item that changed) underneath.
+      title: <Head label="Resource" help="What was done, and to which item." />,
       key: "resource",
-      render: (_, row) => <CellText lead={resourceLabel(row)} supporting={actionLabel(row.action)} />,
+      render: (_, row) => <CellText lead={actionLabel(row.action)} supporting={collapseFlow(resourceLabel(row))} supportingTitle={resourceLabel(row)} />,
+    },
+    {
+      title: <Head label="Section" help="The Dashboard section the action was made in." />,
+      key: "section",
+      width: COL_W.section,
+      render: (_, row) => <CellPlain text={sectionLabel(row.section)} />,
     },
     {
       title: <Head label="Source" help="How the action was performed: the Dashboard UI or the Management API." />,
       key: "source",
-      width: "10%",
+      width: COL_W.chip,
       render: (_, row) => <SourceBadge source={row.source} />,
     },
     {
       title: <Head label={`Timestamp (${viewerTimeZone()})`} help="When the action happened, shown in your local timezone. Stored in UTC." />,
       key: "timestamp",
-      width: "18%",
+      width: COL_W.timestamp,
       render: (_, row) => <CellText lead={formatDate(row.timestamp)} supporting={formatTime(row.timestamp)} />,
     },
     {
       title: <Head label="Outcome" help="Whether the action succeeded or failed." />,
       key: "outcome",
-      width: "9.5%",
+      width: COL_W.chip,
       render: (_, row) => <OutcomeBadge outcome={row.outcome} />,
     },
   ];
@@ -111,7 +132,7 @@ function buildColumns(): ColumnsType<Row> {
  * Previous / Next paging (ENG-39587: the API returns no total count). sm buttons take 16px icons.
  * Grouped right, $spacing-xl (16px) apart.
  */
-function CursorPagination({ hasPrev, hasNext, onPrev, onNext }: { hasPrev: boolean; hasNext: boolean; onPrev: () => void; onNext: () => void }) {
+export function CursorPagination({ hasPrev, hasNext, onPrev, onNext }: { hasPrev: boolean; hasNext: boolean; onPrev: () => void; onNext: () => void }) {
   return (
     <div className="cc-data-table__pagination-footer" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: s.xl }}>
       <CometChatButton hierarchy="secondary" size="sm" disabled={!hasPrev} onClick={onPrev} iconLeading={<Icon name="arrow-back" size={dim.iconXs} />}>
@@ -124,17 +145,20 @@ function CursorPagination({ hasPrev, hasNext, onPrev, onNext }: { hasPrev: boole
   );
 }
 
-function AuditTable({
+export function AuditTable<T extends { externalId: string } = AuditEvent>({
   entries,
+  columns,
   selectedId,
   onSelect,
   noResults,
   hidePagination = false,
   fill = false,
 }: {
-  entries: AuditEvent[];
+  entries: T[];
+  /** Defaults to the app log's columns. */
+  columns?: ColumnsType<T & Record<string, unknown>>;
   selectedId: string | null;
-  onSelect: (entry: AuditEvent) => void;
+  onSelect: (entry: T) => void;
   noResults: React.ReactNode;
   /** The gated preview shows sample rows only. */
   hidePagination?: boolean;
@@ -148,8 +172,8 @@ function AuditTable({
   const [page, setPage] = React.useState(0);
   // Filters change the result set; always land back on the first page.
   React.useEffect(() => setPage(0), [entries]);
-  const columns = React.useMemo(() => buildColumns(), []);
-  const rows: Row[] = entries.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map((row) => ({ ...row, key: row.externalId }));
+  const cols = React.useMemo(() => columns ?? (buildColumns() as unknown as ColumnsType<T & Record<string, unknown>>), [columns]);
+  const rows = entries.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).map((row) => ({ ...row, key: row.externalId }) as T & Record<string, unknown>);
   // A full page can be taller than the viewport; remember its height so a short last page
   // keeps the same card height (and the Previous / Next footer stays put) on small screens too.
   const cardRef = React.useRef<HTMLDivElement>(null);
@@ -166,14 +190,14 @@ function AuditTable({
       className={!fill ? "cc-audit-table" : rows.length > 0 ? "cc-audit-table cc-audit-table--pinned" : "cc-audit-table cc-audit-table--fill"}
       style={{ background: c.bgPrimary, border: `1px solid ${c.borderDefault}`, borderRadius: r.xl, boxShadow: shadow.xs, overflow: "hidden", minHeight: fill && fullPageHeight ? fullPageHeight : undefined, boxSizing: "border-box" }}
     >
-      <CometChatDataTable<Row>
+      <CometChatDataTable<T & Record<string, unknown>>
         appItemList={false}
         pagination={false}
         primaryColumnIndex={null}
         // Pointer cursor only when there are rows to open — not on the empty-state row.
         highlightRow={rows.length > 0}
         tableLayout="fixed"
-        columns={columns}
+        columns={cols}
         dataSource={rows}
         onRowClick={(row) => onSelect(row)}
         rowClassName={(row) => (row.externalId === selectedId ? "cc-audit-table__row-selected" : "")}
@@ -194,7 +218,7 @@ function AuditTable({
 /* ---------------- header ---------------- */
 
 /** Filter button with the purple active-count badge. */
-function FilterButton({ count, open, disabled, onClick }: { count: number; open: boolean; disabled: boolean; onClick: () => void }) {
+export function FilterButton({ count, open, disabled, onClick }: { count: number; open: boolean; disabled: boolean; onClick: () => void }) {
   return (
     <CometChatButton hierarchy="secondary" disabled={disabled} onClick={onClick} iconLeading={<FilterLines size={dim.iconSm} />} aria-expanded={open}>
       <span style={{ display: "inline-flex", alignItems: "center", gap: s.md }}>
@@ -226,7 +250,7 @@ function FilterButton({ count, open, disabled, onClick }: { count: number; open:
 }
 
 /** Export — the header's primary (black) action, right-most. */
-function ExportButton({ disabled, onExport }: { disabled: boolean; onExport: (format: ExportFormat) => void }) {
+export function ExportButton({ disabled, onExport }: { disabled: boolean; onExport: (format: ExportFormat) => void }) {
   return (
     <CometChatDropdown
       trigger={["click"]}
@@ -245,12 +269,12 @@ function ExportButton({ disabled, onExport }: { disabled: boolean; onExport: (fo
   );
 }
 
-function PageHeader({ actions }: { actions: React.ReactNode }) {
+export function PageHeader({ actions, subtitle = "Track all actions performed on this app" }: { actions: React.ReactNode; subtitle?: string }) {
   return (
     <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: s.xl, minHeight: dim.avatar }}>
       <div style={{ display: "flex", flexDirection: "column", gap: s.xxs }}>
         <h1 style={{ ...font.pageTitle, fontWeight: w.semibold as unknown as number, color: c.textPrimary, margin: 0 }}>Audit Logs</h1>
-        <p style={{ ...font.body, color: c.textTertiary, margin: 0 }}>Track all actions performed on this app</p>
+        <p style={{ ...font.body, color: c.textTertiary, margin: 0 }}>{subtitle}</p>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: s.lg }}>{actions}</div>
     </header>
@@ -258,6 +282,19 @@ function PageHeader({ actions }: { actions: React.ReactNode }) {
 }
 
 /* ---------------- enterprise ---------------- */
+
+/** Filters matched nothing: say so, and offer to clear them. */
+export function NoResults({ onClear }: { onClear: () => void }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: s.md, textAlign: "center" }}>
+      <span style={{ ...font.h4, color: c.textPrimary }}>No entries match these filters</span>
+      <span style={{ ...font.body, color: c.textTertiary }}>Try a wider date range or clear a filter.</span>
+      <CometChatButton hierarchy="secondary" size="sm" onClick={onClear}>
+        Clear filters
+      </CometChatButton>
+    </div>
+  );
+}
 
 function EnterpriseView() {
   const entries = React.useMemo(() => buildEvents(), []);
@@ -284,15 +321,7 @@ function EnterpriseView() {
         fill
         selectedId={selected?.externalId ?? null}
         onSelect={setSelected}
-        noResults={
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: s.md, textAlign: "center" }}>
-            <span style={{ ...font.h4, color: c.textPrimary }}>No entries match these filters</span>
-            <span style={{ ...font.body, color: c.textTertiary }}>Try a wider date range or clear a filter.</span>
-            <CometChatButton hierarchy="secondary" size="sm" onClick={() => setFilters(EMPTY_FILTERS)}>
-              Clear filters
-            </CometChatButton>
-          </div>
-        }
+        noResults={<NoResults onClear={() => setFilters(EMPTY_FILTERS)} />}
       />
       <AuditDetailPanel entry={selected} onClose={() => setSelected(null)} />
     </>

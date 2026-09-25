@@ -4,15 +4,19 @@ import CometChatBadge from "components/base/Badge/CometChatBadge";
 import type { BadgeColor } from "components/base/Badge/CometChatBadge";
 import CometChatAvatar from "components/base/Avatar/CometChatAvatar";
 import { c, font } from "../theme";
-import { memberFor, verbOf, type AuditEvent, type Change, type Outcome, type Source } from "./data";
+import { FLOW_SEP, memberFor, verbOf, type AuditEvent, type Change, type Outcome, type Source } from "./data";
+import { meVerb } from "./user-data";
 
 const w = {
   regular: "var(--font-weight-regular)",
   medium: "var(--font-weight-medium)",
 } as const;
 
-/** Figma "Table cell" type Text: lead text (medium, primary) + supporting text (tertiary). */
-export function CellText({ lead, supporting }: { lead: React.ReactNode; supporting?: React.ReactNode }) {
+/**
+ * Figma "Table cell" type Text: lead text (medium, primary) + supporting text (tertiary).
+ * `supportingTitle` is the hover text when the supporting line is shortened (defaults to the line itself).
+ */
+export function CellText({ lead, supporting, supportingTitle }: { lead: React.ReactNode; supporting?: React.ReactNode; supportingTitle?: string }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
       {/* title: when a narrow column ellipsizes the text, hovering shows it in full. */}
@@ -20,13 +24,28 @@ export function CellText({ lead, supporting }: { lead: React.ReactNode; supporti
         {lead}
       </span>
       {supporting && (
-        <span title={typeof supporting === "string" ? supporting : undefined} style={{ ...font.body, fontWeight: w.regular as unknown as number, color: c.textTertiary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+        <span title={supportingTitle ?? (typeof supporting === "string" ? supporting : undefined)} style={{ ...font.body, fontWeight: w.regular as unknown as number, color: c.textTertiary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           {supporting}
         </span>
       )}
     </div>
   );
 }
+
+/** Single-line plain value (body 14/20 regular, text-primary) — ellipsized, full text on hover. */
+export function CellPlain({ text }: { text: string }) {
+  return (
+    <span title={text} style={{ ...font.body, fontWeight: w.regular as unknown as number, color: c.textPrimary, display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      {text}
+    </span>
+  );
+}
+
+/** Table form of a resource flow: a path longer than "<type> → <name>" keeps its first and last steps ("A → … → D"). */
+export const collapseFlow = (flow: string) => {
+  const steps = flow.split(FLOW_SEP);
+  return steps.length > 2 ? [steps[0], "…", steps[steps.length - 1]].join(FLOW_SEP) : flow;
+};
 
 /** Initials from a name ("Sarah Chen" → SC) or, when only an email is known, its local part (tom.baker@… → TB). */
 export const initials = (nameOrEmail: string) =>
@@ -80,6 +99,21 @@ export function ActionBadge({ event }: { event: AuditEvent }) {
   return (
     <CometChatBadge type="pill" size="sm" color={color}>
       {verbOf(event)}
+    </CometChatBadge>
+  );
+}
+
+/**
+ * Action badge for the v4 envelope, which has no change type: the colour follows the verb, matching
+ * ActionBadge — created / enabled green, updated brand, deleted / reset red, disabled / signed in gray.
+ */
+export function VerbBadge({ action }: { action: string }) {
+  const verb = meVerb(action);
+  const color: BadgeColor =
+    verb === "Created" || verb === "Enabled" ? "success" : verb === "Updated" || verb === "Configured" ? "brand" : verb === "Deleted" || verb === "Reset" ? "error" : "gray";
+  return (
+    <CometChatBadge type="pill" size="sm" color={color}>
+      {verb}
     </CometChatBadge>
   );
 }

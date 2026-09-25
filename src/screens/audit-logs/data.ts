@@ -110,7 +110,7 @@ export const ACTION_LABEL: Record<string, string> = {
 };
 
 /** `resource.type` → readable noun. */
-const RESOURCE_TYPE_LABEL: Record<string, string> = {
+export const RESOURCE_TYPE_LABEL: Record<string, string> = {
   collaborator: "Collaborator",
   app: "App",
   settings: "Setting",
@@ -139,16 +139,35 @@ export const PARAMETER_LABEL: Record<string, string> = {
 };
 
 /** Extension `microserviceId` → product name (raw id is the fallback). */
-const EXTENSION_LABEL: Record<string, string> = {
+export const EXTENSION_LABEL: Record<string, string> = {
   "message-translation": "Message Translation",
   "stickers-stipop": "Stickers (Stipop)",
   "pin-message": "Pin Message",
   "url-shortener-bitly": "URL Shortener (Bitly)",
+  "save-message": "Save Message",
   "voice-transcription": "Voice Transcription",
   "disappearing-messages": "Disappearing Messages",
 };
 
-const PROVIDER_LABEL: Record<string, string> = { apns: "APNs", fcm: "FCM", custom: "Custom provider" };
+export const PROVIDER_LABEL: Record<string, string> = { apns: "APNs", fcm: "FCM", custom: "Custom provider" };
+
+/** Separator between the steps of a resource flow. */
+export const FLOW_SEP = " → ";
+
+/**
+ * Where a resource lives in the Dashboard's navigation, for resources shown as their full path rather
+ * than "<type> → <name>" (Dashboard-side lookup — the API sends only type + id). The detail panel shows
+ * the whole path; the table collapses its middle ("Chat & Messaging → … → Save Message").
+ */
+const RESOURCE_PATH: Record<string, string[]> = {
+  "extension:save-message": ["Chat & Messaging", "Features", "Extensions"],
+};
+
+/** "<type> → <name>", or the resource's Dashboard path + name when it has one. */
+export function flowLabel(type: string, id: string | null | undefined, name: string): string {
+  const path = id ? RESOURCE_PATH[`${type}:${id}`] : undefined;
+  return (path ? [...path, name] : [RESOURCE_TYPE_LABEL[type] ?? type, name]).join(FLOW_SEP);
+}
 
 export const actionLabel = (id: string) => ACTION_LABEL[id] ?? id;
 export const sectionLabel = (id: string) => SECTION_LABEL[id] ?? id;
@@ -187,7 +206,7 @@ export function resourceLabel(ev: AuditEvent): string {
       // Creates often have resource.id null (the id only exists after the call) — fall back to the entity's name.
       name = str(body.name) ?? str(body.keyword) ?? id ?? "—";
   }
-  return `${RESOURCE_TYPE_LABEL[type] ?? type} → ${name}`;
+  return flowLabel(type, id, name);
 }
 
 /** What was done, for the Action badge. */
@@ -283,6 +302,7 @@ const SEEDS: Seed[] = [
   { ago: 37 * MIN, actor: SARAH, action: "apikeys.key.create", resource: ["apikey", null], change: { type: "create", entity: { name: "Production key", scope: "authOnly" } } },
   { ago: 54 * MIN, actor: PRIYA, action: "moderation.rule.update", resource: ["rule", "profanity-filter"], change: { type: "update", before: null, after: { name: "Profanity Filter", action: "block", enabled: true } }, outcome: "failure" },
   { ago: 79 * MIN, actor: SARAH, action: "notifications.settings.update", resource: ["settings", "core.notifications.push.enabled"], change: setting("core.notifications.push.enabled", false, true) },
+  { ago: 2 * HOUR, actor: JAMES, action: "extensions.extension.enable", resource: ["extension", "save-message"], change: { type: "toggle", after: { enabled: true } } },
   { ago: 3 * HOUR, actor: SARAH, action: "messages.settings.update", resource: ["settings", "core.chat.messages.retentionDays"], change: setting("core.chat.messages.retentionDays", 30, 90) },
   { ago: 4 * HOUR, actor: PRIYA, action: "push.apns.configure", resource: ["provider", "apns"], change: { type: "update", before: null, after: { teamId: "8XK2Q7M4LP", keyId: "ZB39Q2K7HD", p8Key: REDACTED, production: true } }, outcome: "failure" },
   { ago: 6 * HOUR, actor: JAMES, action: "extensions.extension.enable", resource: ["extension", "message-translation"], change: { type: "create", entity: { microserviceId: "message-translation", enabled: true } } },

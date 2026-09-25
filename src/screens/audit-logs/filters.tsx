@@ -40,7 +40,7 @@ export const EMPTY_FILTERS: Filters = { date: null, actors: [], sections: [], ac
 export const activeFilterCount = (f: Filters) =>
   [f.date !== null, f.actors.length > 0, f.sections.length > 0, f.actions.length > 0, f.sources.length > 0].filter(Boolean).length;
 
-type TimePreset = Exclude<DatePreset, "custom">;
+export type TimePreset = Exclude<DatePreset, "custom">;
 
 const PRESET_MS: Record<TimePreset, number> = {
   "24h": 24 * 60 * 60 * 1000,
@@ -55,19 +55,25 @@ export const PRESET_LABEL: Record<TimePreset, string> = {
   "30d": "Last 30 days",
   "90d": "Last 90 days",
 };
-const TIME_PRESETS = Object.keys(PRESET_LABEL) as TimePreset[];
+export const TIME_PRESETS = Object.keys(PRESET_LABEL) as TimePreset[];
 
 export const SOURCE_LABEL: Record<Source, string> = { dashboard: "Dashboard", api: "API" };
 
+/** Whether an event (epoch-seconds timestamp) falls inside the date filter. */
+export function matchesDate(timestamp: number, date: DateFilter | null, now = Date.now()): boolean {
+  if (!date) return true;
+  const t = timestamp * 1000; // API timestamps are epoch seconds
+  if (date.preset === "custom") {
+    if (date.from && t < dayjs(date.from).startOf("day").valueOf()) return false;
+    if (date.to && t > dayjs(date.to).endOf("day").valueOf()) return false;
+    return true;
+  }
+  return t >= now - PRESET_MS[date.preset];
+}
+
 export function applyFilters(entries: AuditEvent[], f: Filters, now = Date.now()): AuditEvent[] {
   return entries.filter((e) => {
-    const t = e.timestamp * 1000; // API timestamps are epoch seconds
-    if (f.date) {
-      if (f.date.preset === "custom") {
-        if (f.date.from && t < dayjs(f.date.from).startOf("day").valueOf()) return false;
-        if (f.date.to && t > dayjs(f.date.to).endOf("day").valueOf()) return false;
-      } else if (t < now - PRESET_MS[f.date.preset]) return false;
-    }
+    if (!matchesDate(e.timestamp, f.date, now)) return false;
     if (f.actors.length && !f.actors.includes(e.actor.email)) return false;
     if (f.sections.length && !f.sections.includes(e.section)) return false;
     if (f.actions.length && !f.actions.includes(e.action)) return false;
@@ -79,8 +85,8 @@ export function applyFilters(entries: AuditEvent[], f: Filters, now = Date.now()
 /* ---------------- chip ---------------- */
 
 /** Dropdown width (same as Conversation Explorer's FilterBar) and list cap — no size-token family for overlays (flagged to design). */
-const PANEL_W = 220;
-const LIST_MAX_H = 264;
+export const PANEL_W = 220;
+export const LIST_MAX_H = 264;
 
 /** How many value pills a chip shows before collapsing to "+n". */
 const MAX_PILLS = 2;
@@ -91,8 +97,8 @@ const MAX_PILLS = 2;
  * once values are applied a dashed-divided segment lists them as small pills.
  * Chip height = bodyMd line-height + 2 × $spacing-sm (32), derived from tokens.
  */
-const CHIP_H = "calc(var(--line-height-text-sm) + 2 * var(--spacing-sm))";
-function FilterChip({
+export const CHIP_H = "calc(var(--line-height-text-sm) + 2 * var(--spacing-sm))";
+export function FilterChip({
   label,
   values,
   open,
@@ -158,10 +164,10 @@ function FilterChip({
 
 /* ---------------- panels ---------------- */
 
-const sameSet = (a: readonly string[], b: readonly string[]) => a.length === b.length && a.every((x) => b.includes(x));
+export const sameSet = (a: readonly string[], b: readonly string[]) => a.length === b.length && a.every((x) => b.includes(x));
 
 /** Search row: subtle gray search glyph + borderless field (the dashboard's dropdown search). */
-function SearchRow({ value, onChange, placeholder = "Search" }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+export function SearchRow({ value, onChange, placeholder = "Search" }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: s.md, padding: `${s.md} ${s.lg}`, borderBottom: `1px solid ${c.borderLight}` }}>
       <SearchLg size={dim.iconSm} style={{ color: "var(--fg-quaternary)", flexShrink: 0 }} />
@@ -184,7 +190,7 @@ function SearchRow({ value, onChange, placeholder = "Search" }: { value: string;
 const EQUAL_BTN: React.CSSProperties = { width: "100%", boxSizing: "border-box" };
 
 /** Clear / Apply (black = the primary action), equal width. Apply stays disabled until the draft differs from what's applied. */
-function PanelFooter({ onClear, onApply, applyDisabled }: { onClear: () => void; onApply: () => void; applyDisabled: boolean }) {
+export function PanelFooter({ onClear, onApply, applyDisabled }: { onClear: () => void; onApply: () => void; applyDisabled: boolean }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: s.md, padding: s.lg, borderTop: `1px solid ${c.borderLight}` }}>
       <CometChatButton hierarchy="secondary" size="sm" onClick={onClear} style={EQUAL_BTN}>
@@ -197,7 +203,7 @@ function PanelFooter({ onClear, onApply, applyDisabled }: { onClear: () => void;
   );
 }
 
-function NoMatches({ query }: { query: string }) {
+export function NoMatches({ query }: { query: string }) {
   return (
     <div style={{ padding: `${s.lg} ${s.lg}`, textAlign: "center" }}>
       <span style={{ ...font.body, color: c.textTertiary }}>No matches for “{query.trim()}”</span>
@@ -205,7 +211,7 @@ function NoMatches({ query }: { query: string }) {
   );
 }
 
-interface Option {
+export interface Option {
   value: string;
   label: string;
   /** Extra text the search also matches (e.g. an actor's email). */
@@ -215,7 +221,7 @@ interface Option {
 const matches = (o: Option, q: string) => !q || o.label.toLowerCase().includes(q) || o.keywords?.toLowerCase().includes(q);
 
 /** Search + checkbox list + Clear / Apply. Selection is a draft until Apply. */
-function CheckboxPanel({ options, selected, onApply }: { options: Option[]; selected: string[]; onApply: (values: string[]) => void }) {
+export function CheckboxPanel({ options, selected, onApply }: { options: Option[]; selected: string[]; onApply: (values: string[]) => void }) {
   const [query, setQuery] = React.useState("");
   const [draft, setDraft] = React.useState<string[]>(selected);
   const q = query.trim().toLowerCase();
@@ -242,7 +248,7 @@ function CheckboxPanel({ options, selected, onApply }: { options: Option[]; sele
 }
 
 /** Search + radio list of presets + Clear / Apply. */
-function TimeRangePanel({ value, onApply }: { value: TimePreset | null; onApply: (v: TimePreset | null) => void }) {
+export function TimeRangePanel({ value, onApply }: { value: TimePreset | null; onApply: (v: TimePreset | null) => void }) {
   const [query, setQuery] = React.useState("");
   const [draft, setDraft] = React.useState<TimePreset | null>(value);
   const q = query.trim().toLowerCase();
@@ -262,10 +268,31 @@ function TimeRangePanel({ value, onApply }: { value: TimePreset | null; onApply:
   );
 }
 
+/** Search + single-choice radio list + Clear / Apply — Time range's panel for any option list. */
+export function RadioPanel({ options, value, onApply }: { options: Option[]; value: string | null; onApply: (v: string | null) => void }) {
+  const [query, setQuery] = React.useState("");
+  const [draft, setDraft] = React.useState<string | null>(value);
+  const q = query.trim().toLowerCase();
+  const shown = options.filter((o) => matches(o, q));
+  return (
+    <div className="cc-audit-filter" style={{ width: PANEL_W, display: "flex", flexDirection: "column" }}>
+      <SearchRow value={query} onChange={setQuery} />
+      <div style={{ padding: `${s.md} ${s.lg}` }}>
+        {shown.length === 0 ? (
+          <NoMatches query={query} />
+        ) : (
+          <CometChatRadio size="sm" value={draft ?? undefined} onChange={(v) => setDraft(v as string)} options={shown.map((o) => ({ value: o.value, label: o.label }))} />
+        )}
+      </div>
+      <PanelFooter onClear={() => setDraft(null)} onApply={() => onApply(draft)} applyDisabled={draft === value} />
+    </div>
+  );
+}
+
 const SIX_MONTHS_AGO = () => dayjs().subtract(6, "month").startOf("day");
 
 /** Custom date range (max 6 months back — the retention window) + Clear / Apply. */
-function CustomDatesPanel({ value, onApply }: { value: DateFilter | null; onApply: (v: DateFilter | null) => void }) {
+export function CustomDatesPanel({ value, onApply }: { value: DateFilter | null; onApply: (v: DateFilter | null) => void }) {
   const applied: [Dayjs, Dayjs] | null = value?.preset === "custom" && value.from && value.to ? [dayjs(value.from), dayjs(value.to)] : null;
   const [range, setRange] = React.useState<[Dayjs, Dayjs] | null>(applied);
   const unchanged = (range === null && applied === null) || (range !== null && applied !== null && range[0].isSame(applied[0], "day") && range[1].isSame(applied[1], "day"));
@@ -293,6 +320,21 @@ function CustomDatesPanel({ value, onApply }: { value: DateFilter | null; onAppl
 }
 
 /* ---------------- bar ---------------- */
+
+/** ✕ Reset — clears every filter; muted while nothing is applied. */
+export function ResetButton({ disabled, onClick }: { disabled: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      style={{ all: "unset", cursor: disabled ? "default" : "pointer", display: "inline-flex", alignItems: "center", gap: s.xs, height: CHIP_H, boxSizing: "border-box", padding: `0 ${s.md}`, color: disabled ? c.textQuaternary : c.textTertiary }}
+    >
+      <Icon name="close" size={dim.iconXs} />
+      <span style={{ ...font.bodyMd, color: "inherit" }}>Reset</span>
+    </button>
+  );
+}
 
 type ChipKey = "time" | "custom" | "section" | "action" | "actor" | "source";
 
@@ -377,15 +419,7 @@ export function FilterBar({ filters, onChange }: { filters: Filters; onChange: (
           />
         }
       />
-      <button
-        type="button"
-        onClick={() => onChange(EMPTY_FILTERS)}
-        disabled={activeFilterCount(filters) === 0}
-        style={{ all: "unset", cursor: activeFilterCount(filters) === 0 ? "default" : "pointer", display: "inline-flex", alignItems: "center", gap: s.xs, height: CHIP_H, boxSizing: "border-box", padding: `0 ${s.md}`, color: activeFilterCount(filters) === 0 ? c.textQuaternary : c.textTertiary }}
-      >
-        <Icon name="close" size={dim.iconXs} />
-        <span style={{ ...font.bodyMd, color: "inherit" }}>Reset</span>
-      </button>
+      <ResetButton disabled={activeFilterCount(filters) === 0} onClick={() => onChange(EMPTY_FILTERS)} />
     </div>
   );
 }

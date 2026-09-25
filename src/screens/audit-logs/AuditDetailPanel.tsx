@@ -21,6 +21,8 @@ import CometChatButton from "components/base/Button/CometChatButton";
 import CometChatTooltip from "components/base/Tooltip/CometChatTooltip";
 import { c, s, font } from "../theme";
 import { Icon, dim } from "../pin/ui";
+// Untitled UI "arrow-up-right" — same glyph as Conversation Explorer's "View Moderation Logs" link.
+import { ArrowUpRight } from "../conversation-explorer/icons";
 import { REDACTED, actionLabel, memberFor, parameterLabel, resourceLabel, sectionLabel, type AuditEvent, type Change } from "./data";
 import { ActionBadge, ActorAvatar, OutcomeBadge, RoleBadge, SourceBadge, formatDate, formatTime, viewerTimeZone } from "./cells";
 
@@ -59,7 +61,7 @@ const KEY_LABEL: Record<string, string> = {
   maxParticipants: "Max participants",
 };
 
-const keyLabel = (key: string) =>
+export const keyLabel = (key: string) =>
   KEY_LABEL[key] ??
   key
     .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
@@ -74,7 +76,7 @@ const dateTime = (ms: number) => new Date(ms).toLocaleString("en-US", { month: "
  * Enabled/Disabled for on/off fields, otherwise true/false; arrays → one item per line; objects →
  * compact JSON; everything plain text. `*AtMS` / `*At` numbers are epoch ms / s → a date.
  */
-function Value({ v, field }: { v: unknown; field?: string }) {
+export function Value({ v, field }: { v: unknown; field?: string }) {
   if (v === REDACTED) {
     return (
       <span style={{ display: "inline-flex", alignItems: "center", gap: s.xs, color: c.textQuaternary, fontStyle: "italic" }}>
@@ -108,7 +110,7 @@ function Value({ v, field }: { v: unknown; field?: string }) {
 /* ---------------- building blocks ---------------- */
 
 /** Section: sentence-case title + help icon (H4 semibold, text-primary), 12px above its content. */
-function Section({ title, help, children }: { title: string; help: string; children: React.ReactNode }) {
+export function Section({ title, help, children }: { title: string; help: string; children: React.ReactNode }) {
   return (
     <section style={{ display: "flex", flexDirection: "column", gap: s.lg }}>
       <div style={{ display: "flex", alignItems: "center", gap: s.md }}>
@@ -129,7 +131,7 @@ function Section({ title, help, children }: { title: string; help: string; child
  * value (body 14/20, text-primary). `labelOffset` nudges the label down to the first text line when
  * the value starts with something taller than a text line (a 24px chip → xxs, a 32px avatar → sm).
  */
-function Row({ label, children, labelOffset }: { label: string; children: React.ReactNode; labelOffset?: string }) {
+export function Row({ label, children, labelOffset }: { label: string; children: React.ReactNode; labelOffset?: string }) {
   return (
     <div style={{ display: "flex", alignItems: "flex-start", gap: s.xl }}>
       <span style={{ ...font.bodyMd, color: c.textQuaternary, width: LABEL_W, flexShrink: 0, paddingTop: labelOffset }}>{label}</span>
@@ -140,15 +142,29 @@ function Row({ label, children, labelOffset }: { label: string; children: React.
   );
 }
 
-const CHIP_OFFSET = s.xxs; // 24px chip vs 20px label line
-const AVATAR_OFFSET = s.sm; // 32px avatar vs 20px label line
+/**
+ * The Section value as a link to that part of the Dashboard — the dashboard's inline link
+ * ("View Moderation Logs ↗" in Conversation Explorer): body medium, brand colour, arrow-up-right,
+ * underlined. Colour, hover and focus come from .cc-audit-section-link in audit-logs.scss.
+ */
+export function SectionLink({ label }: { label: string }) {
+  return (
+    <button type="button" aria-label={`Open ${label}`} className="cc-audit-section-link" style={{ fontFamily: font.bodyMd.fontFamily, fontSize: font.bodyMd.fontSize, lineHeight: font.bodyMd.lineHeight, fontWeight: w.medium as unknown as number }}>
+      {label}
+      <ArrowUpRight size={dim.iconSm} />
+    </button>
+  );
+}
+
+export const CHIP_OFFSET = s.xxs; // 24px chip vs 20px label line
+export const AVATAR_OFFSET = s.sm; // 32px avatar vs 20px label line
 
 /** Rows 20px apart ($spacing-2xl). */
-function Rows({ children }: { children: React.ReactNode }) {
+export function Rows({ children }: { children: React.ReactNode }) {
   return <div style={{ display: "flex", flexDirection: "column", gap: s["2xl"] }}>{children}</div>;
 }
 
-function Note({ children }: { children: React.ReactNode }) {
+export function Note({ children }: { children: React.ReactNode }) {
   return <p style={{ ...font.body, color: c.textTertiary, margin: 0 }}>{children}</p>;
 }
 
@@ -169,7 +185,7 @@ function Diff({ before, after, field }: { before: unknown; after: unknown; field
   );
 }
 
-function EntityRows({ items }: { items: Obj }) {
+export function EntityRows({ items }: { items: Obj }) {
   return (
     <Rows>
       {Object.entries(items).map(([k, v]) => (
@@ -256,11 +272,15 @@ function ChangeSection({ change }: { change: Change }) {
 
 /* ---------------- panel ---------------- */
 
-export default function AuditDetailPanel({ entry, onClose }: { entry: AuditEvent | null; onClose: () => void }) {
-  const member = entry ? memberFor(entry.actor.email) : undefined;
+/**
+ * The slide-out: 400px drawer, header bar (Figma "Slide out menu header" 136:795528) with the title
+ * and close X, and a scrolling body with sections 32px apart, 24px inset. Shared by the app and
+ * user logs; `title` null keeps it closed.
+ */
+export function PanelShell({ title, onClose, children }: { title: string | null; onClose: () => void; children: React.ReactNode }) {
   return (
     <CometChatDrawer
-      open={entry !== null}
+      open={title !== null}
       onClose={onClose}
       placement="right"
       size={PANEL_WIDTH}
@@ -269,7 +289,7 @@ export default function AuditDetailPanel({ entry, onClose }: { entry: AuditEvent
       styles={{ header: { display: "none" } }}
       className="cc-audit-panel"
     >
-      {entry && (
+      {title !== null && (
         <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
           {/* Header bar — Figma "Slide out menu header" (136:795528) */}
           <header
@@ -284,7 +304,7 @@ export default function AuditDetailPanel({ entry, onClose }: { entry: AuditEvent
             }}
           >
             <h2 style={{ ...font.h2, fontSize: "var(--font-size-text-lg)", lineHeight: "var(--line-height-text-lg)", fontWeight: w.semibold as unknown as number, color: c.textPrimary, margin: 0, paddingRight: s["5xl"] }}>
-              {actionLabel(entry.action)}
+              {title}
             </h2>
             <span style={{ position: "absolute", top: s.xl, right: s.xl }}>
               <CometChatButton variant="close" className="cc-audit-panel__close" ariaLabel="Close" onClick={onClose} iconOnly iconLeading={<Icon name="close" size={dim.iconMd} />} />
@@ -292,57 +312,70 @@ export default function AuditDetailPanel({ entry, onClose }: { entry: AuditEvent
           </header>
 
           {/* Body — sections 32px apart, 24px inset */}
-          <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: s["3xl"], display: "flex", flexDirection: "column", gap: s["4xl"] }}>
-            <Section title="Summary" help="What happened, where it happened, and whether it succeeded.">
-              <Rows>
-                <Row label="Resource">{resourceLabel(entry)}</Row>
-                <Row label="Section">{sectionLabel(entry.section)}</Row>
-                <Row label="Action" labelOffset={CHIP_OFFSET}>
-                  <ActionBadge event={entry} />
-                </Row>
-                <Row label="Outcome" labelOffset={CHIP_OFFSET}>
-                  <OutcomeBadge outcome={entry.outcome} />
-                </Row>
-              </Rows>
-            </Section>
-
-            <Section title="Actor" help="The team member who performed the action, and their role on this app at the time. Name and photo come from the app's team list.">
-              <Rows>
-                <Row label="Name" labelOffset={AVATAR_OFFSET}>
-                  <ActorAvatar email={entry.actor.email} />
-                  {member ? member.name : <span style={{ color: c.textTertiary }}>No longer on this team</span>}
-                </Row>
-                <Row label="Email">{entry.actor.email}</Row>
-                <Row label="Role" labelOffset={CHIP_OFFSET}>
-                  <RoleBadge role={entry.actor.role} />
-                </Row>
-              </Rows>
-            </Section>
-
-            <Section title="Details" help={`When and from where the action was performed. Times are shown in your timezone (${viewerTimeZone()}); the API stores them in UTC.`}>
-              <Rows>
-                <Row label="Date">{formatDate(entry.timestamp)}</Row>
-                <Row label="Time">
-                  {formatTime(entry.timestamp)}
-                  <span style={{ color: c.textQuaternary }}>({viewerTimeZone()})</span>
-                </Row>
-                <Row label="Source" labelOffset={CHIP_OFFSET}>
-                  <SourceBadge source={entry.source} />
-                </Row>
-                <Row label="Source IP">
-                  <Value v={entry.sourceIp} />
-                </Row>
-                <Row label="Event ID">{entry.externalId}</Row>
-                <Row label="Correlation ID">
-                  <Value v={entry.correlationId} />
-                </Row>
-              </Rows>
-            </Section>
-
-            <ChangeSection change={entry.change} />
-          </div>
+          <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: s["3xl"], display: "flex", flexDirection: "column", gap: s["4xl"] }}>{children}</div>
         </div>
       )}
     </CometChatDrawer>
+  );
+}
+
+export default function AuditDetailPanel({ entry, onClose }: { entry: AuditEvent | null; onClose: () => void }) {
+  const member = entry ? memberFor(entry.actor.email) : undefined;
+  return (
+    <PanelShell title={entry ? actionLabel(entry.action) : null} onClose={onClose}>
+      {entry && (
+        <>
+          <Section title="Summary" help="What happened, where it happened, and whether it succeeded.">
+            <Rows>
+              <Row label="Resource">{resourceLabel(entry)}</Row>
+              <Row label="Section">
+                <SectionLink label={sectionLabel(entry.section)} />
+              </Row>
+              <Row label="Action" labelOffset={CHIP_OFFSET}>
+                <ActionBadge event={entry} />
+              </Row>
+              <Row label="Outcome" labelOffset={CHIP_OFFSET}>
+                <OutcomeBadge outcome={entry.outcome} />
+              </Row>
+            </Rows>
+          </Section>
+
+          <Section title="Actor" help="The team member who performed the action, and their role on this app at the time. Name and photo come from the app's team list.">
+            <Rows>
+              <Row label="Name" labelOffset={AVATAR_OFFSET}>
+                <ActorAvatar email={entry.actor.email} />
+                {member ? member.name : <span style={{ color: c.textTertiary }}>No longer on this team</span>}
+              </Row>
+              <Row label="Email">{entry.actor.email}</Row>
+              <Row label="Role" labelOffset={CHIP_OFFSET}>
+                <RoleBadge role={entry.actor.role} />
+              </Row>
+            </Rows>
+          </Section>
+
+          <Section title="Details" help={`When and from where the action was performed. Times are shown in your timezone (${viewerTimeZone()}); the API stores them in UTC.`}>
+            <Rows>
+              <Row label="Date">{formatDate(entry.timestamp)}</Row>
+              <Row label="Time">
+                {formatTime(entry.timestamp)}
+                <span style={{ color: c.textQuaternary }}>({viewerTimeZone()})</span>
+              </Row>
+              <Row label="Source" labelOffset={CHIP_OFFSET}>
+                <SourceBadge source={entry.source} />
+              </Row>
+              <Row label="Source IP">
+                <Value v={entry.sourceIp} />
+              </Row>
+              <Row label="Event ID">{entry.externalId}</Row>
+              <Row label="Correlation ID">
+                <Value v={entry.correlationId} />
+              </Row>
+            </Rows>
+          </Section>
+
+          <ChangeSection change={entry.change} />
+        </>
+      )}
+    </PanelShell>
   );
 }
