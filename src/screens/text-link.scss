@@ -1,0 +1,27 @@
+// Text link — the dashboard's inline link with an arrow ("View Moderation Logs ↗",
+// "Application › Team Members ↗"): underlined, one brand step darker on hover (the
+// base link button's hover step), focus ring for keyboard. The arrow isn't
+// underlined: text-decoration doesn't reach the SVG.
+@import '../assets/design-tokens.scss';
+
+.cc-text-link {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  border-radius: $radius-xs;
+  color: $text-brand-primary;
+  text-decoration: underline;
+  // Satoshi's default underline runs through descenders (the "p" / "y" in
+  // "API Keys") and skip-ink breaks it around them; drop it below them.
+  text-underline-offset: $spacing-xs;
+
+  &:hover {
+    color: $text-brand-secondary;
+  }
+
+  &:focus-visible {
+    box-shadow: $focus-ring;
+  }
+}

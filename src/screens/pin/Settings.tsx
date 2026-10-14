@@ -25,8 +25,8 @@ function InfoIcon() {
   return <Icon name="info" size={dim.iconXs} color={c.textQuaternary} />;
 }
 
-/** Two-column settings section: heading + copy on the left, action card right. */
-function Section({ title, desc, children, last = false }: { title: string; desc: string; children: React.ReactNode; last?: boolean }) {
+/** Two-column settings section: heading + copy on the left, action card right. Without a title, the card spans the full width. */
+export function Section({ title, desc, children, last = false }: { title?: string; desc?: string; children: React.ReactNode; last?: boolean }) {
   return (
     <section
       style={{
@@ -38,29 +38,38 @@ function Section({ title, desc, children, last = false }: { title: string; desc:
         borderBottom: last ? "none" : `1px solid ${c.borderLight}`,
       }}
     >
-      <div style={{ width: 400, flexShrink: 0, display: "flex", flexDirection: "column", gap: s.xs }}>
-        <h2 style={{ ...font.h4, fontWeight: w.semibold as unknown as number, color: c.textSecondary, margin: 0 }}>{title}</h2>
-        <p style={{ ...font.body, color: c.textTertiary, margin: 0 }}>{desc}</p>
-      </div>
-      <div
-        style={{
-          flex: 1,
-          minWidth: 0,
-          background: c.bgSecondary,
-          border: `1px solid ${c.borderDefault}`,
-          borderRadius: r["2xl"],
-          padding: s["2xl"],
-          boxSizing: "border-box",
-        }}
-      >
-        {children}
-      </div>
+      {title && (
+        <div style={{ width: 400, flexShrink: 0, display: "flex", flexDirection: "column", gap: s.xs }}>
+          <h2 style={{ ...font.h4, fontWeight: w.semibold as unknown as number, color: c.textSecondary, margin: 0 }}>{title}</h2>
+          <p style={{ ...font.body, color: c.textTertiary, margin: 0 }}>{desc}</p>
+        </div>
+      )}
+      <SettingsCard>{children}</SettingsCard>
     </section>
   );
 }
 
-/** Toggle + label + optional info/badge + supporting text. */
-function ToggleRow({ on, label, desc, info = false, badge }: { on: boolean; label: string; desc: string; info?: boolean; badge?: string }) {
+/** The settings card: gray panel, default border, 2xl radius, 20px inset. */
+export function SettingsCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        flex: 1,
+        minWidth: 0,
+        background: c.bgSecondary,
+        border: `1px solid ${c.borderDefault}`,
+        borderRadius: r["2xl"],
+        padding: s["2xl"],
+        boxSizing: "border-box",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** Toggle + label + optional info/badge + supporting text (which may hold inline links). */
+export function ToggleRow({ on, label, desc, info = false, badge }: { on: boolean; label: string; desc: React.ReactNode; info?: boolean; badge?: string }) {
   return (
     <div style={{ display: "flex", gap: s.lg, alignItems: "flex-start" }}>
       <CometChatToggle size="sm" checked={on} ariaLabel={label} />

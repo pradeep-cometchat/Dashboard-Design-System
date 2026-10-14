@@ -1,0 +1,71 @@
+// Notification Settings — layout fixes on base components, scoped to this screen.
+@import '../../assets/design-tokens.scss';
+
+// The default dropdown fills its grid column.
+.cc-notif-select .cc-select__input {
+  width: 100%;
+}
+
+// Tabs: the settings screens' segmented style — a gray track with the active tab
+// raised in white. The base tabs have no such type (closest is button-border:
+// white track, gray active), so it's restyled here; flagged to design.
+.cc-notif-tabs.cc-tabs.cc-tabs-horizontal.cc-tabs-type-button-border {
+  .ant-tabs-nav-list {
+    border-color: transparent;
+    background-color: $bg-secondary;
+  }
+
+  .ant-tabs-tab {
+    &:hover {
+      background-color: $bg-primary;
+    }
+
+    &.ant-tabs-tab-active {
+      background-color: $bg-primary;
+      box-shadow: $shadow-xs;
+    }
+  }
+}
+
+// Common Preferences card: white header with no divider under it, light card border.
+.cc-notif-collapse.cc-collapse.ant-collapse {
+  background-color: $bg-primary;
+  border-color: $border-default;
+  border-radius: $radius-xl;
+
+  > .ant-collapse-item {
+    border-bottom: none;
+
+    > .ant-collapse-header {
+      align-items: center;
+      padding: $spacing-xl $spacing-2xl;
+      color: $text-primary;
+    }
+
+    > .ant-collapse-panel,
+    > .ant-collapse-content {
+      border-top: none;
+      background-color: $bg-primary;
+    }
+  }
+}
+
+// Show / Hide legacy: the borderless pill of the tab buttons (tertiary sm —
+// 8px 12px, no border) in brand: purple text at rest, the subtle brand fill
+// only on hover. The base button has no brand-tertiary hierarchy; flagged to design.
+.cc-notif-legacy-btn.cc-button-tertiary.ant-btn.ant-btn-default {
+  border-radius: $radius-sm;
+  background-color: transparent;
+  color: $text-brand-secondary;
+  font-weight: $font-weight-medium;
+
+  &:not(:disabled):hover {
+    background-color: $bg-brand-primary;
+    color: $text-brand-secondary;
+  }
+
+  &:focus-visible:not(.ant-dropdown-open) {
+    background-color: transparent;
+    color: $text-brand-secondary;
+  }
+}

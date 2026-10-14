@@ -21,8 +21,7 @@ import CometChatButton from "components/base/Button/CometChatButton";
 import CometChatTooltip from "components/base/Tooltip/CometChatTooltip";
 import { c, s, font } from "../theme";
 import { Icon, dim } from "../pin/ui";
-// Untitled UI "arrow-up-right" — same glyph as Conversation Explorer's "View Moderation Logs" link.
-import { ArrowUpRight } from "../conversation-explorer/icons";
+import TextLink from "../TextLink";
 import { REDACTED, actionLabel, memberFor, parameterLabel, resourceLabel, sectionLabel, type AuditEvent, type Change } from "./data";
 import { ActionBadge, ActorAvatar, OutcomeBadge, RoleBadge, SourceBadge, formatDate, formatTime, viewerTimeZone } from "./cells";
 
@@ -142,18 +141,9 @@ export function Row({ label, children, labelOffset }: { label: string; children:
   );
 }
 
-/**
- * The Section value as a link to that part of the Dashboard — the dashboard's inline link
- * ("View Moderation Logs ↗" in Conversation Explorer): body medium, brand colour, arrow-up-right,
- * underlined. Colour, hover and focus come from .cc-audit-section-link in audit-logs.scss.
- */
+/** The Section value as a link to that part of the Dashboard — the shared text link. */
 export function SectionLink({ label }: { label: string }) {
-  return (
-    <button type="button" aria-label={`Open ${label}`} className="cc-audit-section-link" style={{ fontFamily: font.bodyMd.fontFamily, fontSize: font.bodyMd.fontSize, lineHeight: font.bodyMd.lineHeight, fontWeight: w.medium as unknown as number }}>
-      {label}
-      <ArrowUpRight size={dim.iconSm} />
-    </button>
-  );
+  return <TextLink ariaLabel={`Open ${label}`}>{label}</TextLink>;
 }
 
 export const CHIP_OFFSET = s.xxs; // 24px chip vs 20px label line
